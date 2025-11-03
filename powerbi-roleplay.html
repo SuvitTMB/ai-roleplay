@@ -254,7 +254,7 @@
 
                 <!-- View 2: My Customer --><div id="customer-view" class="hidden">
                     <div class="flex justify-between items-center mb-6 px-1">
-                        <h1 id="customer-view-title" class="text-xl font-bold">Wealth Customer Management Solution</h1>
+                        <h1 id="customer-view-title" class="text-lg font-bold">Wealth Customer Management Solution</h1>
                         <div class="customer-nav flex items-center space-x-2">
                             <a href="#" data-tab="profile" class="px-4 py-2 text-sm font-semibold text-white bg-[#0056ff] rounded-md">Customer Profile</a>
                             <a href="#" data-tab="asset" class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md">Asset Movement</a>
@@ -271,11 +271,14 @@
                         <div id="asset-content" class="customer-tab-content hidden bg-white p-2 rounded-lg shadow-sm border"><img src="" alt="Asset Movement Chart" class="w-full h-auto rounded-md"></div>
                         <div id="account-content" class="customer-tab-content hidden bg-white p-4 rounded-lg shadow-sm border">
                             <div class="account-management-nav flex justify-center space-x-2 mb-4 p-2 bg-gray-100 rounded-lg">
-                                <button data-subtab="theme" class="px-4 py-2 text-sm font-semibold rounded-md bg-gray-300 text-gray-500 cursor-not-allowed" disabled>Theme Trigger</button>
+                                <!-- (1) Enabled Button: Theme Trigger -->
+                                <button data-subtab="theme" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">Theme Trigger</button>
                                 <button data-subtab="lifestyle" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">Customer Lifestyle</button>
-                                <button data-subtab="use" class="px-4 py-2 text-sm font-semibold rounded-md bg-gray-300 text-gray-500 cursor-not-allowed" disabled>ฉลาดใช้</button>
+                                <!-- (2) Enabled Button: ฉลาดใช้ -->
+                                <button data-subtab="use" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">ฉลาดใช้</button>
                                 <button data-subtab="invest" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">ฉลาดออม และลงทุน</button>
-                                <button data-subtab="protect" class="px-4 py-2 text-sm font-semibold rounded-md bg-gray-300 text-gray-500 cursor-not-allowed" disabled>คุ้มครองที่อุ่นใจ</button>
+                                <!-- (3) Enabled Button: คุ้มครองที่อุ่นใจ -->
+                                <button data-subtab="protect" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">คุ้มครองที่อุ่นใจ</button>
                                 <button data-subtab="loan" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">รอบรู้กู้ยืม</button>
                             </div>
                             <div id="theme-subcontent" class="account-sub-content hidden"><img src="" alt="Theme Trigger Image" class="w-full h-auto rounded-md"></div>
@@ -441,28 +444,86 @@
                 "E": "./images/CustomerE.jpg",
             },
             roleplay: {
-                transcript: "./images/transcript.png'",
+                transcript: "./images/transcript.png",
                 evaluation: "./images/evaluation.png",
             },
-            mainDashboardKPIs: "./images/UI_PowerBI1.png",
-            viewReport: "./images/ui.png",
-            viewReport: "https://placehold.co/1200x1800/e2e8f0/4a5563?text=Scrollable+Report+Image",
-            viewReport2: "https://placehold.co/1200x1800/fff7ed/ea580c?text=Scrollable+Report+2+Image",
+            mainDashboardKPIs: "./images/page-1.jpg",
+            viewReport: "./images/transcript.png",
+            viewReport: "./images/evaluation.png",
+            viewReport2: "./images/transcript.png",
             customerTabs: {
-                "A": { profile: "./images/p-21.png", asset: "https://placehold.co/1200x600/FFFFFF/4A5568?text=Customer+A+-+Asset", account: "https://placehold.co/1200x600/FFFFFF/4A5568?text=Customer+A+-+Account", kys: "https://placehold.co/1200x600/FFFFFF/4A5568?text=Customer+A+-+KYS" },
-                "B": { profile: "https://placehold.co/1200x600/fdf4ff/701a75?text=Customer+B+-+Profile", asset: "https://placehold.co/1200x600/fdf4ff/701a75?text=Customer+B+-+Asset", account: "https://placehold.co/1200x600/fdf4ff/701a75?text=Customer+B+-+Account", kys: "https://placehold.co/1200x600/fdf4ff/701a75?text=Customer+B+-+KYS" },
-                "C": { profile: "https://placehold.co/1200x600/fefce8/854d0e?text=Customer+C+-+Profile", asset: "https://placehold.co/1200x600/fefce8/854d0e?text=Customer+C+-+Asset", account: "https://placehold.co/1200x600/fefce8/854d0e?text=Customer+C+-+Account", kys: "https://placehold.co/1200x600/fefce8/854d0e?text=Customer+C+-+KYS" },
-                "D": { profile: "./images/p-51.jpg", asset: "https://placehold.co/1200x600/f0fdf4/166534?text=Customer+D+-+Asset", account: "https://placehold.co/1200x600/f0fdf4/166534?text=Customer+D+-+Account", kys: "https://placehold.co/1200x600/f0fdf4/166534?text=Customer+D+-+KYS" },
-                "E": { profile: "./images/p-51.jpg", asset: "https://placehold.co/1200x600/eef2ff/312e81?text=Customer+E+-+Asset", account: "https://placehold.co/1200x600/eef2ff/312e81?text=Customer+E+-+Account", kys: "https://placehold.co/1200x600/eef2ff/312e81?text=Customer+E+-+KYS" },
+                "A": { 
+                    profile: "./images/w1/W1-profile.jpg", 
+                    asset: "./images/w1/W1-AssetMovement.jpg", 
+                    account: "./images/w1/W1-AssetMovement.jpg", 
+                    kys: "./images/w1/W1-4ผลตอบรับ.jpg",
+                    accountManagement: {
+                        theme: "./images/w1/W1-3.1Account.jpg",
+                        lifestyle: "./images/w1/W1-3.2Lifestyle.jpg", // Kept specific lifestyle image
+                        use: "./images/w1/W1-3.3ฉลาดใช้.jpg",
+                        invest: "./images/w1/W1-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
+                        protect: "./images/w1/W1-3.5คุ้มครองที่อุ่นใจ.jpg",
+                        loan: "./images/w1/W1-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
+                    }
+                },
+                "B": { 
+                    profile: "./images/w2/W2-1Customer Profile.jpg", 
+                    asset: "./images/w2/W2-2AssetMovement.jpg", 
+                    account: "./images/w2/W2-AssetMovement.jpg", 
+                    kys: "./images/w2/W2-4ผลตอบรับ.jpg",
+                    accountManagement: {
+                        theme: "./images/w2/W2-3.1Account.jpg",
+                        lifestyle: "./images/w2/W2-3.2Lifestyle.jpg", // Kept specific lifestyle image
+                        use: "./images/w2/W2-3.3ฉลาดใช้.jpg",
+                        invest: "./images/w2/W2-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
+                        protect: "./images/w2/W2-3.5คุ้มครองที่อุ่นใจ.jpg",
+                        loan: "./images/w2/W2-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
+                    }
+                },
+                "C": { 
+                    profile: "./images/w3/W3-1Customer Profile.jpg", 
+                    asset: "./images/w3/W3-2AssetMovement.jpg", 
+                    account: "./images/w3/W3-AssetMovement.jpg", 
+                    kys: "./images/w3/W3-4ผลตอบรับ.jpg",
+                    accountManagement: {
+                        theme: "./images/w3/W3-3.1Account.jpg",
+                        lifestyle: "./images/w3/W3-3.2Lifestyle.jpg", // Kept specific lifestyle image
+                        use: "./images/w3/W3-3.3ฉลาดใช้.jpg",
+                        invest: "./images/w3/W3-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
+                        protect: "./images/w3/W3-3.5คุ้มครองที่อุ่นใจ.jpg",
+                        loan: "./images/w3/W3-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
+                    }
+                },
+                "D": { 
+                    profile: "./images/w4/W4-1Customer Profile.jpg", 
+                    asset: "./images/w4/W4-2AssetMovement.jpg", 
+                    account: "./images/w4/W4-AssetMovement.jpg", 
+                    kys: "./images/w4/W4-4ผลตอบรับ.jpg",
+                    accountManagement: {
+                        theme: "./images/w4/W4-3.1Account.jpg",
+                        lifestyle: "./images/w4/W4-3.2Lifestyle.jpg", // Kept specific lifestyle image
+                        use: "./images/w4/W4-3.3ฉลาดใช้.jpg",
+                        invest: "./images/w4/W4-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
+                        protect: "./images/w4/W4-3.5คุ้มครองที่อุ่นใจ.jpg",
+                        loan: "./images/w4/W4-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
+                    }
+                },
+                "E": { 
+                    profile: "./images/w5/W5-1Customer Profile.jpg", 
+                    asset: "./images/w5/W5-2AssetMovement.jpg", 
+                    account: "./images/w5/W5-AssetMovement.jpg", 
+                    kys: "./images/w5/W5-4ผลตอบรับ.jpg",
+                    accountManagement: {
+                        theme: "./images/w5/W5-3.1Account.jpg",
+                        lifestyle: "./images/w5/W5-3.2Lifestyle.jpg", // Kept specific lifestyle image
+                        use: "./images/w5/W5-3.3ฉลาดใช้.jpg",
+                        invest: "./images/w5/W5-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
+                        protect: "./images/w5/W5-3.5คุ้มครองที่อุ่นใจ.jpg",
+                        loan: "./images/w5/W5-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
+                    }
+                },
             },
-            accountManagementTabs: {
-                theme: "https://placehold.co/1200x400/fff7ed/c2410c?text=Theme+Trigger",
-                lifestyle: "./images/p-31.jpg",
-                use: "https://placehold.co/1200x400/ecfdf5/16a34a?text=ฉลาดใช้",
-                invest: "./images/p-33.jpg",
-                protect: "https://placehold.co/1200x400/fff1f2/db2777?text=คุ้มครองที่อุ่นใจ",
-                loan: "./images/p-36.jpg",
-            }
+            /* (4) Removed the static accountManagementTabs object from here */
         };
 
         let currentCustomer = null;
@@ -844,20 +905,22 @@
             mainHeaderTitle.textContent = `My Customer - ${currentCustomer.name}`;
             setActiveNav(navMyCustomer);
             
-            document.getElementById('customer-view-title').textContent = `Customer Details: ${currentCustomer.name}`;
+            document.getElementById('customer-view-title').textContent = `Wealth Customer Management Solution`;
             
             // Set main tab images
             document.querySelector('#profile-content img').src = imagePaths.customerTabs[customerId].profile;
             document.querySelector('#asset-content img').src = imagePaths.customerTabs[customerId].asset;
             document.querySelector('#kys-content img').src = imagePaths.customerTabs[customerId].kys;
             
+            // (5) Updated logic to pull customer-specific sub-tab images
             // Set account management sub-tab images
-            document.querySelector('#theme-subcontent img').src = imagePaths.accountManagementTabs.theme;
-            document.querySelector('#lifestyle-subcontent img').src = imagePaths.accountManagementTabs.lifestyle;
-            document.querySelector('#use-subcontent img').src = imagePaths.accountManagementTabs.use;
-            document.querySelector('#invest-subcontent img').src = imagePaths.accountManagementTabs.invest;
-            document.querySelector('#protect-subcontent img').src = imagePaths.accountManagementTabs.protect;
-            document.querySelector('#loan-subcontent img').src = imagePaths.accountManagementTabs.loan;
+            const customerSubImages = imagePaths.customerTabs[customerId].accountManagement;
+            document.querySelector('#theme-subcontent img').src = customerSubImages.theme;
+            document.querySelector('#lifestyle-subcontent img').src = customerSubImages.lifestyle;
+            document.querySelector('#use-subcontent img').src = customerSubImages.use;
+            document.querySelector('#invest-subcontent img').src = customerSubImages.invest;
+            document.querySelector('#protect-subcontent img').src = customerSubImages.protect;
+            document.querySelector('#loan-subcontent img').src = customerSubImages.loan;
 
 
             const firstTabLink = document.querySelector('.customer-nav a[data-tab="profile"]');
@@ -879,11 +942,11 @@
                 customerView.querySelectorAll('.customer-tab-content').forEach(tab => {
                     tab.classList.toggle('hidden', tab.id !== `${targetTab}-content`);
                 });
-                // If account tab is selected, default to the second sub-tab
+                // (6) Default to the first button ("theme") since it's now enabled
                 if(targetTab === 'account') {
                     // Use setTimeout to allow the DOM to update before clicking
                     setTimeout(() => {
-                        document.querySelector('.account-management-nav button[data-subtab="lifestyle"]').click();
+                        document.querySelector('.account-management-nav button[data-subtab="theme"]').click();
                     }, 0);
                 }
             });
@@ -925,4 +988,6 @@
 
 </body>
 </html>
+
+
 

@@ -3,991 +3,598 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wealth Customer Management Solution</title>
-    <!-- Tailwind CSS for styling --><script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons for UI icons --><script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
-    <!-- Google Fonts --><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>AI Sales Voice Roleplay Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            font-family: 'Sarabun', 'Inter', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        .lightbox {
-            transition: opacity 0.3s ease-in-out;
-        }
-        button, .customer-nav a, .account-management-nav button {
-            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
+            font-family: 'Kanit', sans-serif;
             background-color: #f1f5f9;
+            color: #1e293b;
+            padding-top: 64px; 
         }
-        /* Persona Button Styles */
-        .persona-btn {
-            border: 1px solid #FDE8D7;
-            background-color: white;
-            color: #C08252;
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            font-weight: 500;
-            cursor: pointer;
+        .font-inter {
+            font-family: 'Inter', sans-serif;
         }
-        .persona-btn.selected-persona {
-            background-color: #FDE8D7;
-            border-color: #F9C093;
-            color: #A0643A;
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
+        }
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
             font-weight: 600;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
-        #customer-details-table td {
-            vertical-align: middle;
+        .btn-primary:hover:not(:disabled) {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
-        .max-w-4xl { max-width: 60rem;}
-        .max-w-2xl { max-width: 60rem !important;}
-        
-        /* Soundwave Animation */
-        .sound-wave {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            border: 2px solid rgba(234, 179, 8, 0.5);
-            width: 100%;
-            height: 100%;
-            animation: pulse 2s infinite ease-out;
+        .btn-primary:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: none;
         }
-        .sound-wave:nth-child(2) {
-            animation-delay: 0.5s;
+        .btn-secondary {
+            background-color: #475569;
+            color: white;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
         }
-        .sound-wave:nth-child(3) {
-            animation-delay: 1s;
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #334155;
+             transform: translateY(-2px);
         }
-
-        @keyframes pulse {
-            0% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0.6;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1.5);
-                opacity: 0;
-            }
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
         }
+        .chat-bubble {
+            max-width: 75%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+        }
+        .user-bubble {
+            background-color: #2563eb;
+            color: white;
+            border-bottom-right-radius: 0.25rem;
+        }
+        .ai-bubble {
+            background-color: #e2e8f0;
+            color: #1e293b;
+            border-bottom-left-radius: 0.25rem;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-white text-gray-800">
+<body class="text-gray-800">
 
-    <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar --><aside id="sidebar" class="w-64 bg-gray-50 flex-shrink-0 flex flex-col border-r transition-all duration-300">
-            <!-- Sidebar Header --><div class="h-[61px] flex items-center justify-between px-4 border-b flex-shrink-0">
-                <h2 id="sidebar-title" class="text-lg font-semibold text-gray-700">Pages</h2>
-                <button id="toggleSidebarBtn" class="text-gray-500 hover:text-gray-800">
-                    <i id="collapse-icon" data-lucide="chevrons-left" class="w-5 h-5"></i>
-                    <i id="expand-icon" data-lucide="chevrons-right" class="w-5 h-5 hidden"></i>
-                </button>
+    <!-- Login View -->
+    <div id="login-view" class="fixed inset-0 bg-slate-100 flex items-center justify-center z-[100] transition-opacity duration-300">
+        <div class="w-full max-w-md p-8 bg-white rounded-2xl shadow-2xl">
+            <div class="text-center">
+                 <i class="fas fa-brain text-5xl text-blue-600"></i>
+                <h2 class="mt-4 text-3xl font-bold text-slate-800">SalesSim Login</h2>
+                <p class="text-slate-500 mb-8">กรุณากรอกข้อมูลเพื่อเข้าสู่ระบบ</p>
             </div>
-            <!-- Navigation --><nav class="flex-1 overflow-y-auto custom-scrollbar sidebar-nav">
-                <ul class="py-2">
-                    <li id="navMyPortfolio"><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm bg-gray-200 text-gray-900 font-semibold border-l-4 border-blue-600"><i data-lucide="home" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text">My Portfolio</span></a></li>
-                    <li id="navMyCustomer"><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="users" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text">My Customer</span></a></li>
-                    <li><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="activity" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text">My Activity</span></a></li>
-                    <li><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="trending-up" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text">Maturity Leads</span></a></li>
-                    <li><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="alert-triangle" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text truncate">My Alert! Deposit Attrition</span></a></li>
-                    <li><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="alert-circle" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text truncate">My Alert! ทำธุรกรรมกองทุน</span></a></li>
-                    <li><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="file-text" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text">In-depth KYC</span></a></li>
-                    <li><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="bar-chart-2" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text">KPI</span></a></li>
-                    <li><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="layout-dashboard" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text truncate">Wealth AUM Daily Dashboard</span></a></li>
-                </ul>
-            </nav>
-        </aside>
-
-        <!-- Main Content --><div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Top Header --><header class="bg-white shadow-sm px-6 h-[61px] flex justify-between items-center z-10 flex-shrink-0 border-b">
-                <div class="flex items-center text-sm"><span id="mainHeaderTitle" class="text-lg font-semibold">My Portfolio</span></div>
-                <div class="flex items-center space-x-4">
-                    <span id="data-updated-span" class="text-xs text-gray-500"></span>
-                    <div class="relative"><i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i><input type="text" placeholder="Search" class="pl-9 pr-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"></div>
-                    <button class="text-gray-600 hover:text-blue-600"><i data-lucide="settings" class="w-5 h-5"></i></button>
-                    <button class="text-gray-600 hover:text-blue-600"><i data-lucide="help-circle" class="w-5 h-5"></i></button>
-                    <button class="text-gray-600 hover:text-blue-600"><i data-lucide="user-circle-2" class="w-5 h-5"></i></button>
+            <div class="space-y-4">
+                <div>
+                    <label for="employee-id" class="block text-sm font-medium text-slate-600">รหัสพนักงาน</label>
+                    <input type="text" id="employee-id" class="mt-1 block w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 12345">
                 </div>
-            </header>
-
-            <!-- Content Area --><main class="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-100">
-                <!-- View 1: My Portfolio --><div id="portfolio-view">
-                    <div class="flex justify-between items-center mb-6 px-1">
-                        <h1 class="text-xl font-bold">Wealth Customer Management Solution</h1>
-                        <div class="flex items-center space-x-2">
-                            <button class="px-4 py-2 text-sm font-semibold bg-blue-600 text-white rounded-md hover:bg-blue-700">รายชื่อลูกค้า</button>
-                            <button id="exportFileBtn" class="px-4 py-2 text-sm font-semibold bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center"><i data-lucide="file-down" class="w-4 h-4 mr-2"></i> Export File</button>
-                        </div>
-                    </div>
-                    <div class="flex flex-wrap -mx-3">
-                        <div class="w-full px-3">
-                            <div class="flex flex-col space-y-6">
-                               <div class="bg-white p-2 rounded-lg shadow-sm border"><img id="main-dashboard-kpi-img" src="" alt="UI PowerBI KPIs" class="w-full h-auto rounded-md"></div>
-                               <!-- Customer Details Table --><div id="customer-details-table" class="bg-white p-2 rounded-lg shadow-sm border">
-                                    <div class="flex flex-wrap gap-2 p-2 mb-4">
-                                        <button class="px-4 py-2 text-sm font-semibold text-white bg-red-700 rounded-md hover:bg-red-800">รายชื่อ Do Not Contact</button>
-                                        <button class="px-4 py-2 text-sm font-semibold bg-orange-100 text-orange-800 rounded-md hover:bg-orange-200">อัพเดทประวัติเดือน คลิก</button>
-                                        <button class="px-4 py-2 text-sm font-semibold bg-orange-100 text-orange-800 rounded-md hover:bg-orange-200">ปรับตาม ttb WOW คลิก</button>
-                                        <button class="px-4 py-2 text-sm font-semibold bg-orange-100 text-orange-800 rounded-md hover:bg-orange-200">ปรับตาม HWC ใหม่ คลิก</button>
-                                        <button class="px-4 py-2 text-sm font-semibold bg-orange-100 text-orange-800 rounded-md hover:bg-orange-200">ปรับตาม Filter คลิก</button>
-                                        <button class="px-4 py-2 text-sm font-semibold bg-orange-100 text-orange-800 rounded-md hover:bg-orange-200">ปรับตาม W1-W5 คลิก</button>
-                                    </div>
-                                    <div class="overflow-x-auto">
-                                        <table class="min-w-full divide-y divide-gray-200">
-                                            <thead class="bg-gray-50">
-                                                <tr>
-                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><div class="flex items-center">Customer ID <i data-lucide="arrow-down-up" class="w-3 h-3 ml-1"></i></div></th>
-                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><div class="flex items-center">ชื่อลูกค้า <i data-lucide="arrow-down-up" class="w-3 h-3 ml-1"></i></div></th>
-                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Group</th>
-                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wealth Sub Segment</th>
-                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tier Loyalty</th>
-                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">H W C ลูกค้า 2024</th>
-                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">H W C ลูกค้า 2025</th>
-                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wealth</th>
-                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Segment</th>
-                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200">
-                                                <tr class="hover:bg-gray-50">
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0011000...</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 max-w-[10ch] truncate">Customer A</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">G2 Wealth Bank</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm p-1"><span class="block w-full text-center px-2 py-1 text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">W1</span></td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">BASIC</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">Y</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">HNW</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium"><button class="view-profile-btn w-full px-2 py-1 text-xs font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700" data-customer-id="A">View Profile</button></td>
-                                                </tr>
-                                                <tr class="bg-gray-50 hover:bg-gray-100">
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0011000...</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 max-w-[10ch] truncate">Customer B</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">G3 Prospect Wealth</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm p-1"><span class="block w-full text-center px-2 py-1 text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">W2</span></td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">BASIC</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">4.COLD_TXN</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">N</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">UAF</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium"><button class="view-profile-btn w-full px-2 py-1 text-xs font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700" data-customer-id="B">View Profile</button></td>
-                                                </tr>
-                                                <tr class="hover:bg-gray-50">
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0011000...</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 max-w-[10ch] truncate">Customer C</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">G2 Wealth Bank</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm p-1"><span class="block w-full text-center px-2 py-1 text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">W3</span></td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">GOLD</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">4.COLD_TXN</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">Y</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">UAF</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium"><button class="view-profile-btn w-full px-2 py-1 text-xs font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700" data-customer-id="C">View Profile</button></td>
-                                                </tr>
-                                                <tr class="bg-gray-50 hover:bg-gray-100">
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0011000...</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 max-w-[10ch] truncate">Customer D</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">G2 Wealth Bank</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm p-1"><span class="block w-full text-center px-2 py-1 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">W4</span></td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">SILVER</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">N</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">UAF</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium"><button class="view-profile-btn w-full px-2 py-1 text-xs font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700" data-customer-id="D">View Profile</button></td>
-                                                </tr>
-                                                <tr class="hover:bg-gray-50">
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0011000...</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 max-w-[10ch] truncate">Customer E</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">G2 Wealth Bank</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm p-1"><span class="block w-full text-center px-2 py-1 text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">W5</span></td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">GOLD</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">1.SUPER_HOT</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">1.SUPER_HOT</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">Y</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">HNW_Not Verified</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium"><button class="view-profile-btn w-full px-2 py-1 text-xs font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700" data-customer-id="E">View Profile</button></td>
-                                                </tr>
-                                                <tr class="bg-gray-50 hover:bg-gray-100">
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0011000...</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 max-w-[10ch] truncate">Customer F</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">G2 Wealth Bank</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm p-1"><span class="block w-full text-center px-2 py-1 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">W4</span></td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">SILVER</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">2.HOT</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">N</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">UAF</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium"><button class="w-full px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-300 rounded-md cursor-not-allowed" disabled>View Profile</button></td>
-                                                </tr>
-                                                <tr class="hover:bg-gray-50">
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0011000...</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 max-w-[10ch] truncate">Customer G</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">G2 Wealth Bank</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm p-1"><span class="block w-full text-center px-2 py-1 text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">W1</span></td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">BASIC</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">N</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">MI</td>
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium"><button class="w-full px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-300 rounded-md cursor-not-allowed" disabled>View Profile</button></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                               </div>
-                            </div>
-                        </div>
-                    </div>
+                 <div>
+                    <label for="employee-name" class="block text-sm font-medium text-slate-600">ชื่อ-นามสกุล</label>
+                    <input type="text" id="employee-name" class="mt-1 block w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., สมชาย ชาญชัย">
                 </div>
-
-                <!-- View 2: My Customer --><div id="customer-view" class="hidden">
-                    <div class="flex justify-between items-center mb-6 px-1">
-                        <h1 id="customer-view-title" class="text-lg font-bold">Wealth Customer Management Solution</h1>
-                        <div class="customer-nav flex items-center space-x-2">
-                            <a href="#" data-tab="profile" class="px-4 py-2 text-sm font-semibold text-white bg-[#0056ff] rounded-md">Customer Profile</a>
-                            <a href="#" data-tab="asset" class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md">Asset Movement</a>
-                            <a href="#" data-tab="account" class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md">Account Management</a>
-                            <a href="#" data-tab="kys" class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md">ผลตอบรับ In Depth KYS</a>
-                            <button id="prompobBtn" class="flex items-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-yellow-900 to-amber-800 hover:from-yellow-800 hover:to-amber-700 rounded-md shadow-md">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2 fill-current"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/><path d="M20 2L20.9 4.08L23 4.54L21.5 5.97L21.82 8.04L20 7.02L18.18 8.04L18.5 5.97L17 4.54L19.1 4.08L20 2Z" fill="currentColor"/></svg>
-                                พร้อมพบ
-                            </button>
-                        </div>
-                    </div>
-                    <div class="w-full px-1">
-                        <div id="profile-content" class="customer-tab-content bg-white p-2 rounded-lg shadow-sm border"><img src="" alt="Customer Profile Details" class="w-full h-auto rounded-md"></div>
-                        <div id="asset-content" class="customer-tab-content hidden bg-white p-2 rounded-lg shadow-sm border"><img src="" alt="Asset Movement Chart" class="w-full h-auto rounded-md"></div>
-                        <div id="account-content" class="customer-tab-content hidden bg-white p-4 rounded-lg shadow-sm border">
-                            <div class="account-management-nav flex justify-center space-x-2 mb-4 p-2 bg-gray-100 rounded-lg">
-                                <!-- (1) Enabled Button: Theme Trigger -->
-                                <button data-subtab="theme" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">Theme Trigger</button>
-                                <button data-subtab="lifestyle" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">Customer Lifestyle</button>
-                                <!-- (2) Enabled Button: ฉลาดใช้ -->
-                                <button data-subtab="use" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">ฉลาดใช้</button>
-                                <button data-subtab="invest" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">ฉลาดออม และลงทุน</button>
-                                <!-- (3) Enabled Button: คุ้มครองที่อุ่นใจ -->
-                                <button data-subtab="protect" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">คุ้มครองที่อุ่นใจ</button>
-                                <button data-subtab="loan" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">รอบรู้กู้ยืม</button>
-                            </div>
-                            <div id="theme-subcontent" class="account-sub-content hidden"><img src="" alt="Theme Trigger Image" class="w-full h-auto rounded-md"></div>
-                            <div id="lifestyle-subcontent" class="account-sub-content"><img src="" alt="Lifestyle Image" class="w-full h-auto rounded-md"></div>
-                            <div id="use-subcontent" class="account-sub-content hidden"><img src="" alt="Use Image" class="w-full h-auto rounded-md"></div>
-                            <div id="invest-subcontent" class="account-sub-content hidden"><img src="" alt="Invest Image" class="w-full h-auto rounded-md"></div>
-                            <div id="protect-subcontent" class="account-sub-content hidden"><img src="" alt="Protect Image" class="w-full h-auto rounded-md"></div>
-                            <div id="loan-subcontent" class="account-sub-content hidden"><img src="" alt="Loan Image" class="w-full h-auto rounded-md"></div>
-                        </div>
-                        <div id="kys-content" class="customer-tab-content hidden bg-white p-2 rounded-lg shadow-sm border"><img src="" alt="In Depth KYS Feedback" class="w-full h-auto rounded-md"></div>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </div>
-
-    <!-- Standard Lightboxes --><div id="imageLightbox" class="lightbox fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 p-4"><div class="relative"><button id="closeLightboxBtn" class="absolute -top-3 -right-3 text-white bg-gray-800 rounded-full p-1 hover:bg-gray-700"><i data-lucide="x" class="w-6 h-6"></i></button><img src="" alt="Roleplay Image" class="max-w-full max-h-[90vh] rounded-lg shadow-lg"></div></div>
-    <div id="exportFileLightbox" class="lightbox fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 p-4"><div class="relative"><button id="closeExportLightboxBtn" class="absolute -top-3 -right-3 text-white bg-gray-800 rounded-full p-1 hover:bg-gray-700"><i data-lucide="x" class="w-6 h-6"></i></button><img src="" alt="Export File Image" class="max-w-full max-h-[90vh] rounded-lg shadow-lg"></div></div>
-    <div id="viewReportLightbox" class="lightbox fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[70] p-4">
-        <div class="bg-white rounded-2xl shadow-lg w-full max-w-4xl h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center p-4 border-b">
-                <h3 class="text-xl font-bold text-gray-800">View Report</h3>
-                <button id="closeViewReportBtn" class="bg-gray-300 hover:bg-gray-400 p-1 rounded-full"><i data-lucide="x" class="w-6 h-6"></i></button>
-            </div>
-            <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
-                <img id="viewReportImg" src="" alt="Report" class="w-full h-auto">
-            </div>
-            <div class="p-4 mt-auto border-t flex justify-end">
-                <button id="closeViewReportBtn2" class="py-2 px-4 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Close</button>
+                <button id="login-btn" class="w-full btn-primary py-3 px-4 rounded-lg text-base">เข้าสู่ระบบ</button>
             </div>
         </div>
     </div>
 
-    <!-- Persona View Report Lightbox --><div id="personaReportLightbox" class="lightbox fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-[60] p-4">
-        <div class="bg-white rounded-2xl shadow-lg w-full max-w-4xl h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center p-4 border-b">
-                <h3 class="text-xl font-bold text-gray-800">View Report</h3>
-                <button id="closePersonaReportBtn" class="bg-gray-300 hover:bg-gray-400 p-1 rounded-full"><i data-lucide="x" class="w-6 h-6"></i></button>
+    <!-- Main View: Customer Selection -->
+    <main id="main-content" class="container mx-auto p-4 md:p-8 hidden">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">AI Sales Voice Roleplay Simulator</h1>
+            <p class="text-lg text-slate-600 mt-2">เลือกโปรไฟล์ลูกค้าเพื่อเริ่มการสนทนาจำลอง</p>
+        </header>
+        <div id="customer-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
+            <!-- Customer cards will be injected here by JavaScript -->
+        </div>
+    </main>
+
+    <!-- Roleplay View -->
+    <div id="roleplay-view" class="hidden fixed inset-0 h-screen w-screen flex flex-col bg-white z-50">
+        <!-- Header -->
+        <div class="p-4 md:p-6 border-b border-slate-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <button id="back-to-list-btn" class="btn-secondary py-2 px-4 !rounded-lg flex items-center gap-2">
+                        <i class="fas fa-arrow-left"></i>
+                        กลับไป
+                    </button>
+                    <button id="show-roleplay-info-btn" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors">
+                        <i class="fas fa-info-circle"></i>
+                        ข้อมูลลูกค้า
+                    </button>
+                    <button id="end-chat-btn" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors disabled:bg-red-300 disabled:cursor-not-allowed">
+                        <i class="fas fa-flag-checkered"></i>
+                        จบการสนทนา
+                    </button>
+                </div>
+                <div id="roleplay-customer-profile" class="flex items-center gap-4">
+                    <!-- Profile info will be injected here -->
+                </div>
             </div>
-            <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
-                <img src="" id="personaReportImg" alt="Report" class="w-full h-auto">
-            </div>
-            <div class="p-4 mt-auto border-t flex justify-end">
-                <button id="personaReportCloseBtnBottom" class="py-2 px-4 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Close</button>
-            </div>
+        </div>
+        
+        <!-- Conversation Context -->
+        <div id="conversation-context" class="p-3 bg-blue-50 border-b border-blue-200 text-sm text-blue-800">
+            <!-- Context will be injected here -->
+        </div>
+
+        <!-- Chat Area -->
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar bg-slate-50">
+            <!-- Chat messages will be appended here -->
+        </div>
+
+        <!-- Input Controls (Voice Version) -->
+        <div class="p-4 border-t border-slate-200 flex flex-col items-center justify-center gap-4">
+            <button id="mic-btn" class="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white rounded-full w-20 h-20 flex items-center justify-center text-3xl transition-all duration-300 shadow-lg">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <p id="status-indicator" class="text-slate-500 text-sm h-5">แตะไมโครโฟนเพื่อเริ่มพูด</p>
         </div>
     </div>
     
-    <!-- Evaluation Report Lightbox --><div id="evaluationReportLightbox" class="lightbox fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden z-[70] p-4">
-        <div class="bg-white rounded-2xl shadow-lg w-full max-w-4xl h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center p-4 border-b">
-                <h3 class="text-xl font-bold text-gray-800">View Report</h3>
-                <button id="closeEvaluationReportBtn" class="bg-gray-300 hover:bg-gray-400 p-1 rounded-full"><i data-lucide="x" class="w-6 h-6"></i></button>
-            </div>
-            <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
-                <img id="evaluationReportImg" src="" alt="Evaluation Report" class="w-full h-auto">
-            </div>
+    <!-- Modals -->
+    <div id="info-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-backdrop">
+        <div class="card p-8 max-w-2xl w-full mx-4 relative text-slate-700 flex flex-col">
+             <div id="info-modal-content"></div>
+             <div class="mt-8 text-center">
+                 <button onclick="closeInfoModal()" class="btn-secondary py-2 px-6">ปิด</button>
+             </div>
         </div>
     </div>
 
-    <!-- Prompob (AI) Lightbox - Step 1: Persona Selection --><div id="prompobLightbox" class="lightbox fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-[#FFFBF7] rounded-2xl shadow-lg w-full max-w-2xl max-h-[95vh] flex flex-col">
-            <div class="flex justify-between items-center p-4 border-b border-orange-200">
-                <h3 class="text-xl font-bold" style="color: #A0643A;"><span class="text-2xl mr-2">✨</span>พร้อมพบ</h3>
-                <div class="flex items-center space-x-2">
-                    <button id="personaViewReportBtn" class="px-4 py-1.5 text-sm font-semibold bg-orange-100 text-orange-800 rounded-full hover:bg-orange-200 flex items-center"><i data-lucide="bar-chart-3" class="w-4 h-4 mr-2"></i>View Report</button>
-                    <button id="closePrompobLightboxBtn" class="bg-gray-300 hover:bg-gray-400 p-1 rounded-full"><i data-lucide="x" class="w-6 h-6"></i></button>
-                </div>
+    <div id="evaluation-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-backdrop">
+        <div class="card p-8 max-w-2xl w-full mx-4 relative" style="max-width: 80% !important;">
+            <h2 class="text-3xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">ผลการประเมิน</h2>
+            <div id="evaluation-content" class="space-y-6"></div>
+            <div class="text-center mt-8">
+                <button onclick="closeEvaluationModalAndReset()" class="btn-primary py-2 px-6">ปิด</button>
             </div>
-            <div id="persona-selection-content" class="p-6 overflow-y-auto custom-scrollbar">
-                <div class="bg-white p-8 rounded-lg shadow-inner-lg" style="box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);">
-                    <p id="persona-customer-name" class="text-center text-lg font-bold text-orange-900 mb-2"></p>
-                    <p class="text-center text-lg font-medium text-orange-900 mb-8">Please choose your "Wealth Customer Persona"</p>
-                    <div class="space-y-6">
-                        <div><p class="font-semibold text-gray-700 mb-2">Gender</p><div class="grid grid-cols-2 gap-4 persona-group" data-group="gender"><button class="persona-btn" data-value="male">Male</button><button class="persona-btn" data-value="female">Female</button></div></div>
-                        <div><p class="font-semibold text-gray-700 mb-2">Wealth Sub-Segment</p><div class="grid grid-cols-5 gap-3 persona-group" data-group="wealth"><button class="persona-btn" data-value="w1">W1</button><button class="persona-btn" data-value="w2">W2</button><button class="persona-btn" data-value="w3">W3</button><button class="persona-btn" data-value="w4">W4</button><button class="persona-btn" data-value="w5">W5</button></div></div>
-                        <div><p class="font-semibold text-gray-700 mb-2">Risk</p><div class="grid grid-cols-3 gap-3 persona-group" data-group="risk"><button class="persona-btn" data-value="pure-deposit">Pure Deposit</button><button class="persona-btn" data-value="low-risk">Low Risk</button><button class="persona-btn" data-value="medium-to-high-risk">Medium to High Risk</button></div></div>
-                        <div><p class="font-semibold text-gray-700 mb-2">Personality Type</p><div class="grid grid-cols-4 gap-3 persona-group" data-group="personality"><button class="persona-btn" data-value="goal">เป้าประสงค์</button><button class="persona-btn" data-value="star">หนึ่งดารา</button><button class="persona-btn" data-value="road">ถนอมจิต</button><button class="persona-btn" data-value="calculate">คิดคำนวณ</button></div></div>
-                        <div><p class="font-semibold text-gray-700 mb-2">Children</p><div class="grid grid-cols-2 gap-4 persona-group" data-group="children"><button class="persona-btn" data-value="yes">Yes</button><button class="persona-btn" data-value="no">No</button></div></div>
-                    </div>
-                </div>
-            </div>
-            <div class="p-6 mt-auto border-t border-orange-200 flex items-center space-x-4">
-                <button id="closePrompobBtnBottom" class="w-full py-3 px-4 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Close</button>
-                <button id="personaNextBtn" class="w-full text-white font-bold py-3 px-4 rounded-lg shadow-md" style="background-color: #A0643A;">Next</button>
-            </div>
+             <button onclick="closeEvaluationModalAndReset()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800 text-2xl">&times;</button>
         </div>
     </div>
+    
+    <script>
+        const customers = [
+            { id: 1, name: 'สมชาย เกียรติสกุล', age: 62, gender: 'male', image: 'https://i.imgur.com/r6p6JjY.png', title: 'Senior Business Owner', segment: 'Platinum', riskAppetite: 'Conservative', details: {'Suitability Score': '1', 'Main bank': 'เป็น', 'ttb Payroll': 'ไม่เป็น', 'เคยซื้อ Structured Note': 'ไม่เคย', 'เคยซื้อหุ้นกู้ (Bond)': 'ไม่เคย', 'เคยซื้อ MF Type B': 'ไม่เคย', 'เคยซื้อกองทุนลดหย่อนภาษี': 'เคย', 'เคยมีประสบการณ์ FX': 'ไม่เคย'}, summary: 'ผมเป็นเจ้าของธุรกิจใหญ่ใกล้เกษียณ มีความมั่งคั่งสูง แต่กังวลเรื่องความเสี่ยงและเน้นการรักษาเงินต้นเป็นหลัก สนใจการลงทุนที่ให้ผลตอบแทนดีกว่าเงินฝากแต่ต้องปลอดภัยสูง', personaPrompt: 'คุณคือ สมชาย เกียรติสกุล, เจ้าของธุรกิจวัย 62 ปีที่ประสบความสำเร็จและกำลังวางแผนเกษียณ คุณเป็นคนรอบคอบมากเรื่องการเงิน ไม่ชอบความเสี่ยง และให้ความสำคัญกับการรักษาเงินต้นสูงสุด คุณมีประสบการณ์ลงทุนในกองทุนลดหย่อนภาษีบ้าง แต่ไม่เคยแตะผลิตภัณฑ์ที่ซับซ้อน เป้าหมายของคุณคือหาผลตอบแทนที่ชนะเงินเฟ้อโดยไม่ต้องเสี่ยงมากเกินไป คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ' },
+            { id: 2, name: 'อลิสา วัฒนากุล', age: 35, gender: 'female', image: 'https://i.imgur.com/O2h5vDb.png', title: 'Tech Startup Founder', segment: 'Gold', riskAppetite: 'Growth Investor', details: {'Suitability Score': '4', 'Main bank': 'ไม่เป็น', 'ttb Payroll': 'ไม่เป็น', 'เคยซื้อ Structured Note': 'เคย', 'เคยซื้อหุ้นกู้ (Bond)': 'เคย', 'เคยซื้อ MF Type B': 'เคย', 'เคยซื้อกองทุนลดหย่อนภาษี': 'ไม่เคย', 'เคยมีประสบการณ์ FX': 'เคย'}, summary: 'ดิฉันเป็นผู้ก่อตั้งสตาร์ทอัพด้านเทคโนโลยี มีรายได้สูงและยอมรับความเสี่ยงได้ดี มองหาการลงทุนที่เติบโตสูงในระยะยาว และสนใจนวัตกรรมการเงินใหม่ๆ', personaPrompt: 'คุณคือ อลิสา วัฒนากุล, CEO สตาร์ทอัพเทคโนโลยีวัย 35 ปี คุณมีความเข้าใจในเทคโนโลยีเป็นอย่างดีและยอมรับความเสี่ยงได้สูงเพื่อผลตอบแทนที่คุ้มค่า คุณมองหาการลงทุนที่จะช่วยต่อยอดความมั่งคั่งอย่างรวดเร็ว และไม่กลัวความผันผวนในระยะสั้น คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ' },
+            { id: 3, name: 'ปรีชา ตั้งใจจริง', age: 45, gender: 'male', image: 'https://i.imgur.com/Q9p5d7A.png', title: 'Government Officer', segment: 'Silver', riskAppetite: 'Balanced', details: {'Suitability Score': '3', 'Main bank': 'เป็น', 'ttb Payroll': 'เป็น', 'เคยซื้อ Structured Note': 'ไม่เคย', 'เคยซื้อหุ้นกู้ (Bond)': 'เคย', 'เคยซื้อ MF Type B': 'เคย', 'เคยซื้อกองทุนลดหย่อนภาษี': 'เคย', 'เคยมีประสบการณ์ FX': 'ไม่เคย'}, summary: 'ผมเป็นข้าราชการระดับสูง มีความมั่นคงในอาชีพ ต้องการวางแผนการเงินเพื่อการศึกษาบุตรและวัยเกษียณ รับความเสี่ยงได้ปานกลาง เน้นการลงทุนแบบสมดุล', personaPrompt: 'คุณคือ ปรีชา ตั้งใจจริง, ข้าราชการวัย 45 ปี คุณมีเป้าหมายทางการเงินที่ชัดเจนคือเพื่อการศึกษาของลูกและเพื่อการเกษียณอย่างสุขสบาย คุณไม่ต้องการความเสี่ยงที่สูงเกินไป แต่ก็เข้าใจว่าการฝากเงินอย่างเดียวไม่เพียงพอ คุณมองหาการลงทุนที่สมดุลระหว่างการเติบโตและความมั่นคง คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ'},
+            { id: 4, name: 'มาลินี สดใส', age: 28, gender: 'female', image: 'https://i.imgur.com/emily.png', title: 'Freelance Designer', segment: 'Basic', riskAppetite: 'Pure Deposit', details: {'Suitability Score': '2', 'Main bank': 'เป็น', 'ttb Payroll': 'ไม่เป็น', 'เคยซื้อ Structured Note': 'ไม่เคย', 'เคยซื้อหุ้นกู้ (Bond)': 'ไม่เคย', 'เคยซื้อ MF Type B': 'ไม่เคย', 'เคยซื้อกองทุนลดหย่อนภาษี': 'ไม่เคย', 'เคยมีประสบการณ์ FX': 'ไม่เคย'}, summary: 'ฉันเป็นดีไซน์เนอร์ฟรีแลนซ์ค่ะ เพิ่งเริ่มสร้างตัวและเก็บเงิน มีความรู้ด้านการเงินจำกัด ต้องการลงทุนที่เข้าใจง่าย ความเสี่ยงต่ำ และมีสภาพคล่อง', personaPrompt: 'คุณคือ มาลินี สดใส, ฟรีแลนซ์ดีไซน์เนอร์วัย 28 ปี คุณเพิ่งเริ่มอาชีพและกำลังสร้างความมั่นคงทางการเงิน คุณกลัวการขาดทุนและอยากเริ่มต้นลงทุนกับอะไรที่ปลอดภัย เข้าใจง่าย และสามารถนำเงินออกมาใช้ได้เมื่อจำเป็น คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ'},
+            { id: 5, name: 'วิลเลียม เฉิน', age: 50, gender: 'male', image: 'https://i.imgur.com/michael.png', title: 'Expat Executive', segment: 'Platinum', riskAppetite: 'Aggressive', details: {'Suitability Score': '5', 'Main bank': 'ไม่เป็น', 'ttb Payroll': 'ไม่เป็น', 'เคยซื้อ Structured Note': 'เคย', 'เคยซื้อหุ้นกู้ (Bond)': 'เคย', 'เคยซื้อ MF Type B': 'เคย', 'เคยซื้อกองทุนลดหย่อนภาษี': 'เคย', 'เคยมีประสบการณ์ FX': 'เคย'}, summary: 'ผมเป็นผู้บริหารชาวต่างชาติที่ทำงานในไทย มีความรู้ด้านการลงทุนเป็นอย่างดีและรับความเสี่ยงได้สูงมาก มองหาโอกาสการลงทุนทั่วโลกเพื่อสร้างผลตอบแทนสูงสุด', personaPrompt: 'คุณคือ วิลเลียม เฉิน, ผู้บริหารระดับสูงวัย 50 ปี คุณมีประสบการณ์การลงทุนทั่วโลกและมองหาผลตอบแทนที่ดีที่สุดเสมอ คุณไม่กลัวความเสี่ยงและสนใจผลิตภัณฑ์การเงินที่ซับซ้อนที่สามารถสร้าง Alpha ได้ คุณต้องการคุยกับที่ปรึกษาที่เข้าใจตลาดโลกและนำเสนอไอเดียที่น่าสนใจได้ คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ'},
+        ];
 
-    <!-- Prompob (AI) Lightbox - Step 2: Roleplay --><div id="roleplayStartLightbox" class="lightbox fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50 p-4">
-        <div id="roleplay-container" class="bg-[#FFFBF7] rounded-2xl shadow-lg w-full max-w-[70vw] h-[90vh] flex flex-row overflow-hidden relative">
-             <button id="mainRoleplayCloseBtn" class="absolute top-4 right-4 bg-gray-300 hover:bg-gray-400 p-1 rounded-full z-10">
-                <i data-lucide="x" class="w-7 h-7"></i>
-            </button>
-            <!-- Left Column: Customer Details --><div id="roleplay-left-panel" class="hidden w-[40%] bg-gray-200 p-6 flex flex-col custom-scrollbar overflow-y-auto">
-                <h3 class="text-xl font-bold text-gray-800 mb-6 text-center">ข้อมูลลูกค้า</h3>
-                <div id="roleplay-customer-details" class="flex-grow">
-                     <!-- Dynamic content will be injected here -->
-                </div>
-                <!-- Additional Notes Section --><div class="mt-auto pt-6 flex-shrink-0">
-                    <p class="font-semibold text-gray-600 mb-2 text-sm">บันทึกเพิ่มเติม</p>
-                    <textarea id="additionalNotesTextarea" rows="5" class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-orange-500 focus:border-orange-500 p-2.5" placeholder="พิมพ์ข้อความที่นี่..."></textarea>
-                    <button id="saveNotesBtn" class="w-full mt-2 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm bg-gray-400 cursor-not-allowed" disabled>Save</button>
-                </div>
-            </div>
-            
-            <!-- Right Column: AI Roleplay (Container for states) --><div id="roleplay-right-panel" class="w-full flex flex-col p-6">
-                <!-- State 1: Intro --><div id="roleplay-intro-view" class="flex flex-col h-full">
-                    <div class="flex justify-between items-center mb-4 flex-shrink-0"><button id="roleplayBackBtn" class="text-gray-800 bg-gray-300 hover:bg-gray-400 p-1 rounded-full"><i data-lucide="chevron-left" class="w-6 h-6"></i></button><h3 class="text-xl font-bold" style="color: #A0643A;"><span class="text-2xl mr-2">✨</span>A.I. Roleplay</h3><div class="w-6"></div></div>
-                    <div id="roleplay-intro-content" class="flex-1 bg-white rounded-xl shadow-inner-lg flex flex-col items-center justify-center text-center p-8 overflow-y-auto custom-scrollbar" style="box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);">
-                        <!-- Dynamic content will be injected here -->
-                    </div>
-                    <div class="pt-6 mt-auto flex-shrink-0 flex items-center space-x-4">
-                        <button id="introViewCloseBtn" class="w-full py-3 px-4 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Close</button>
-                        <button id="roleplayStartBtn" class="w-full text-white font-bold py-3 px-4 rounded-lg shadow-md bg-orange-300 hover:bg-orange-400" style="color: #A0643A;">Start</button>
-                    </div>
-                </div>
-                <!-- State 2: In Progress --><div id="roleplay-inprogress-view" class="hidden flex-col h-full">
-                    <div class="flex justify-between items-center mb-4 flex-shrink-0"><div class="w-6"></div><h3 class="text-xl font-bold" style="color: #A0643A;"><span class="text-2xl mr-2">✨</span>A.I. Roleplay</h3><div class="w-6"></div></div>
-                    <div id="roleplay-inprogress-content" class="flex-1 bg-white rounded-xl shadow-inner-lg" style="box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);">
-                        <!-- Dynamic content will be injected here -->
-                    </div>
-                    <div class="pt-6 mt-auto flex-shrink-0"><button id="roleplayEndBtn" class="w-full text-white font-bold py-3 px-4 rounded-lg shadow-md bg-red-600 hover:bg-red-700">End</button></div>
-                </div>
-            </div>
-            <!-- State 3: Transcript --><div id="roleplay-transcript-view" class="hidden w-full flex-col p-6">
-                 <div class="flex justify-between items-center mb-4 flex-shrink-0"><div class="w-6"></div><h3 class="text-xl font-bold" style="color: #A0643A;"><span class="text-2xl mr-2">✨</span>Transcript</h3><div class="w-6"></div></div>
-                <div class="flex-1 bg-white rounded-xl shadow-inner-lg p-4 custom-scrollbar overflow-y-auto" style="box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);"><img id="transcriptImg" src="" alt="Transcript" class="w-full h-auto"></div>
-                <div class="pt-6 mt-auto flex-shrink-0 flex items-center space-x-4">
-                    <button id="transcriptCloseBtn" class="w-full py-3 px-4 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Close</button>
-                    <button id="transcriptNextBtn" class="w-full py-3 px-4 rounded-lg text-white font-semibold" style="background-color: #A0643A;">Next</button>
-                </div>
-            </div>
-            <!-- State 4: Evaluation --><div id="roleplay-evaluation-view" class="hidden w-full flex-col p-6">
-                <div class="flex justify-between items-center mb-4 flex-shrink-0">
-                    <h3 class="text-xl font-bold" style="color: #A0643A;"><span class="text-2xl mr-2">✨</span>Evaluation Result</h3>
-                    <button id="evaluationViewReportBtn" class="px-4 py-1.5 text-sm font-semibold bg-orange-100 text-orange-800 rounded-full hover:bg-orange-200 flex items-center"><i data-lucide="bar-chart-3" class="w-4 h-4 mr-2"></i>View Report</button>
-                </div>
-                <div class="flex-1 bg-white rounded-xl shadow-inner-lg p-4 custom-scrollbar overflow-y-auto" style="box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);"><img id="evaluationImg" src="" alt="Evaluation Report" class="w-full h-auto"></div>
-            </div>
-        </div>
-    </div>
-
-        <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        lucide.createIcons();
+        const loginView = document.getElementById('login-view');
+        const mainContent = document.getElementById('main-content');
+        const loginBtn = document.getElementById('login-btn');
+        const employeeIdInput = document.getElementById('employee-id');
+        const employeeNameInput = document.getElementById('employee-name');
         
-        // --- DATA ---
-        const customerData = {
-            "A": { id: "A", name: "คุณ A", age: 67, title: "Senior Business Owner age > 60", aum: "32362613", segment: "W1", risk: "Pure Deposit", riskLevel: 1, personality: "Steadiness - ถนอมจิต", personalityValue: "road", hasKids: true, gender: "male", group: "G1", tier: "Platinum", lifestyle: ["Eating: Standard Domestic Dinner", "Self-Care: Fitness member", "Shopping: Luxury Watches", "Travel: Luxury Hotel, Full-Service Flights", "Hospital visit: Occasional Checkup"], productMaturity: "Term Deposit – Oct, Dec", productHolding: {ใช้: ["CC Reserve Infinite", "CC So Smart"], คุ้มครอง: ["Global Index 15/5 Plus เบี้ยปีละ 500,000 บาท"], ออมและลงทุน: ["All Free: 1,121,119 บาท", "No Fixed: 14,434,948 บาท", "Term Deposit: 15,295,088 บาท", "เงินฝากอื่นๆ: 1,511,458 บาท"], กู้ยืม: ["N/A"]}},
-            "B": { id: "B", name: "คุณ B", age: 64, title: "Senior Professional age > 60", aum: "6254365", segment: "W2", risk: "Low Risk", riskLevel: 2, personality: "Compliance - คิดคำนวณ", personalityValue: "calculate", hasKids: true, gender: "female", group: "G2", tier: "Gold", lifestyle: ["Eating: Standard Domestic Dinner & Food Delivery Lovers", "Self-Care: Fitness member", "Travel: Premium Low-Cost Flyers, Frequent Booking Platform Users", "Hospital visit: Occasional Checkup"], productMaturity: "Term Fund – Nov, Dec", productHolding: {ใช้: ["CC Reserve Signature", "CC So Smart"], คุ้มครอง: ["N/A"], ออมและลงทุน: ["All Free: 25,677 บาท", "No Fixed: 2,869,627 บาท", "Term Deposit: 1,169,214 บาท", "เงินฝากอื่นๆ: - บาท", "MF (Type B): - บาท", "MF อื่นๆ: 2,189,847 บาท"], กู้ยืม: ["N/A"]}},
-            "C": { id: "C", name: "คุณ C", age: 50, title: "Wealth Business Owner age 41-60", aum: "10020188", segment: "W3", risk: "Medium to High Risk", riskLevel: 4, personality: "Influence - หนึ่งดารา", personalityValue: "star", hasKids: false, gender: "female", group: "G2", tier: "Gold", lifestyle: ["Eating: Dine in Lover, Standard International Diners", "Shopping: Luxury Shopping, Luxury Fashion", "Travel: Luxury Hotel, Full-Service Flights", "Asset Allocation: Regular Investors", "Hospital visit: Occasional Checkup"], productMaturity: "Term Fund - Oct, Nov, Structured Fund - Nov", productHolding: {ใช้: ["CC Reserve Signature", "CC So Smart"], คุ้มครอง: ["Happy Retire 90 เบี้ยปีละ 100,000 บาท"], ออมและลงทุน: ["All Free: 23,407 บาท", "No Fixed: 1,060 บาท", "เงินฝากอื่นๆ: 152,102 บาท", "MF (Type B): 2,815,000 บาท", "Term Fund: 2,028,540 บาท", "MF อื่นๆ: 5,000,079 บาท"], กู้ยืม: ["N/A"]}},
-            "D": { id: "D", name: "คุณ D", age: 46, title: "Wealth Professional age 41-60", aum: "6086239", segment: "W4", risk: "Low Risk", riskLevel: 2, personality: "Dominance - เป้าประสงค์", personalityValue: "goal", hasKids: true, gender: "male", group: "G2", tier: "Gold", lifestyle: ["Eating : Dine in Lover & Food delivery", "Self – Care : Fitness member", "Entertainment : Movie", "Travel : Luxury Hotel", "Hospital visit : Occasional Checkup"], productMaturity: "No", productHolding: {ใช้: ["CC Reserve Signature"], คุ้มครอง: ["ttb global index principal protect 15/5 plus เบี้ยปีละ 1,500,000 บาท"], ออมและลงทุน: ["All Free: 1,064,310 บาท", "No Fixed: 1,647,297 บาท", "Term Deposit: 1,075,106 บาท", "Term Fund: - บาท", "MF อื่นๆ: 2,299,580 บาท"], กู้ยืม: ["N/A"]}},
-            "E": { id: "E", name: "คุณ E", age: 37, title: "Junior Wealth age ≤ 40", aum: "4467291", segment: "W5", risk: "Medium to High Risk", riskLevel: 5, personality: "Compliance - คิดคำนวณ", personalityValue: "calculate", hasKids: false, gender: "male", group: "G3", tier: "Silver", lifestyle: ["Eating: Food delivery", "Self-Care: Fitness member", "Travel: Luxury Hotel", "Asset Allocation: Regular Investors"], productMaturity: "Term Deposit - Oct, Dec", productHolding: {ใช้: ["CC Absolute"], คุ้มครอง: ["N/A"], ออมและลงทุน: ["All Free: 620,695 บาท", "No Fixed: 6,473 บาท", "MF (Type B): 2,107,241 บาท", "MF อื่นๆ: 1,711,882 บาท"], กู้ยืม: ["N/A"]} },
-        };
-               
-        const imagePaths = {
-            customerPortraits: {
-                "A": "./images/CustomerA.jpg",
-                "B": "./images/CustomerB.jpg",
-                "C": "./images/CustomerC.jpg",
-                "D": "./images/CustomerD.jpg",
-                "E": "./images/CustomerE.jpg",
-            },
-            roleplay: {
-                transcript: "./images/transcript.png",
-                evaluation: "./images/evaluation.png",
-            },
-            mainDashboardKPIs: "./images/page-1.jpg",
-            viewReport: "./images/transcript.png",
-            viewReport: "./images/evaluation.png",
-            viewReport2: "./images/transcript.png",
-            customerTabs: {
-                "A": { 
-                    profile: "./images/w1/W1-profile.jpg", 
-                    asset: "./images/w1/W1-AssetMovement.jpg", 
-                    account: "./images/w1/W1-AssetMovement.jpg", 
-                    kys: "./images/w1/W1-4ผลตอบรับ.jpg",
-                    accountManagement: {
-                        theme: "./images/w1/W1-3.1Account.jpg",
-                        lifestyle: "./images/w1/W1-3.2Lifestyle.jpg", // Kept specific lifestyle image
-                        use: "./images/w1/W1-3.3ฉลาดใช้.jpg",
-                        invest: "./images/w1/W1-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
-                        protect: "./images/w1/W1-3.5คุ้มครองที่อุ่นใจ.jpg",
-                        loan: "./images/w1/W1-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
-                    }
-                },
-                "B": { 
-                    profile: "./images/w2/W2-1Customer Profile.jpg", 
-                    asset: "./images/w2/W2-2AssetMovement.jpg", 
-                    account: "./images/w2/W2-AssetMovement.jpg", 
-                    kys: "./images/w2/W2-4ผลตอบรับ.jpg",
-                    accountManagement: {
-                        theme: "./images/w2/W2-3.1Account.jpg",
-                        lifestyle: "./images/w2/W2-3.2Lifestyle.jpg", // Kept specific lifestyle image
-                        use: "./images/w2/W2-3.3ฉลาดใช้.jpg",
-                        invest: "./images/w2/W2-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
-                        protect: "./images/w2/W2-3.5คุ้มครองที่อุ่นใจ.jpg",
-                        loan: "./images/w2/W2-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
-                    }
-                },
-                "C": { 
-                    profile: "./images/w3/W3-1Customer Profile.jpg", 
-                    asset: "./images/w3/W3-2AssetMovement.jpg", 
-                    account: "./images/w3/W3-AssetMovement.jpg", 
-                    kys: "./images/w3/W3-4ผลตอบรับ.jpg",
-                    accountManagement: {
-                        theme: "./images/w3/W3-3.1Account.jpg",
-                        lifestyle: "./images/w3/W3-3.2Lifestyle.jpg", // Kept specific lifestyle image
-                        use: "./images/w3/W3-3.3ฉลาดใช้.jpg",
-                        invest: "./images/w3/W3-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
-                        protect: "./images/w3/W3-3.5คุ้มครองที่อุ่นใจ.jpg",
-                        loan: "./images/w3/W3-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
-                    }
-                },
-                "D": { 
-                    profile: "./images/w4/W4-1Customer Profile.jpg", 
-                    asset: "./images/w4/W4-2AssetMovement.jpg", 
-                    account: "./images/w4/W4-AssetMovement.jpg", 
-                    kys: "./images/w4/W4-4ผลตอบรับ.jpg",
-                    accountManagement: {
-                        theme: "./images/w4/W4-3.1Account.jpg",
-                        lifestyle: "./images/w4/W4-3.2Lifestyle.jpg", // Kept specific lifestyle image
-                        use: "./images/w4/W4-3.3ฉลาดใช้.jpg",
-                        invest: "./images/w4/W4-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
-                        protect: "./images/w4/W4-3.5คุ้มครองที่อุ่นใจ.jpg",
-                        loan: "./images/w4/W4-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
-                    }
-                },
-                "E": { 
-                    profile: "./images/w5/W5-1Customer Profile.jpg", 
-                    asset: "./images/w5/W5-2AssetMovement.jpg", 
-                    account: "./images/w5/W5-AssetMovement.jpg", 
-                    kys: "./images/w5/W5-4ผลตอบรับ.jpg",
-                    accountManagement: {
-                        theme: "./images/w5/W5-3.1Account.jpg",
-                        lifestyle: "./images/w5/W5-3.2Lifestyle.jpg", // Kept specific lifestyle image
-                        use: "./images/w5/W5-3.3ฉลาดใช้.jpg",
-                        invest: "./images/w5/W5-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
-                        protect: "./images/w5/W5-3.5คุ้มครองที่อุ่นใจ.jpg",
-                        loan: "./images/w5/W5-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
-                    }
-                },
-            },
-            /* (4) Removed the static accountManagementTabs object from here */
-        };
+        const roleplayView = document.getElementById('roleplay-view');
+        const infoModal = document.getElementById('info-modal');
+        const infoModalContent = document.getElementById('info-modal-content');
+        const evaluationModal = document.getElementById('evaluation-modal');
+        const evaluationContent = document.getElementById('evaluation-content');
+        
+        const chatContainer = document.getElementById('chat-container');
+        const endChatButton = document.getElementById('end-chat-btn');
+        const showRoleplayInfoButton = document.getElementById('show-roleplay-info-btn');
+        const contextContainer = document.getElementById('conversation-context');
 
+        // --- Voice Control Elements ---
+        const micBtn = document.getElementById('mic-btn');
+        const statusIndicator = document.getElementById('status-indicator');
+
+        let currentUser = null;
+        let conversationHistory = [];
         let currentCustomer = null;
-        
-        // --- HELPERS ---
-        const setupSimpleLightbox = (btnId, lightboxId, closeBtnIds) => {
-            const button = document.getElementById(btnId);
-            const lightbox = document.getElementById(lightboxId);
-            if (!button || !lightbox) return;
-            const open = () => lightbox.classList.remove('hidden');
-            const close = () => lightbox.classList.add('hidden');
-            button.addEventListener('click', open);
-            closeBtnIds.forEach(id => {
-                const closeBtn = document.getElementById(id);
-                if (closeBtn) closeBtn.addEventListener('click', close);
-            });
-        };
+        let turnCount = 0;
+        const maxTurns = 5;
+        let isEvaluationInProgress = false;
+        let voices = [];
 
-        // --- INITIALIZATION ---
-        setupSimpleLightbox('exportFileBtn', 'exportFileLightbox', ['closeExportLightboxBtn']);
-        // setupSimpleLightbox('viewReportBtn', 'viewReportLightbox', ['closeViewReportBtn', 'closeViewReportBtn2']);
-        
-        document.getElementById('main-dashboard-kpi-img').src = imagePaths.mainDashboardKPIs;
-        document.getElementById('viewReportImg').src = imagePaths.viewReport;
-        document.getElementById('personaReportImg').src = imagePaths.viewReport;
-        document.getElementById('transcriptImg').src = imagePaths.roleplay.transcript;
-        document.getElementById('evaluationImg').src = imagePaths.roleplay.evaluation;
-        document.getElementById('evaluationReportImg').src = imagePaths.viewReport2;
-
-        const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.getElementById('toggleSidebarBtn');
-        const collapseIcon = document.getElementById('collapse-icon');
-        const expandIcon = document.getElementById('expand-icon');
-        const sidebarTitle = document.getElementById('sidebar-title');
-        const sidebarLinkTexts = document.querySelectorAll('.sidebar-link-text');
-        const navLinks = sidebar.querySelectorAll('nav a');
-
-        if (toggleBtn && sidebar) {
-            toggleBtn.addEventListener('click', () => {
-                const isCollapsed = sidebar.classList.contains('w-16');
-                sidebar.classList.toggle('w-16', !isCollapsed);
-                sidebar.classList.toggle('w-64', isCollapsed);
-                sidebarTitle.classList.toggle('hidden');
-                collapseIcon.classList.toggle('hidden');
-                expandIcon.classList.toggle('hidden');
-                sidebarLinkTexts.forEach(text => text.classList.toggle('hidden'));
-                navLinks.forEach(link => link.classList.toggle('justify-center'));
-            });
-        }
-        
-        const portfolioView = document.getElementById('portfolio-view');
-        const customerView = document.getElementById('customer-view');
-        const navMyPortfolio = document.getElementById('navMyPortfolio');
-        const navMyCustomer = document.getElementById('navMyCustomer');
-        const mainHeaderTitle = document.getElementById('mainHeaderTitle');
-        const customerDetailsTable = document.getElementById('customer-details-table');
-        const customerNavContainer = document.querySelector('.customer-nav');
-        
-        // --- Prompob Lightbox Elements ---
-        const prompobBtn = document.getElementById('prompobBtn');
-        const prompobLightbox = document.getElementById('prompobLightbox');
-        const closePrompobLightboxBtn = document.getElementById('closePrompobLightboxBtn');
-        const closePrompobBtnBottom = document.getElementById('closePrompobBtnBottom');
-        const personaNextBtn = document.getElementById('personaNextBtn');
-        const roleplayStartLightbox = document.getElementById('roleplayStartLightbox');
-        const personaSelectionContent = document.getElementById('persona-selection-content');
-        const personaCustomerName = document.getElementById('persona-customer-name');
-        const personaViewReportBtn = document.getElementById('personaViewReportBtn');
-        const personaReportLightbox = document.getElementById('personaReportLightbox');
-        const personaReportBackBtn = document.getElementById('personaReportBackBtn');
-        const closePersonaReportBtn = document.getElementById('closePersonaReportBtn');
-        const evaluationReportLightbox = document.getElementById('evaluationReportLightbox');
-        const closeEvaluationReportBtn = document.getElementById('closeEvaluationReportBtn');
-
-        // Roleplay views and panels
-        const roleplayContainer = document.getElementById('roleplay-container');
-        const roleplayLeftPanel = document.getElementById('roleplay-left-panel');
-        const roleplayRightPanel = document.getElementById('roleplay-right-panel');
-        const roleplayIntroView = document.getElementById('roleplay-intro-view');
-        const roleplayInProgressView = document.getElementById('roleplay-inprogress-view');
-        const roleplayTranscriptView = document.getElementById('roleplay-transcript-view');
-        const roleplayEvaluationView = document.getElementById('roleplay-evaluation-view');
-        
-        // Roleplay buttons & timer
-        const roleplayBackBtn = document.getElementById('roleplayBackBtn');
-        const roleplayStartBtn = document.getElementById('roleplayStartBtn');
-        const roleplayEndBtn = document.getElementById('roleplayEndBtn');
-        const transcriptCloseBtn = document.getElementById('transcriptCloseBtn');
-        const transcriptNextBtn = document.getElementById('transcriptNextBtn');
-        const mainRoleplayCloseBtn = document.getElementById('mainRoleplayCloseBtn');
-        const introViewCloseBtn = document.getElementById('introViewCloseBtn');
-        const evaluationViewReportBtn = document.getElementById('evaluationViewReportBtn');
-        let timerInterval;
-        let seconds = 0;
-        
-        // Additional notes elements
-        const additionalNotesTextarea = document.getElementById('additionalNotesTextarea');
-        const saveNotesBtn = document.getElementById('saveNotesBtn');
-
-        const updateDateTime = () => {
-            const now = new Date();
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-            const formattedDateTime = now.toLocaleString('th-TH', options);
-            const span = document.getElementById('data-updated-span');
-            if (span) {
-                span.textContent = `Data updated ${formattedDateTime}`;
-            }
-        };
-        updateDateTime();
-        
-        // --- TIMER FUNCTIONS ---
-        const stopTimer = () => {
-            clearInterval(timerInterval);
-            seconds = 0;
-        };
-        
-        // --- ROLEPLAY LOGIC ---
-        const closeRoleplay = () => {
-            stopTimer();
-            roleplayStartLightbox.classList.add('hidden');
-        }
-        
-        const showRoleplayView = (viewToShow) => {
-            // Hide all views first
-            [roleplayIntroView, roleplayInProgressView, roleplayTranscriptView, roleplayEvaluationView].forEach(view => {
-                view.classList.add('hidden');
-                view.classList.remove('flex');
-            });
-
-            // Handle the layout
-            if (viewToShow === roleplayEvaluationView || viewToShow === roleplayTranscriptView) {
-                // These views take up the whole container, so hide the right panel which contains the other views
-                roleplayContainer.classList.remove('flex-row');
-                roleplayRightPanel.classList.add('hidden');
-                viewToShow.classList.remove('hidden');
-                viewToShow.classList.add('flex');
+        loginBtn.addEventListener('click', () => {
+            const employeeId = employeeIdInput.value.trim();
+            const employeeName = employeeNameInput.value.trim();
+            if (employeeId && employeeName) {
+                currentUser = { id: employeeId, name: employeeName };
+                loginView.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                renderCustomers();
             } else {
-                // These views (intro, in-progress) are inside the right panel
-                roleplayContainer.classList.add('flex-row');
-                roleplayRightPanel.classList.remove('hidden'); // Ensure right panel is visible
-                viewToShow.classList.remove('hidden');
-                viewToShow.classList.add('flex');
+                alert('กรุณากรอกรหัสพนักงานและชื่อ-นามสกุล');
             }
-        };
-        
-        if (prompobBtn) prompobBtn.addEventListener('click', () => {
-             populatePersonaSelection(currentCustomer);
-             prompobLightbox.classList.remove('hidden');
-        });
-        if (closePrompobLightboxBtn) closePrompobLightboxBtn.addEventListener('click', () => prompobLightbox.classList.add('hidden'));
-        if (closePrompobBtnBottom) closePrompobBtnBottom.addEventListener('click', () => prompobLightbox.classList.add('hidden'));
-        
-        if (personaNextBtn) personaNextBtn.addEventListener('click', () => {
-            prompobLightbox.classList.add('hidden');
-            populateRoleplayView(currentCustomer);
-            showRoleplayView(roleplayIntroView);
-            roleplayStartLightbox.classList.remove('hidden');
-        });
-        
-        if (roleplayBackBtn) roleplayBackBtn.addEventListener('click', () => {
-            roleplayStartLightbox.classList.add('hidden');
-            prompobLightbox.classList.remove('hidden');
-            stopTimer();
-        });
-        if (roleplayStartBtn) roleplayStartBtn.addEventListener('click', () => {
-            const inProgressContent = document.getElementById('roleplay-inprogress-content');
-            inProgressContent.innerHTML = `<iframe src="https://www.ttbbank.com/th/rates/deposit-rates" class="w-full h-full border-0 rounded-xl"></iframe>`;
-            showRoleplayView(roleplayInProgressView);
-        });
-        if (roleplayEndBtn) roleplayEndBtn.addEventListener('click', () => {
-            showRoleplayView(roleplayTranscriptView);
-            stopTimer();
-        });
-        if (transcriptNextBtn) transcriptNextBtn.addEventListener('click', () => showRoleplayView(roleplayEvaluationView));
-        
-        [mainRoleplayCloseBtn, introViewCloseBtn, transcriptCloseBtn].forEach(btn => {
-            if(btn) btn.addEventListener('click', closeRoleplay);
         });
 
-        // View Report buttons
-        if(personaViewReportBtn) personaViewReportBtn.addEventListener('click', () => personaReportLightbox.classList.remove('hidden'));
-        if(closePersonaReportBtn) closePersonaReportBtn.addEventListener('click', () => personaReportLightbox.classList.add('hidden'));
-        if (personaReportCloseBtnBottom) personaReportCloseBtnBottom.addEventListener('click', () => personaReportLightbox.classList.add('hidden'));
+        function loadVoices() {
+            voices = window.speechSynthesis.getVoices();
+        }
+        loadVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
 
-        if (evaluationViewReportBtn) evaluationViewReportBtn.addEventListener('click', () => {
-            evaluationReportLightbox.classList.remove('hidden');
-        });
-        if (closeEvaluationReportBtn) closeEvaluationReportBtn.addEventListener('click', () => evaluationReportLightbox.classList.add('hidden'));
-        
+        const speakText = (text, gender = 'female') => {
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            setTimeout(() => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.95;
 
-        if (additionalNotesTextarea && saveNotesBtn) {
-            additionalNotesTextarea.addEventListener('input', () => {
-                if (additionalNotesTextarea.value.length >= 5) {
-                    saveNotesBtn.disabled = false;
-                    saveNotesBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                    saveNotesBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                } else {
-                    saveNotesBtn.disabled = true;
-                    saveNotesBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
-                    saveNotesBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                const thaiVoices = voices.filter(v => v.lang === 'th-TH');
+                if (thaiVoices.length > 0) {
+                    let selectedVoice = gender === 'male' ? thaiVoices.find(v => v.name.includes('Pattara')) : null;
+                    if (!selectedVoice) selectedVoice = thaiVoices[0]; // fallback
+                    utterance.voice = selectedVoice;
                 }
+                
+                // --- Seamless Conversation Logic ---
+                // When AI finishes speaking, start listening for the user's voice
+                utterance.onend = () => {
+                   setTimeout(() => {
+                        if (!isRecording && !isEvaluationInProgress) {
+                            recognition.start();
+                        }
+                   }, 500); // Small delay
+                };
+                
+                window.speechSynthesis.speak(utterance);
+            }, 100);
+        };
+
+        function renderCustomers() {
+            const customerGridView = document.getElementById('customer-grid');
+            customerGridView.innerHTML = '';
+            customers.forEach(customer => {
+                const card = document.createElement('div');
+                card.className = 'card p-6 flex flex-col items-center text-center space-y-4';
+                card.innerHTML = `
+                    <img src="${customer.image}" alt="${customer.name}" class="w-32 h-32 rounded-full object-cover border-4 border-slate-200">
+                    <div>
+                        <h3 class="text-xl font-bold">${customer.name}</h3>
+                        <p class="text-slate-500">${customer.title} (อายุ: ${customer.age} ปี)</p>
+                    </div>
+                    <div class="flex space-x-2 w-full">
+                        <button onclick="showCustomerInfo(${customer.id})" class="flex-1 btn-secondary py-2 px-4 !text-sm">ข้อมูลลูกค้า</button>
+                        <button onclick="startRoleplay(${customer.id})" class="flex-1 btn-primary py-2 px-4 !text-sm">เริ่มสนทนา</button>
+                    </div>
+                `;
+                customerGridView.appendChild(card);
             });
         }
         
-        // --- DYNAMIC CONTENT FUNCTIONS ---
-        const populatePersonaSelection = (customer) => {
-            if (!customer) return;
-            personaCustomerName.textContent = customer.name;
-            personaSelectionContent.querySelectorAll('.persona-btn').forEach(btn => btn.classList.remove('selected-persona'));
-            
-            const selectRandom = (group) => {
-                const buttons = group.querySelectorAll('.persona-btn');
-                const randomIndex = Math.floor(Math.random() * buttons.length);
-                buttons[randomIndex].classList.add('selected-persona');
-            };
-
-            const groups = personaSelectionContent.querySelectorAll('.persona-group');
-            groups.forEach(group => {
-                const groupName = group.dataset.group;
-                let valueToSelect;
-                switch(groupName) {
-                    case 'gender': valueToSelect = customer.gender; break;
-                    case 'wealth': valueToSelect = customer.segment.toLowerCase(); break;
-                    case 'risk': valueToSelect = customer.risk.toLowerCase().replace(/ /g, '-'); break;
-                    case 'personality': valueToSelect = customer.personalityValue; break;
-                    case 'children': valueToSelect = customer.hasKids ? 'yes' : 'no'; break;
-                    default: selectRandom(group); return;
-                }
-                const btn = group.querySelector(`[data-value="${valueToSelect}"]`);
-                if (btn) btn.classList.add('selected-persona');
-                else selectRandom(group);
-            });
-        };
-        
-        personaSelectionContent.addEventListener('click', (e) => {
-            if (e.target.classList.contains('persona-btn')) {
-                const group = e.target.closest('.persona-group');
-                if (group) {
-                    group.querySelectorAll('.persona-btn').forEach(btn => btn.classList.remove('selected-persona'));
-                    e.target.classList.add('selected-persona');
-                }
-            }
-        });
-
-        const populateRoleplayView = (customer) => {
-            if (!customer) return;
-
-            const personalityColorMap = {
-                road: 'bg-blue-500', // Steadiness
-                calculate: 'bg-green-500', // Compliance
-                star: 'bg-red-500', // Influence
-                goal: 'bg-purple-500' // Dominance
-            };
-            const personalityBgColor = personalityColorMap[customer.personalityValue] || 'bg-gray-500';
-
-            const formatList = (items) => (items || []).map(item => `<li>${item}</li>`).join('');
-            const formatProductHolding = (holding) => {
-                 if (!holding) return '';
-                 return Object.entries(holding).map(([category, products]) => {
-                    const productList = Array.isArray(products) ? products.map(p => `<li class="truncate">${p}</li>`).join('') : `<p class="text-xs text-gray-600">${products}</p>`;
-                    const iconMap = {'ใช้': 'landmark', 'คุ้มครอง': 'shield-check', 'ออมและลงทุน': 'area-chart', 'กู้ยืม': 'repeat'};
-                    const colorMap = {'ใช้': 'blue', 'คุ้มครอง': 'green', 'ออมและลงทุน': 'indigo', 'กู้ยืม': 'orange'};
-                    const icon = iconMap[category] || 'zap';
-                    const color = colorMap[category] || 'gray';
-
-                    return `<div>
-                                <div class="flex items-center mb-1"><i data-lucide="${icon}" class="w-4 h-4 mr-2 text-${color}-500"></i><h6 class="font-semibold">ฉลาด${category}</h6></div>
-                                ${Array.isArray(products) ? `<ul class="text-xs text-gray-600 list-disc list-inside">${productList}</ul>` : productList}
-                            </div>`;
-                }).join('');
-            };
-
-            const leftPanel = document.getElementById('roleplay-customer-details');
-            leftPanel.innerHTML = `
-                <div class="text-center mb-6">
-                    <div class="relative inline-block">
-                        <img src="${imagePaths.customerPortraits[customer.id]}" alt="Customer" class="w-32 h-32 rounded-full mx-auto shadow-md">
-                        <span class="absolute bottom-1 right-1 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">${customer.segment}</span>
-                    </div>
-                    <h4 class="text-xl font-bold text-gray-800 mt-4">${customer.name} อายุ ${customer.age} ปี</h4>
-                    <span class="inline-block bg-blue-600 text-white text-sm font-semibold px-4 py-1 rounded-full mt-2">${customer.title}</span>
-                </div>
-                <div class="space-y-4 text-sm">
-                    <div class="bg-white p-3 rounded-lg shadow-sm">
-                         <div class="flex items-center justify-between">
-                            <span class="text-gray-500">${customer.group}</span>
-                            <span class="font-semibold text-gray-800">AUM ${new Intl.NumberFormat('th-TH').format(customer.aum)} บาท</span>
-                            <span class="text-gray-500">${customer.tier}</span>
-                         </div>
-                         <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                            <div class="bg-gradient-to-r from-yellow-400 to-orange-500 h-2.5 rounded-full" style="width: ${Math.min(parseInt(customer.aum) / 50000000 * 100, 100)}%"></div>
+        window.showCustomerInfo = (id) => {
+            const customer = customers.find(c => c.id === id);
+            infoModalContent.innerHTML = `
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="flex-shrink-0 text-center">
+                        <img src="${customer.image}" alt="${customer.name}" class="w-40 h-40 rounded-full object-cover border-4 border-slate-200 mx-auto">
+                        <h3 class="text-2xl font-bold mt-4">${customer.name} (${customer.age} ปี)</h3>
+                        <p class="text-blue-600 font-semibold">${customer.title}</p>
+                        <div class="flex justify-center gap-2 mt-2">
+                             <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">${customer.segment}</span>
+                             <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">${customer.riskAppetite}</span>
                         </div>
                     </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm">
-                        <h5 class="font-bold text-gray-700 mb-3">Risk Appetite</h5>
-                        <div class="flex items-center mb-3">
-                            <span class="font-semibold text-sm mr-4">${customer.risk}</span>
-                            <div class="w-full bg-gray-200 rounded-full h-3">
-                                <div class="bg-blue-800 h-3 rounded-full" style="width: ${customer.riskLevel * 20}%;"></div>
-                            </div>
-                        </div>
-                        <ul class="space-y-1 text-xs text-gray-600">
-                            <li class="flex justify-between py-2 px-1 border-b border-gray-200"><span>- Suitability Score</span> <span class="font-mono">${customer.riskLevel}</span></li>
-                            <li class="flex justify-between py-2 px-1 border-b border-gray-200 bg-gray-50"><span>- Main bank</span> <span class="text-gray-400">เป็น</span></li>
-                            <li class="flex justify-between py-2 px-1 border-b border-gray-200"><span>- ttb Payroll</span> <span class="text-gray-400">ไม่เป็น</span></li>
-                            <li class="flex justify-between py-2 px-1 border-b border-gray-200 bg-gray-50"><span>- เคยซื้อ Structured Note</span> <span class="text-gray-400">ไม่เคย</span></li>
-                            <li class="flex justify-between py-2 px-1 border-b border-gray-200"><span>- เคยซื้อหุ้นกู้ (Bond)</span> <span class="text-gray-400">ไม่เคย</span></li>
-                            <li class="flex justify-between py-2 px-1 bg-gray-50"><span>- เคยซื้อ MF Type B</span> <span class="text-gray-400">เคย</span></li>
+                    <div class="w-full">
+                        <h4 class="text-lg font-semibold border-b border-slate-200 pb-2 mb-3">ข้อมูลเบื้องต้น</h4>
+                        <p class="text-sm text-slate-600 mb-4 bg-slate-50 p-3 rounded-lg">${customer.summary}</p>
+                        <ul class="space-y-1 text-sm">
+                            ${Object.entries(customer.details).map(([key, value]) => `
+                                <li class="flex justify-between"><span class="text-slate-500">${key}:</span> <strong>${value}</strong></li>
+                            `).join('')}
                         </ul>
                     </div>
-                    <div class="bg-blue-600 text-white p-4 rounded-lg shadow-sm">
-                        <h5 class="font-bold mb-2">Lifestyle</h5>
-                        <ul class="list-disc list-inside text-sm space-y-1">${formatList(customer.lifestyle)}</ul>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center">
-                            <span class="font-semibold text-gray-700">Have Kids?</span>
-                            <div class="flex items-center">
-                                <span class="font-bold ${customer.hasKids ? 'text-green-600' : 'text-red-600'} mr-1">${customer.hasKids ? 'Yes' : 'No'}</span>
-                                <i data-lucide="${customer.hasKids ? 'check-circle-2' : 'x-circle'}" class="w-5 h-5 ${customer.hasKids ? 'text-green-500' : 'text-red-500'}"></i>
-                            </div>
-                        </div>
-                        <div class="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center">
-                            <span class="font-semibold text-gray-700">Product Maturity?</span>
-                            <div class="flex items-center">
-                                <span class="font-bold text-green-600 mr-1">Yes</span>
-                                <i data-lucide="check-circle-2" class="w-5 h-5 text-green-500"></i>
-                            </div>
-                        </div>
-                    </div>
-                     <div class="bg-white p-4 rounded-lg shadow-sm text-center">
-                        <h5 class="font-bold text-gray-700 mb-3">Personality Type</h5>
-                        <div class="inline-block ${personalityBgColor} text-white text-sm font-semibold px-4 py-1 rounded-md mb-4">${customer.personality}</div>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm">
-                        <h5 class="font-bold text-gray-700 mb-2">Product Holding</h5>
-                        <div class="grid grid-cols-2 gap-x-6 gap-y-4">${formatProductHolding(customer.productHolding)}</div>
-                    </div>
-                </div>
-             `;
+                </div>`;
+            infoModal.classList.remove('hidden');
+            infoModal.classList.add('flex');
+        };
+
+        window.closeInfoModal = () => {
+            infoModal.classList.add('hidden');
+            infoModal.classList.remove('flex');
+        };
+
+        window.startRoleplay = (id) => {
+            currentCustomer = customers.find(c => c.id === id);
+            turnCount = 0;
+            isEvaluationInProgress = false;
+            conversationHistory = [{ role: 'system', parts: [{ text: `${currentCustomer.personaPrompt}\nบทสนทนาต้องไม่เกิน ${maxTurns} คู่ (คุณถาม ${maxTurns} ครั้ง ฉันตอบ ${maxTurns} ครั้ง)` }] }];
             
-             const rightIntro = document.getElementById('roleplay-intro-content');
-             rightIntro.innerHTML = `<p class="font-semibold text-orange-900 mb-4">MWIBOT</p><img src="${imagePaths.customerPortraits[customer.id]}" alt="AI Persona" class="w-48 h-48 rounded-full border-4 border-white shadow-lg mb-6 flex-shrink-0"><h4 class="text-2xl font-bold text-orange-900 mb-2">สวัสดีครับ ผมชื่อ "${customer.name}"</h4><p class="text-gray-600 max-w-md mx-auto">${customer.title}, อายุ ${customer.age} ปี, ความเสี่ยง ${customer.risk}. <br>วันนี้มาเล่นเป็นลูกค้าเพื่อเป็นคู่ซ้อม Roleplay<br>ให้คุณเป็นเจ้าหน้าที่ เพื่อให้คุณฝึกก่อนไปเจอลูกค้าจริง<br><br>หลังจากที่คุณ คัด นัด เรียบร้อยแล้ว ถ้าคุณอยากฝึกก่อนพบลูกค้าจริง <br>ให้กดปุ่ม Start และเริ่มพูดคุบกับผมได้เลยครับ</p>`;
-             
-             lucide.createIcons();
+            document.getElementById('roleplay-customer-profile').innerHTML = `
+                <div>
+                    <h3 class="text-lg font-semibold text-right">${currentCustomer.name}</h3>
+                    <p class="text-sm text-slate-500 text-right">อายุ: ${currentCustomer.age} ปี</p>
+                </div>
+                <img src="${currentCustomer.image}" alt="${currentCustomer.name}" class="w-14 h-14 rounded-full border-2 border-blue-500">
+            `;
+            contextContainer.innerHTML = `<p><strong class="font-semibold">กำลังสนทนากับ:</strong> ${currentCustomer.name} (${currentCustomer.age} ปี)</p>
+            <p><strong class="font-semibold">หัวข้อ:</strong> ${currentCustomer.summary}</p>`;
+            chatContainer.innerHTML = '';
+            
+            mainContent.classList.add('hidden');
+            roleplayView.classList.remove('hidden');
+            
+            // Start the conversation by having the AI "wait" for the user.
+            // A greeting could be added here if desired.
+            setTimeout(() => {
+                if (!isRecording && recognition) {
+                    recognition.start();
+                }
+            }, 1000);
         };
         
-        // --- PAGE NAVIGATION LOGIC ---
-        const setActiveNav = (activeElement) => {
-            [navMyPortfolio, navMyCustomer].forEach(item => {
-                const link = item.querySelector('a');
-                link.classList.remove('bg-gray-200', 'text-gray-900', 'font-semibold', 'border-blue-600');
-                link.classList.add('text-gray-700', 'hover:bg-gray-100', 'border-transparent');
-            });
-            const activeLink = activeElement.querySelector('a');
-            activeLink.classList.add('bg-gray-200', 'text-gray-900', 'font-semibold', 'border-blue-600');
-            activeLink.classList.remove('text-gray-700', 'hover:bg-gray-100', 'border-transparent');
+        document.getElementById('back-to-list-btn').addEventListener('click', () => {
+             if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+             if (isRecording) recognition.stop();
+             roleplayView.classList.add('hidden');
+             mainContent.classList.remove('hidden');
+        });
+
+        const addUserMessage = (container, text) => {
+            const messageEl = document.createElement('div');
+            messageEl.className = 'chat-bubble self-end user-bubble';
+            messageEl.innerHTML = `<p class="font-semibold mb-1">คุณ (${currentUser.name})</p><p>${text}</p>`;
+            container.appendChild(messageEl);
+            container.scrollTop = container.scrollHeight;
         };
 
-        const showPortfolioView = (e) => {
-            if (e) e.preventDefault();
-            portfolioView.classList.remove('hidden');
-            customerView.classList.add('hidden');
-            mainHeaderTitle.textContent = 'My Portfolio';
-            setActiveNav(navMyPortfolio);
+        const addAiMessage = (container, customerName, text) => {
+            const messageEl = document.createElement('div');
+            messageEl.className = 'chat-bubble self-start ai-bubble';
+            messageEl.innerHTML = `<p class="font-semibold mb-1">${customerName} (AI)</p><div class="ai-response-text">${text}</div>`;
+            container.appendChild(messageEl);
+            container.scrollTop = container.scrollHeight;
+            return messageEl.querySelector('.ai-response-text');
         };
 
-        const showCustomerView = (e, customerId = null) => {
-            if (e) e.preventDefault();
+        const handleUserTurn = async (userMessage) => {
+            turnCount++;
+            conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
+
+            const thinkingMessage = addAiMessage(chatContainer, currentCustomer.name, '<i class="fas fa-spinner fa-spin"></i> กำลังคิด...');
             
-            currentCustomer = customerData[customerId] || null;
-            if(!currentCustomer) {
-                console.error("Customer not found:", customerId);
-                return;
+            micBtn.disabled = true;
+
+            const aiResponse = await getAIResponse(conversationHistory);
+            conversationHistory.push({ role: 'model', parts: [{ text: aiResponse }] });
+            
+            thinkingMessage.innerHTML = aiResponse;
+            speakText(aiResponse, currentCustomer.gender);
+            
+            micBtn.disabled = false;
+            
+            if (turnCount >= maxTurns) {
+                endChatButton.disabled = false;
+            }
+        };
+        
+        async function getAIResponse(history) {
+            try {
+                const payload = {
+                    "contents": history.slice(1), // Exclude system prompt from contents
+                    "systemInstruction": history[0]
+                };
+                const responseText = await callGemini(payload);
+                return responseText;
+            } catch (error) {
+                console.error("Error in getAIResponse:", error);
+                return `เกิดข้อผิดพลาด: ${error.message}`;
+            }
+        }
+
+        endChatButton.addEventListener('click', () => {
+            if (!isEvaluationInProgress) {
+                getFinalEvaluation();
+            }
+        });
+
+        showRoleplayInfoButton.addEventListener('click', () => {
+            if (currentCustomer) {
+                showCustomerInfo(currentCustomer.id);
+            }
+        });
+
+        async function getFinalEvaluation() {
+            if (isEvaluationInProgress) return;
+            isEvaluationInProgress = true;
+            micBtn.disabled = true;
+            if(isRecording) recognition.stop();
+            
+            addAiMessage(chatContainer, currentCustomer.name, 'บทสนทนาสิ้นสุดแล้ว กำลังสร้างผลประเมิน...');
+
+            const evaluationPrompt = `Based on the entire conversation, evaluate the employee's sales performance as the customer (${currentCustomer.name}). Provide a fair and balanced evaluation with moderately strict scoring, avoiding extreme scores unless clearly justified. Score each criterion out of 15: 1. Product Knowledge 2. Sales Presentation Skills 3. Clear Sales Process 4. Employee's Expertise 5. Closing Ability. Calculate the Total Score (max 75). Provide a summary of Strengths and Improvements. Respond in Thai and JSON format only: {"scores": {"productKnowledge": 15, "presentationSkills": 15, "salesProcess": 15, "expertise": 15, "closingAbility": 15}, "totalScore": 75, "summary": {"strengths": "...", "improvements": "..."}}`;
+            
+            const evaluationHistory = [...conversationHistory];
+            evaluationHistory.push({ role: 'user', parts: [{ text: evaluationPrompt }] });
+
+            const rawResponse = await getAIResponse(evaluationHistory);
+            
+            try {
+                const jsonResponse = rawResponse.replace(/^```json\s*|```$/g, '').trim();
+                const evaluationData = JSON.parse(jsonResponse);
+                displayEvaluation(evaluationData);
+            } catch (error) {
+                console.error("Error parsing evaluation JSON:", error, "Raw text:", rawResponse);
+                displayEvaluation({ error: `ไม่สามารถสร้างผลการประเมินได้: ${error.message}` });
+            }
+        }
+
+        function displayEvaluation(data) {
+             if (data.error) {
+                evaluationContent.innerHTML = `<p class="text-red-500">${data.error}</p>`;
+            } else {
+                const totalScoreClass = data.totalScore >= 60 ? 'text-green-500' : data.totalScore >= 45 ? 'text-yellow-500' : 'text-red-500';
+                evaluationContent.innerHTML = `
+                    <div class="text-center mb-6">
+                        <h3 class="text-xl font-semibold">คะแนนรวม</h3>
+                        <p class="text-6xl font-bold ${totalScoreClass}">${data.totalScore} <span class="text-3xl font-medium text-slate-500">/ 75</span></p>
+                    </div>
+                     <div class="mt-6 pt-6 border-t border-slate-200 space-y-4">
+                        <div><h4 class="text-xl font-bold text-green-600 mb-2"><i class="fas fa-check-circle mr-2"></i>จุดแข็ง</h4><p class="text-slate-700 bg-slate-100 p-3 rounded-lg">${data.summary.strengths}</p></div>
+                        <div><h4 class="text-xl font-bold text-yellow-600 mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>สิ่งที่ควรปรับปรุง</h4><p class="text-slate-700 bg-slate-100 p-3 rounded-lg">${data.summary.improvements}</p></div>
+                    </div>
+                `;
+            }
+            evaluationModal.classList.remove('hidden');
+            evaluationModal.classList.add('flex');
+        }
+
+        window.closeEvaluationModalAndReset = () => {
+            evaluationModal.classList.add('hidden');
+            evaluationModal.classList.remove('flex');
+            roleplayView.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+        };
+
+        // --- Speech Recognition Setup ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        let isRecording = false;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'th-TH';
+            recognition.interimResults = false;
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[event.results.length - 1][0].transcript.trim();
+                statusIndicator.textContent = 'ประมวลผล...';
+                
+                addUserMessage(chatContainer, transcript);
+                handleUserTurn(transcript);
+            };
+            
+            // --- FIX: Auto-Retry on Network Error ---
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                let errorMessage = `เกิดข้อผิดพลาด: ${event.error}`;
+
+                if (event.error === 'network') {
+                    errorMessage = 'การเชื่อมต่อขัดข้อง กำลังลองอีกครั้ง...';
+                    // Automatically retry after 2 seconds for network errors
+                    setTimeout(() => {
+                        if (!isRecording && !isEvaluationInProgress) {
+                            statusIndicator.textContent = 'กำลังพยายามเชื่อมต่อใหม่...';
+                            try {
+                                recognition.start();
+                            } catch(e) {
+                                console.error("Retry failed:", e);
+                            }
+                        }
+                    }, 2500);
+                } else if (event.error === 'no-speech') {
+                    errorMessage = 'ไม่พบเสียงพูด กรุณาลองอีกครั้ง';
+                     // When the AI finishes speaking, it will auto-listen again, so no need to auto-retry here.
+                } else if (event.error === 'audio-capture') {
+                    errorMessage = 'ไม่สามารถเข้าถึงไมโครโฟนได้';
+                } else if (event.error === 'not-allowed') {
+                    errorMessage = 'กรุณาอนุญาตให้ใช้ไมโครโฟน';
+                    micBtn.disabled = true; // Permanently disable if not allowed
+                }
+                
+                statusIndicator.textContent = errorMessage;
+            };
+
+            recognition.onstart = () => {
+                isRecording = true;
+                statusIndicator.textContent = 'กำลังฟัง... พูดได้เลย';
+                micBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+                micBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                micBtn.innerHTML = '<i class="fas fa-stop"></i>';
+            };
+
+            recognition.onend = () => {
+                isRecording = false;
+                // Don't change status text here if an error is being displayed
+                if (!statusIndicator.textContent.startsWith('เกิดข้อผิดพลาด') && !statusIndicator.textContent.startsWith('การเชื่อมต่อขัดข้อง')) {
+                   if (!isEvaluationInProgress) {
+                        statusIndicator.textContent = 'แตะไมโครโฟนเพื่อเริ่มพูด';
+                   }
+                }
+                micBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                micBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+            };
+
+        } else {
+            micBtn.disabled = true;
+            statusIndicator.textContent = 'ขออภัย บราวเซอร์ของคุณไม่รองรับการแปลงเสียงพูด';
+        }
+
+        micBtn.addEventListener('click', () => {
+            if (!recognition) return;
+
+            // Stop any speaking AI before recording
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
             }
 
-            portfolioView.classList.add('hidden');
-            customerView.classList.remove('hidden');
-            mainHeaderTitle.textContent = `My Customer - ${currentCustomer.name}`;
-            setActiveNav(navMyCustomer);
-            
-            document.getElementById('customer-view-title').textContent = `Wealth Customer Management Solution`;
-            
-            // Set main tab images
-            document.querySelector('#profile-content img').src = imagePaths.customerTabs[customerId].profile;
-            document.querySelector('#asset-content img').src = imagePaths.customerTabs[customerId].asset;
-            document.querySelector('#kys-content img').src = imagePaths.customerTabs[customerId].kys;
-            
-            // (5) Updated logic to pull customer-specific sub-tab images
-            // Set account management sub-tab images
-            const customerSubImages = imagePaths.customerTabs[customerId].accountManagement;
-            document.querySelector('#theme-subcontent img').src = customerSubImages.theme;
-            document.querySelector('#lifestyle-subcontent img').src = customerSubImages.lifestyle;
-            document.querySelector('#use-subcontent img').src = customerSubImages.use;
-            document.querySelector('#invest-subcontent img').src = customerSubImages.invest;
-            document.querySelector('#protect-subcontent img').src = customerSubImages.protect;
-            document.querySelector('#loan-subcontent img').src = customerSubImages.loan;
-
-
-            const firstTabLink = document.querySelector('.customer-nav a[data-tab="profile"]');
-            if (firstTabLink) firstTabLink.click();
-        };
-        
-        if (customerNavContainer) {
-            customerNavContainer.addEventListener('click', (e) => {
-                const link = e.target.closest('a');
-                if (!link) return;
-                e.preventDefault();
-                const targetTab = link.dataset.tab;
-                customerNavContainer.querySelectorAll('a').forEach(l => {
-                    l.classList.remove('bg-[#0056ff]', 'text-white');
-                    l.classList.add('text-gray-700', 'bg-white', 'border', 'border-gray-300', 'hover:bg-gray-50');
-                });
-                link.classList.add('bg-[#0056ff]', 'text-white');
-                link.classList.remove('text-gray-700', 'bg-white', 'border', 'border-gray-300', 'hover:bg-gray-50');
-                customerView.querySelectorAll('.customer-tab-content').forEach(tab => {
-                    tab.classList.toggle('hidden', tab.id !== `${targetTab}-content`);
-                });
-                // (6) Default to the first button ("theme") since it's now enabled
-                if(targetTab === 'account') {
-                    // Use setTimeout to allow the DOM to update before clicking
-                    setTimeout(() => {
-                        document.querySelector('.account-management-nav button[data-subtab="theme"]').click();
-                    }, 0);
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                try {
+                    recognition.start();
+                } catch(e) {
+                    console.error("Could not start recognition:", e);
+                    statusIndicator.textContent = 'ไม่สามารถเริ่มการบันทึกเสียงได้';
                 }
-            });
-        }
+            }
+        });
         
-        const accountManagementNav = document.querySelector('.account-management-nav');
-        if(accountManagementNav) {
-            accountManagementNav.addEventListener('click', (e) => {
-                const button = e.target.closest('button');
-                if(!button || button.disabled) return;
-                
-                accountManagementNav.querySelectorAll('button:not([disabled])').forEach(btn => {
-                    btn.classList.remove('bg-blue-600', 'text-white');
-                    btn.classList.add('bg-white', 'text-gray-700', 'hover:bg-gray-50');
-                });
-                button.classList.add('bg-blue-600', 'text-white');
-                button.classList.remove('bg-white', 'text-gray-700', 'hover:bg-gray-50');
+        async function callGemini(payload) {
+            const API_KEY = ""; // This will be provided by the execution environment.
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
 
-                const targetSubTab = button.dataset.subtab;
-                document.querySelectorAll('.account-sub-content').forEach(content => {
-                    content.classList.toggle('hidden', content.id !== `${targetSubTab}-subcontent`);
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
-            });
-        }
-        
-        if(customerDetailsTable) {
-            customerDetailsTable.addEventListener('click', (e) => {
-                if (e.target.classList.contains('view-profile-btn')) {
-                    const customerId = e.target.dataset.customerId;
-                    showCustomerView(null, customerId);
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: { message: response.statusText }}));
+                    throw new Error(`API error (${response.status}): ${errorData.error.message}`);
                 }
-            });
+                const data = await response.json();
+                if (!data.candidates || data.candidates.length === 0 || !data.candidates[0].content) {
+                    return "ขออภัยค่ะ AI ไม่สามารถตอบกลับได้ในขณะนี้";
+                }
+                return data.candidates[0].content.parts[0].text;
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                return `ขออภัย, เกิดข้อผิดพลาดในการเชื่อมต่อ: ${error.message}.`;
+            }
         }
 
-        if(navMyPortfolio) navMyPortfolio.addEventListener('click', showPortfolioView);
-        if(navMyCustomer) navMyCustomer.addEventListener('click', (e) => showCustomerView(e, 'A')); // Default to A if clicked directly
-    });
-</script>
-
+    </script>
 </body>
 </html>
-
-
 
