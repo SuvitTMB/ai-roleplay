@@ -3,458 +3,991 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Sales Roleplay Simulator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Wealth Customer Management Solution</title>
+    <!-- Tailwind CSS for styling --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons for UI icons --><script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <!-- Google Fonts --><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Kanit', sans-serif;
-            background-color: #f1f5f9; /* Softer slate background */
-            color: #1e293b; /* Darker slate text */
-            padding-top: 64px; 
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        .font-inter {
-            font-family: 'Inter', sans-serif;
+        .lightbox {
+            transition: opacity 0.3s ease-in-out;
         }
-        .card {
-            background-color: #FFFFFF;
-            border: 1px solid #e2e8f0;
-            border-radius: 1rem; /* xl */
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        button, .customer-nav a, .account-management-nav button {
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
         }
-        .btn-primary {
-            background-color: #2563eb; /* Blue 600 */
-            color: white;
-            font-weight: 600;
-            border-radius: 0.5rem; /* lg */
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 3px;
         }
-        .btn-primary:hover:not(:disabled) {
-            background-color: #1d4ed8; /* Blue 700 */
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background-color: #f1f5f9;
         }
-        .btn-primary:disabled {
-            background-color: #94a3b8; /* Slate 400 */
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-        .btn-secondary {
-            background-color: #475569; /* Slate 600 */
-            color: white;
-            font-weight: 600;
-            border-radius: 0.5rem; /* lg */
-            transition: all 0.3s ease;
-        }
-        .btn-secondary:hover:not(:disabled) {
-            background-color: #334155; /* Slate 700 */
-             transform: translateY(-2px);
-        }
-        .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-        }
-        .chat-bubble {
-            max-width: 75%;
-            padding: 0.75rem 1rem;
-            border-radius: 1rem;
-        }
-        .user-bubble {
-            background-color: #2563eb;
-            color: white;
-            border-bottom-right-radius: 0.25rem;
-        }
-        .ai-bubble {
-            background-color: #e2e8f0; /* Slate 200 */
-            color: #1e293b;
-            border-bottom-left-radius: 0.25rem;
-        }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        .nav-btn {
-            padding: 8px 16px;
-            border-radius: 0.5rem; /* lg */
-            transition: background-color 0.3s, color 0.3s;
-            font-weight: 600;
-        }
-        .nav-btn.active {
-            background-color: #2563eb;
-            color: white;
-        }
-        .nav-btn:not(.active):hover {
-            background-color: #e2e8f0;
-        }
-        .news-card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 0.75rem; /* lg */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.25rem;
-        }
-        .quiz-option.correct {
-            background-color: #22c55e !important; /* Green 500 */
-            color: white !important;
-            border-color: #16a34a !important;
-        }
-        .quiz-option.incorrect {
-            background-color: #ef4444 !important; /* Red 500 */
-            color: white !important;
-            border-color: #dc2626 !important;
-        }
-        .quiz-option:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        .rating-stars .fa-star {
-            color: #cbd5e1; /* slate 300 */
+        /* Persona Button Styles */
+        .persona-btn {
+            border: 1px solid #FDE8D7;
+            background-color: white;
+            color: #C08252;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-weight: 500;
             cursor: pointer;
-            transition: color 0.2s;
         }
-        .rating-stars:hover .fa-star {
-            color: #f59e0b; /* amber 500 */
+        .persona-btn.selected-persona {
+            background-color: #FDE8D7;
+            border-color: #F9C093;
+            color: #A0643A;
+            font-weight: 600;
         }
-        .rating-stars .fa-star:hover ~ .fa-star {
-            color: #cbd5e1;
+        #customer-details-table td {
+            vertical-align: middle;
         }
-        .rating-stars[data-rating="1"] .fa-star:nth-child(-n+1),
-        .rating-stars[data-rating="2"] .fa-star:nth-child(-n+2),
-        .rating-stars[data-rating="3"] .fa-star:nth-child(-n+3),
-        .rating-stars[data-rating="4"] .fa-star:nth-child(-n+4),
-        .rating-stars[data-rating="5"] .fa-star:nth-child(-n+5) {
-            color: #f59e0b;
+        .max-w-4xl { max-width: 60rem;}
+        .max-w-2xl { max-width: 60rem !important;}
+        
+        /* Soundwave Animation */
+        .sound-wave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 2px solid rgba(234, 179, 8, 0.5);
+            width: 100%;
+            height: 100%;
+            animation: pulse 2s infinite ease-out;
         }
-        .w-24 { width: 8rem !important; }
-        .h-24 { height: 8rem !important; }
+        .sound-wave:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+        .sound-wave:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.6;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="bg-white text-gray-800">
 
-    <!-- Login View -->
-    <div id="login-view" class="fixed inset-0 bg-slate-100 flex items-center justify-center z-[100] transition-opacity duration-300">
-        <div class="w-full max-w-md p-8 bg-white rounded-2xl shadow-2xl">
-            <div class="text-center">
-                 <i class="fas fa-brain text-5xl text-blue-600"></i>
-                <h2 class="mt-4 text-3xl font-bold text-slate-800">SalesSim Login</h2>
-                <p class="text-slate-500 mb-8">กรุณากรอกข้อมูลเพื่อเข้าสู่ระบบ</p>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label for="employee-id" class="block text-sm font-medium text-slate-600">รหัสพนักงาน</label>
-                    <input type="text" id="employee-id" class="mt-1 block w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 12345">
-                </div>
-                 <div>
-                    <label for="employee-name" class="block text-sm font-medium text-slate-600">ชื่อ-นามสกุล</label>
-                    <input type="text" id="employee-name" class="mt-1 block w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., สมชาย ชาญชัย">
-                </div>
-                <button id="login-btn" class="w-full btn-primary py-3 px-4 rounded-lg text-base">เข้าสู่ระบบ</button>
-            </div>
-        </div>
-    </div>
-
-    <nav class="bg-white/70 backdrop-blur-lg shadow-md fixed top-0 left-0 right-0 z-40 hidden">
-        <div class="container mx-auto px-4 md:px-8 flex justify-between items-center h-16">
-            <div class="text-xl font-bold text-blue-600">
-                <i class="fas fa-brain mr-2"></i>SalesSim
-            </div>
-            <div class="flex items-center space-x-2">
-                <button id="nav-roleplay" class="nav-btn"><i class="fas fa-user-friends mr-2"></i>Roleplay</button>
-                <button id="nav-specialist" class="nav-btn"><i class="fas fa-user-tie mr-2"></i>Product Specialist</button>
-                <button id="nav-quiz" class="nav-btn"><i class="fas fa-question-circle mr-2"></i>Quiz Game</button>
-                <button id="nav-news" class="nav-btn"><i class="far fa-newspaper mr-2"></i>Daily News</button>
-                <button id="nav-leaderboard" class="nav-btn"><i class="fas fa-trophy mr-2"></i>Leaderboard</button>
-            </div>
-             <div class="flex items-center space-x-4">
-                <div id="user-info" class="hidden items-center space-x-3">
-                    <span id="user-display-name" class="font-semibold text-slate-700 text-right"></span>
-                    <i class="fas fa-user-circle text-slate-600 text-2xl"></i>
-                </div>
-                <button id="logout-btn" class="hidden nav-btn !bg-red-500/90 !text-white hover:!bg-red-600">
-                    <i class="fas fa-sign-out-alt"></i>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar --><aside id="sidebar" class="w-64 bg-gray-50 flex-shrink-0 flex flex-col border-r transition-all duration-300">
+            <!-- Sidebar Header --><div class="h-[61px] flex items-center justify-between px-4 border-b flex-shrink-0">
+                <h2 id="sidebar-title" class="text-lg font-semibold text-gray-700">Pages</h2>
+                <button id="toggleSidebarBtn" class="text-gray-500 hover:text-gray-800">
+                    <i id="collapse-icon" data-lucide="chevrons-left" class="w-5 h-5"></i>
+                    <i id="expand-icon" data-lucide="chevrons-right" class="w-5 h-5 hidden"></i>
                 </button>
             </div>
+            <!-- Navigation --><nav class="flex-1 overflow-y-auto custom-scrollbar sidebar-nav">
+                <ul class="py-2">
+                    <li id="navMyPortfolio"><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm bg-gray-200 text-gray-900 font-semibold border-l-4 border-blue-600"><i data-lucide="home" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text">My Portfolio</span></a></li>
+                    <li id="navMyCustomer"><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="users" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text">My Customer</span></a></li>
+                    <li><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="activity" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text">My Activity</span></a></li>
+                    <li><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="trending-up" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text">Maturity Leads</span></a></li>
+                    <li><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="alert-triangle" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text truncate">My Alert! Deposit Attrition</span></a></li>
+                    <li><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="alert-circle" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text truncate">My Alert! ทำธุรกรรมกองทุน</span></a></li>
+                    <li><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="file-text" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text">In-depth KYC</span></a></li>
+                    <li><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="bar-chart-2" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text">KPI</span></a></li>
+                    <li><a href="#" class="flex items-center pl-4 pr-2 py-2.5 text-sm text-gray-700 hover:bg-gray-100 border-l-4 border-transparent"><i data-lucide="layout-dashboard" class="w-4 h-4 mr-3"></i><span class="sidebar-link-text truncate">Wealth AUM Daily Dashboard</span></a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content --><div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Header --><header class="bg-white shadow-sm px-6 h-[61px] flex justify-between items-center z-10 flex-shrink-0 border-b">
+                <div class="flex items-center text-sm"><span id="mainHeaderTitle" class="text-lg font-semibold">My Portfolio</span></div>
+                <div class="flex items-center space-x-4">
+                    <span id="data-updated-span" class="text-xs text-gray-500"></span>
+                    <div class="relative"><i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i><input type="text" placeholder="Search" class="pl-9 pr-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"></div>
+                    <button class="text-gray-600 hover:text-blue-600"><i data-lucide="settings" class="w-5 h-5"></i></button>
+                    <button class="text-gray-600 hover:text-blue-600"><i data-lucide="help-circle" class="w-5 h-5"></i></button>
+                    <button class="text-gray-600 hover:text-blue-600"><i data-lucide="user-circle-2" class="w-5 h-5"></i></button>
+                </div>
+            </header>
+
+            <!-- Content Area --><main class="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-100">
+                <!-- View 1: My Portfolio --><div id="portfolio-view">
+                    <div class="flex justify-between items-center mb-6 px-1">
+                        <h1 class="text-xl font-bold">Wealth Customer Management Solution</h1>
+                        <div class="flex items-center space-x-2">
+                            <button class="px-4 py-2 text-sm font-semibold bg-blue-600 text-white rounded-md hover:bg-blue-700">รายชื่อลูกค้า</button>
+                            <button id="exportFileBtn" class="px-4 py-2 text-sm font-semibold bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center"><i data-lucide="file-down" class="w-4 h-4 mr-2"></i> Export File</button>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap -mx-3">
+                        <div class="w-full px-3">
+                            <div class="flex flex-col space-y-6">
+                               <div class="bg-white p-2 rounded-lg shadow-sm border"><img id="main-dashboard-kpi-img" src="" alt="UI PowerBI KPIs" class="w-full h-auto rounded-md"></div>
+                               <!-- Customer Details Table --><div id="customer-details-table" class="bg-white p-2 rounded-lg shadow-sm border">
+                                    <div class="flex flex-wrap gap-2 p-2 mb-4">
+                                        <button class="px-4 py-2 text-sm font-semibold text-white bg-red-700 rounded-md hover:bg-red-800">รายชื่อ Do Not Contact</button>
+                                        <button class="px-4 py-2 text-sm font-semibold bg-orange-100 text-orange-800 rounded-md hover:bg-orange-200">อัพเดทประวัติเดือน คลิก</button>
+                                        <button class="px-4 py-2 text-sm font-semibold bg-orange-100 text-orange-800 rounded-md hover:bg-orange-200">ปรับตาม ttb WOW คลิก</button>
+                                        <button class="px-4 py-2 text-sm font-semibold bg-orange-100 text-orange-800 rounded-md hover:bg-orange-200">ปรับตาม HWC ใหม่ คลิก</button>
+                                        <button class="px-4 py-2 text-sm font-semibold bg-orange-100 text-orange-800 rounded-md hover:bg-orange-200">ปรับตาม Filter คลิก</button>
+                                        <button class="px-4 py-2 text-sm font-semibold bg-orange-100 text-orange-800 rounded-md hover:bg-orange-200">ปรับตาม W1-W5 คลิก</button>
+                                    </div>
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><div class="flex items-center">Customer ID <i data-lucide="arrow-down-up" class="w-3 h-3 ml-1"></i></div></th>
+                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><div class="flex items-center">ชื่อลูกค้า <i data-lucide="arrow-down-up" class="w-3 h-3 ml-1"></i></div></th>
+                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Group</th>
+                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wealth Sub Segment</th>
+                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tier Loyalty</th>
+                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">H W C ลูกค้า 2024</th>
+                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">H W C ลูกค้า 2025</th>
+                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wealth</th>
+                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Segment</th>
+                                                    <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200">
+                                                <tr class="hover:bg-gray-50">
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0011000...</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 max-w-[10ch] truncate">Customer A</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">G2 Wealth Bank</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm p-1"><span class="block w-full text-center px-2 py-1 text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">W1</span></td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">BASIC</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">Y</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">HNW</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium"><button class="view-profile-btn w-full px-2 py-1 text-xs font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700" data-customer-id="A">View Profile</button></td>
+                                                </tr>
+                                                <tr class="bg-gray-50 hover:bg-gray-100">
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0011000...</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 max-w-[10ch] truncate">Customer B</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">G3 Prospect Wealth</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm p-1"><span class="block w-full text-center px-2 py-1 text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">W2</span></td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">BASIC</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">4.COLD_TXN</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">N</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">UAF</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium"><button class="view-profile-btn w-full px-2 py-1 text-xs font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700" data-customer-id="B">View Profile</button></td>
+                                                </tr>
+                                                <tr class="hover:bg-gray-50">
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0011000...</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 max-w-[10ch] truncate">Customer C</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">G2 Wealth Bank</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm p-1"><span class="block w-full text-center px-2 py-1 text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">W3</span></td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">GOLD</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">4.COLD_TXN</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">Y</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">UAF</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium"><button class="view-profile-btn w-full px-2 py-1 text-xs font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700" data-customer-id="C">View Profile</button></td>
+                                                </tr>
+                                                <tr class="bg-gray-50 hover:bg-gray-100">
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0011000...</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 max-w-[10ch] truncate">Customer D</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">G2 Wealth Bank</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm p-1"><span class="block w-full text-center px-2 py-1 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">W4</span></td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">SILVER</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">N</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">UAF</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium"><button class="view-profile-btn w-full px-2 py-1 text-xs font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700" data-customer-id="D">View Profile</button></td>
+                                                </tr>
+                                                <tr class="hover:bg-gray-50">
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0011000...</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 max-w-[10ch] truncate">Customer E</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">G2 Wealth Bank</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm p-1"><span class="block w-full text-center px-2 py-1 text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">W5</span></td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">GOLD</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">1.SUPER_HOT</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">1.SUPER_HOT</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">Y</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">HNW_Not Verified</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium"><button class="view-profile-btn w-full px-2 py-1 text-xs font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700" data-customer-id="E">View Profile</button></td>
+                                                </tr>
+                                                <tr class="bg-gray-50 hover:bg-gray-100">
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0011000...</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 max-w-[10ch] truncate">Customer F</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">G2 Wealth Bank</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm p-1"><span class="block w-full text-center px-2 py-1 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">W4</span></td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">SILVER</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">2.HOT</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">N</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">UAF</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium"><button class="w-full px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-300 rounded-md cursor-not-allowed" disabled>View Profile</button></td>
+                                                </tr>
+                                                <tr class="hover:bg-gray-50">
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">0011000...</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 max-w-[10ch] truncate">Customer G</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">G2 Wealth Bank</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm p-1"><span class="block w-full text-center px-2 py-1 text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">W1</span></td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">BASIC</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">3.WARM</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">N</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">MI</td>
+                                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium"><button class="w-full px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-300 rounded-md cursor-not-allowed" disabled>View Profile</button></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                               </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View 2: My Customer --><div id="customer-view" class="hidden">
+                    <div class="flex justify-between items-center mb-6 px-1">
+                        <h1 id="customer-view-title" class="text-lg font-bold">Wealth Customer Management Solution</h1>
+                        <div class="customer-nav flex items-center space-x-2">
+                            <a href="#" data-tab="profile" class="px-4 py-2 text-sm font-semibold text-white bg-[#0056ff] rounded-md">Customer Profile</a>
+                            <a href="#" data-tab="asset" class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md">Asset Movement</a>
+                            <a href="#" data-tab="account" class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md">Account Management</a>
+                            <a href="#" data-tab="kys" class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md">ผลตอบรับ In Depth KYS</a>
+                            <button id="prompobBtn" class="flex items-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-yellow-900 to-amber-800 hover:from-yellow-800 hover:to-amber-700 rounded-md shadow-md">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2 fill-current"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/><path d="M20 2L20.9 4.08L23 4.54L21.5 5.97L21.82 8.04L20 7.02L18.18 8.04L18.5 5.97L17 4.54L19.1 4.08L20 2Z" fill="currentColor"/></svg>
+                                พร้อมพบ
+                            </button>
+                        </div>
+                    </div>
+                    <div class="w-full px-1">
+                        <div id="profile-content" class="customer-tab-content bg-white p-2 rounded-lg shadow-sm border"><img src="" alt="Customer Profile Details" class="w-full h-auto rounded-md"></div>
+                        <div id="asset-content" class="customer-tab-content hidden bg-white p-2 rounded-lg shadow-sm border"><img src="" alt="Asset Movement Chart" class="w-full h-auto rounded-md"></div>
+                        <div id="account-content" class="customer-tab-content hidden bg-white p-4 rounded-lg shadow-sm border">
+                            <div class="account-management-nav flex justify-center space-x-2 mb-4 p-2 bg-gray-100 rounded-lg">
+                                <!-- (1) Enabled Button: Theme Trigger -->
+                                <button data-subtab="theme" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">Theme Trigger</button>
+                                <button data-subtab="lifestyle" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">Customer Lifestyle</button>
+                                <!-- (2) Enabled Button: ฉลาดใช้ -->
+                                <button data-subtab="use" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">ฉลาดใช้</button>
+                                <button data-subtab="invest" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">ฉลาดออม และลงทุน</button>
+                                <!-- (3) Enabled Button: คุ้มครองที่อุ่นใจ -->
+                                <button data-subtab="protect" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">คุ้มครองที่อุ่นใจ</button>
+                                <button data-subtab="loan" class="px-4 py-2 text-sm font-semibold rounded-md bg-white text-gray-700 hover:bg-gray-50">รอบรู้กู้ยืม</button>
+                            </div>
+                            <div id="theme-subcontent" class="account-sub-content hidden"><img src="" alt="Theme Trigger Image" class="w-full h-auto rounded-md"></div>
+                            <div id="lifestyle-subcontent" class="account-sub-content"><img src="" alt="Lifestyle Image" class="w-full h-auto rounded-md"></div>
+                            <div id="use-subcontent" class="account-sub-content hidden"><img src="" alt="Use Image" class="w-full h-auto rounded-md"></div>
+                            <div id="invest-subcontent" class="account-sub-content hidden"><img src="" alt="Invest Image" class="w-full h-auto rounded-md"></div>
+                            <div id="protect-subcontent" class="account-sub-content hidden"><img src="" alt="Protect Image" class="w-full h-auto rounded-md"></div>
+                            <div id="loan-subcontent" class="account-sub-content hidden"><img src="" alt="Loan Image" class="w-full h-auto rounded-md"></div>
+                        </div>
+                        <div id="kys-content" class="customer-tab-content hidden bg-white p-2 rounded-lg shadow-sm border"><img src="" alt="In Depth KYS Feedback" class="w-full h-auto rounded-md"></div>
+                    </div>
+                </div>
+            </main>
         </div>
-    </nav>
+    </div>
+
+    <!-- Standard Lightboxes --><div id="imageLightbox" class="lightbox fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 p-4"><div class="relative"><button id="closeLightboxBtn" class="absolute -top-3 -right-3 text-white bg-gray-800 rounded-full p-1 hover:bg-gray-700"><i data-lucide="x" class="w-6 h-6"></i></button><img src="" alt="Roleplay Image" class="max-w-full max-h-[90vh] rounded-lg shadow-lg"></div></div>
+    <div id="exportFileLightbox" class="lightbox fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 p-4"><div class="relative"><button id="closeExportLightboxBtn" class="absolute -top-3 -right-3 text-white bg-gray-800 rounded-full p-1 hover:bg-gray-700"><i data-lucide="x" class="w-6 h-6"></i></button><img src="" alt="Export File Image" class="max-w-full max-h-[90vh] rounded-lg shadow-lg"></div></div>
+    <div id="viewReportLightbox" class="lightbox fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[70] p-4">
+        <div class="bg-white rounded-2xl shadow-lg w-full max-w-4xl h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-xl font-bold text-gray-800">View Report</h3>
+                <button id="closeViewReportBtn" class="bg-gray-300 hover:bg-gray-400 p-1 rounded-full"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
+                <img id="viewReportImg" src="" alt="Report" class="w-full h-auto">
+            </div>
+            <div class="p-4 mt-auto border-t flex justify-end">
+                <button id="closeViewReportBtn2" class="py-2 px-4 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Persona View Report Lightbox --><div id="personaReportLightbox" class="lightbox fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-[60] p-4">
+        <div class="bg-white rounded-2xl shadow-lg w-full max-w-4xl h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-xl font-bold text-gray-800">View Report</h3>
+                <button id="closePersonaReportBtn" class="bg-gray-300 hover:bg-gray-400 p-1 rounded-full"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
+                <img src="" id="personaReportImg" alt="Report" class="w-full h-auto">
+            </div>
+            <div class="p-4 mt-auto border-t flex justify-end">
+                <button id="personaReportCloseBtnBottom" class="py-2 px-4 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Close</button>
+            </div>
+        </div>
+    </div>
     
-    <main id="main-content" class="hidden">
-        <!-- Main View: Customer Selection -->
-        <div id="customer-list-view" class="main-view" data-parent-nav="nav-roleplay">
-            <div class="container mx-auto p-4 md:p-8">
-                <header class="text-center mb-10">
-                    <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">AI Sales Roleplay Simulator</h1>
-                    <p class="text-lg text-slate-600 mt-2">เลือกโปรไฟล์ลูกค้าเพื่อเริ่มการจำลองสถานการณ์</p>
-                </header>
-                <div id="customer-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
-                    <!-- Customer cards will be injected here by JavaScript -->
-                </div>
+    <!-- Evaluation Report Lightbox --><div id="evaluationReportLightbox" class="lightbox fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden z-[70] p-4">
+        <div class="bg-white rounded-2xl shadow-lg w-full max-w-4xl h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-xl font-bold text-gray-800">View Report</h3>
+                <button id="closeEvaluationReportBtn" class="bg-gray-300 hover:bg-gray-400 p-1 rounded-full"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
+                <img id="evaluationReportImg" src="" alt="Evaluation Report" class="w-full h-auto">
             </div>
         </div>
+    </div>
 
-        <!-- Product Specialist View -->
-        <div id="specialist-view" class="main-view container mx-auto p-4 md:p-8 hidden" data-parent-nav="nav-specialist">
-            <header class="text-center mb-10">
-                <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-500">Product Specialist</h1>
-                <p class="text-lg text-slate-600 mt-2">เลือกผู้เชี่ยวชาญ AI เพื่อสอบถามข้อมูลผลิตภัณฑ์</p>
-            </header>
-            <div id="specialist-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Specialist cards will be injected here -->
-            </div>
-        </div>
-        
-        <!-- Quiz Game View -->
-        <div id="quiz-view" class="main-view container mx-auto p-4 md:p-8 hidden" data-parent-nav="nav-quiz">
-            <header class="text-center mb-10">
-                <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500">Quiz Game</h1>
-                <p class="text-lg text-slate-600 mt-2">เลือกผลิตภัณฑ์เพื่อทดสอบความรู้ของคุณ</p>
-            </header>
-            <div id="quiz-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                 <!-- Quiz cards will be injected here -->
-            </div>
-        </div>
-        
-        <!-- Product Detail View -->
-        <div id="quiz-product-detail-view" class="main-view container mx-auto p-4 md:p-8 hidden" data-parent-nav="nav-quiz">
-            <div id="product-detail-content">
-                <!-- Product detail content will be injected here -->
-            </div>
-        </div>
-
-
-        <!-- Quiz Interface View -->
-        <div id="quiz-interface-view" class="main-view container mx-auto p-4 md:p-8 hidden" data-parent-nav="nav-quiz">
-            <div class="max-w-3xl mx-auto">
-                <div id="quiz-header" class="text-center mb-8 relative">
-                    <button id="quiz-sound-toggle" class="absolute top-0 right-0 btn-secondary !bg-blue-500 hover:!bg-blue-600 p-2 rounded-full h-10 w-10 text-lg">
-                        <i class="fas fa-volume-up"></i>
-                    </button>
-                    <h2 id="quiz-title" class="text-3xl font-bold"></h2>
-                    <p id="quiz-progress" class="text-slate-500 font-semibold mt-1"></p>
-                    <p id="quiz-timer" class="text-2xl font-bold text-red-500 mt-2"></p>
-                </div>
-                <div id="quiz-question-card" class="card p-8 mb-6 min-h-[120px] flex items-center justify-center">
-                    <p id="quiz-question-text" class="text-xl text-center"></p>
-                </div>
-                <div id="quiz-options" class="grid grid-cols-1 gap-4">
-                    <!-- Options will be dynamically inserted here -->
-                </div>
-                <div id="quiz-feedback" class="mt-6 p-4 rounded-lg hidden bg-slate-100">
-                    <h4 id="quiz-feedback-title" class="font-bold text-lg"></h4>
-                    <p id="quiz-feedback-text" class="mt-1 text-slate-700"></p>
-                </div>
-                <div class="text-center mt-8">
-                     <button id="quiz-next-btn" class="btn-primary px-8 py-3 hidden" onclick="displayNextQuestion()">คำถามถัดไป</button>
+    <!-- Prompob (AI) Lightbox - Step 1: Persona Selection --><div id="prompobLightbox" class="lightbox fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-[#FFFBF7] rounded-2xl shadow-lg w-full max-w-2xl max-h-[95vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b border-orange-200">
+                <h3 class="text-xl font-bold" style="color: #A0643A;"><span class="text-2xl mr-2">✨</span>พร้อมพบ</h3>
+                <div class="flex items-center space-x-2">
+                    <button id="personaViewReportBtn" class="px-4 py-1.5 text-sm font-semibold bg-orange-100 text-orange-800 rounded-full hover:bg-orange-200 flex items-center"><i data-lucide="bar-chart-3" class="w-4 h-4 mr-2"></i>View Report</button>
+                    <button id="closePrompobLightboxBtn" class="bg-gray-300 hover:bg-gray-400 p-1 rounded-full"><i data-lucide="x" class="w-6 h-6"></i></button>
                 </div>
             </div>
-        </div>
-
-        <!-- Quiz Results View -->
-        <div id="quiz-results-view" class="main-view container mx-auto p-4 md:p-8 hidden" data-parent-nav="nav-quiz">
-             <div class="max-w-2xl mx-auto text-center card p-10" style="max-width: 70% !important;">
-                <i class="fas fa-award text-6xl text-amber-400"></i>
-                <h2 class="text-4xl font-bold mt-4">สรุปผลคะแนน</h2>
-                <p id="quiz-results-product" class="text-xl text-slate-500 mt-1"></p>
-                <p id="quiz-results-score" class="text-6xl font-bold my-6"></p>
-                <div id="quiz-evaluation" class="text-left space-y-4">
-                    <!-- Evaluation will be inserted here -->
-                </div>
-                <div class="mt-8">
-                     <button onclick="showView('quiz-view')" class="btn-primary px-8 py-3">กลับไปหน้า Quiz</button>
-                </div>
-             </div>
-        </div>
-
-
-        <!-- News View -->
-        <div id="news-view" class="main-view container mx-auto p-4 md:p-8 hidden" data-parent-nav="nav-news">
-             <header class="text-center mb-10">
-                 <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-blue-500">Daily News</h1>
-                <p class="text-lg text-slate-600 mt-2">สรุปข่าวสารเศรษฐกิจและการลงทุนรายวันโดย AI</p>
-            </header>
-            <div id="news-content-wrapper">
-                <!-- News content will be injected here -->
-            </div>
-        </div>
-
-        <!-- Leaderboard View -->
-         <div id="leaderboard-view" class="main-view container mx-auto p-4 md:p-8 hidden" data-parent-nav="nav-leaderboard">
-            <header class="text-center mb-10">
-                 <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">Leaderboard</h1>
-                <p class="text-lg text-slate-600 mt-2">อันดับผู้ทำคะแนนสูงสุด</p>
-            </header>
-             <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-50">
-                            <tr>
-                                <th class="p-4 text-sm font-semibold text-slate-600 uppercase tracking-wider">อันดับ</th>
-                                <th class="p-4 text-sm font-semibold text-slate-600 uppercase tracking-wider">รหัสพนักงาน</th>
-                                <th class="p-4 text-sm font-semibold text-slate-600 uppercase tracking-wider">ชื่อพนักงาน</th>
-                                <th class="p-4 text-sm font-semibold text-slate-600 uppercase tracking-wider">คะแนนเฉลี่ย</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaderboard-body">
-                            <!-- Rows will be injected here -->
-                        </tbody>
-                    </table>
+            <div id="persona-selection-content" class="p-6 overflow-y-auto custom-scrollbar">
+                <div class="bg-white p-8 rounded-lg shadow-inner-lg" style="box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);">
+                    <p id="persona-customer-name" class="text-center text-lg font-bold text-orange-900 mb-2"></p>
+                    <p class="text-center text-lg font-medium text-orange-900 mb-8">Please choose your "Wealth Customer Persona"</p>
+                    <div class="space-y-6">
+                        <div><p class="font-semibold text-gray-700 mb-2">Gender</p><div class="grid grid-cols-2 gap-4 persona-group" data-group="gender"><button class="persona-btn" data-value="male">Male</button><button class="persona-btn" data-value="female">Female</button></div></div>
+                        <div><p class="font-semibold text-gray-700 mb-2">Wealth Sub-Segment</p><div class="grid grid-cols-5 gap-3 persona-group" data-group="wealth"><button class="persona-btn" data-value="w1">W1</button><button class="persona-btn" data-value="w2">W2</button><button class="persona-btn" data-value="w3">W3</button><button class="persona-btn" data-value="w4">W4</button><button class="persona-btn" data-value="w5">W5</button></div></div>
+                        <div><p class="font-semibold text-gray-700 mb-2">Risk</p><div class="grid grid-cols-3 gap-3 persona-group" data-group="risk"><button class="persona-btn" data-value="pure-deposit">Pure Deposit</button><button class="persona-btn" data-value="low-risk">Low Risk</button><button class="persona-btn" data-value="medium-to-high-risk">Medium to High Risk</button></div></div>
+                        <div><p class="font-semibold text-gray-700 mb-2">Personality Type</p><div class="grid grid-cols-4 gap-3 persona-group" data-group="personality"><button class="persona-btn" data-value="goal">เป้าประสงค์</button><button class="persona-btn" data-value="star">หนึ่งดารา</button><button class="persona-btn" data-value="road">ถนอมจิต</button><button class="persona-btn" data-value="calculate">คิดคำนวณ</button></div></div>
+                        <div><p class="font-semibold text-gray-700 mb-2">Children</p><div class="grid grid-cols-2 gap-4 persona-group" data-group="children"><button class="persona-btn" data-value="yes">Yes</button><button class="persona-btn" data-value="no">No</button></div></div>
+                    </div>
                 </div>
             </div>
-        </div>
-
-    </main>
-
-    <!-- Roleplay View -->
-    <div id="roleplay-view" class="hidden fixed inset-0 h-screen w-screen flex flex-col bg-white z-50">
-        <!-- Header -->
-        <div class="p-4 md:p-6 border-b border-slate-200">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <button id="back-to-list-btn" class="btn-secondary py-2 px-4 !rounded-lg flex items-center gap-2">
-                        <i class="fas fa-arrow-left"></i>
-                        กลับไป
-                    </button>
-                    <button id="show-roleplay-info-btn" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors">
-                        <i class="fas fa-info-circle"></i>
-                        ข้อมูลลูกค้า
-                    </button>
-                    <button id="show-scoring-btn" onclick="showScoringInfo()" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors">
-                        <i class="fas fa-star-half-alt"></i> การให้คะแนน
-                    </button>
-                    <button id="end-chat-btn" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors disabled:bg-red-300 disabled:cursor-not-allowed">
-                        <i class="fas fa-flag-checkered"></i>
-                        จบการสนทนา
-                    </button>
-                </div>
-                <div id="roleplay-customer-profile" class="flex items-center gap-4">
-                    <!-- Profile info will be injected here -->
-                </div>
+            <div class="p-6 mt-auto border-t border-orange-200 flex items-center space-x-4">
+                <button id="closePrompobBtnBottom" class="w-full py-3 px-4 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Close</button>
+                <button id="personaNextBtn" class="w-full text-white font-bold py-3 px-4 rounded-lg shadow-md" style="background-color: #A0643A;">Next</button>
             </div>
         </div>
-        
-        <!-- Conversation Context -->
-        <div id="conversation-context" class="p-3 bg-blue-50 border-b border-blue-200 text-sm text-blue-800">
-            <!-- Context will be injected here -->
-        </div>
+    </div>
 
-        <!-- Chat Area -->
-        <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar bg-slate-50">
-            <!-- Chat messages will be appended here -->
-        </div>
-
-        <!-- Input Controls -->
-        <div class="p-4 border-t border-slate-200 flex items-start gap-4">
-            <textarea id="chat-input" rows="4" class="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none no-scrollbar" placeholder="พิมพ์ข้อความของคุณ... (กด Enter เพื่อส่ง, Shift+Enter เพื่อขึ้นบรรทัดใหม่)"></textarea>
-            <button id="send-button" class="btn-primary py-3 px-6 rounded-lg flex items-center justify-center self-end">
-                <i class="fas fa-paper-plane"></i>
+    <!-- Prompob (AI) Lightbox - Step 2: Roleplay --><div id="roleplayStartLightbox" class="lightbox fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50 p-4">
+        <div id="roleplay-container" class="bg-[#FFFBF7] rounded-2xl shadow-lg w-full max-w-[70vw] h-[90vh] flex flex-row overflow-hidden relative">
+             <button id="mainRoleplayCloseBtn" class="absolute top-4 right-4 bg-gray-300 hover:bg-gray-400 p-1 rounded-full z-10">
+                <i data-lucide="x" class="w-7 h-7"></i>
             </button>
-        </div>
-    </div>
-    
-     <!-- Specialist Chat View -->
-    <div id="specialist-chat-view" class="hidden fixed inset-0 h-screen w-screen flex flex-col bg-white z-50">
-        <!-- Header -->
-        <div class="p-4 md:p-6 border-b border-slate-200">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <button id="back-to-specialist-list-btn" class="btn-secondary py-2 px-4 !rounded-lg flex items-center gap-2">
-                        <i class="fas fa-arrow-left"></i>
-                        กลับไป
-                    </button>
-                     <button id="end-specialist-chat-btn" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors disabled:bg-red-300 disabled:cursor-not-allowed">
-                        <i class="fas fa-flag-checkered"></i>
-                        จบการสนทนา
-                    </button>
+            <!-- Left Column: Customer Details --><div id="roleplay-left-panel" class="hidden w-[40%] bg-gray-200 p-6 flex flex-col custom-scrollbar overflow-y-auto">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 text-center">ข้อมูลลูกค้า</h3>
+                <div id="roleplay-customer-details" class="flex-grow">
+                     <!-- Dynamic content will be injected here -->
                 </div>
-                 <div id="specialist-chat-profile" class="flex items-center gap-4">
-                    <!-- Profile info will be injected here -->
+                <!-- Additional Notes Section --><div class="mt-auto pt-6 flex-shrink-0">
+                    <p class="font-semibold text-gray-600 mb-2 text-sm">บันทึกเพิ่มเติม</p>
+                    <textarea id="additionalNotesTextarea" rows="5" class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-orange-500 focus:border-orange-500 p-2.5" placeholder="พิมพ์ข้อความที่นี่..."></textarea>
+                    <button id="saveNotesBtn" class="w-full mt-2 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm bg-gray-400 cursor-not-allowed" disabled>Save</button>
                 </div>
             </div>
-        </div>
-        
-        <!-- Chat Area -->
-        <div id="specialist-chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar bg-slate-50">
-            <!-- Chat messages will be appended here -->
-        </div>
-
-        <!-- Input Controls -->
-        <div class="p-4 border-t border-slate-200 flex items-start gap-4">
-            <textarea id="specialist-chat-input" rows="4" class="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none no-scrollbar" placeholder="พิมพ์คำถามเกี่ยวกับผลิตภัณฑ์..."></textarea>
-            <button id="specialist-send-button" class="btn-primary py-3 px-6 rounded-lg flex items-center justify-center self-end">
-                <i class="fas fa-paper-plane"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Modals -->
-    <div id="info-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-backdrop">
-        <div class="card p-8 max-w-2xl w-full mx-4 relative text-slate-700 flex flex-col">
-             <div id="info-modal-content"></div>
-             <div class="mt-8 text-center">
-                 <button onclick="closeInfoModal()" class="btn-secondary py-2 px-6">ปิด</button>
-             </div>
-        </div>
-    </div>
-
-    <div id="evaluation-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-backdrop">
-        <div class="card p-8 max-w-2xl w-full mx-4 relative" style="max-width: 80% !important;">
-            <h2 class="text-3xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">ผลการประเมิน</h2>
-            <div id="evaluation-content" class="space-y-6"></div>
-            <div class="text-center mt-8">
-                <button onclick="closeEvaluationModalAndReset()" class="btn-primary py-2 px-6">ปิด</button>
+            
+            <!-- Right Column: AI Roleplay (Container for states) --><div id="roleplay-right-panel" class="w-full flex flex-col p-6">
+                <!-- State 1: Intro --><div id="roleplay-intro-view" class="flex flex-col h-full">
+                    <div class="flex justify-between items-center mb-4 flex-shrink-0"><button id="roleplayBackBtn" class="text-gray-800 bg-gray-300 hover:bg-gray-400 p-1 rounded-full"><i data-lucide="chevron-left" class="w-6 h-6"></i></button><h3 class="text-xl font-bold" style="color: #A0643A;"><span class="text-2xl mr-2">✨</span>A.I. Roleplay</h3><div class="w-6"></div></div>
+                    <div id="roleplay-intro-content" class="flex-1 bg-white rounded-xl shadow-inner-lg flex flex-col items-center justify-center text-center p-8 overflow-y-auto custom-scrollbar" style="box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);">
+                        <!-- Dynamic content will be injected here -->
+                    </div>
+                    <div class="pt-6 mt-auto flex-shrink-0 flex items-center space-x-4">
+                        <button id="introViewCloseBtn" class="w-full py-3 px-4 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Close</button>
+                        <button id="roleplayStartBtn" class="w-full text-white font-bold py-3 px-4 rounded-lg shadow-md bg-orange-300 hover:bg-orange-400" style="color: #A0643A;">Start</button>
+                    </div>
+                </div>
+                <!-- State 2: In Progress --><div id="roleplay-inprogress-view" class="hidden flex-col h-full">
+                    <div class="flex justify-between items-center mb-4 flex-shrink-0"><div class="w-6"></div><h3 class="text-xl font-bold" style="color: #A0643A;"><span class="text-2xl mr-2">✨</span>A.I. Roleplay</h3><div class="w-6"></div></div>
+                    <div id="roleplay-inprogress-content" class="flex-1 bg-white rounded-xl shadow-inner-lg" style="box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);">
+                        <!-- Dynamic content will be injected here -->
+                    </div>
+                    <div class="pt-6 mt-auto flex-shrink-0"><button id="roleplayEndBtn" class="w-full text-white font-bold py-3 px-4 rounded-lg shadow-md bg-red-600 hover:bg-red-700">End</button></div>
+                </div>
             </div>
-             <button onclick="closeEvaluationModalAndReset()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800 text-2xl">&times;</button>
-        </div>
-    </div>
-    
-    <div id="leaderboard-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-backdrop">
-        <div class="card p-8 max-w-3xl w-full mx-4 relative text-slate-700 flex flex-col max-h-[90vh]">
-             <div id="leaderboard-modal-content" class="overflow-y-auto"></div>
-             <div class="mt-8 text-center border-t border-slate-200 pt-6">
-                 <button onclick="closeLeaderboardModal()" class="btn-secondary py-2 px-6">ปิด</button>
-             </div>
-        </div>
-    </div>
-
-    <div id="scoring-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-backdrop">
-        <div class="card p-8 max-w-2xl w-full mx-4 relative text-slate-700 flex flex-col" style="max-width: 80% !important;">
-             <div id="scoring-modal-content"></div>
-             <div class="mt-8 text-center">
-                 <button onclick="closeScoringModal()" class="btn-secondary py-2 px-6">ปิด</button>
-             </div>
-        </div>
-    </div>
-    
-    <div id="rating-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-backdrop">
-        <div class="card p-8 max-w-md w-full mx-4 relative text-center">
-            <img id="rating-specialist-image" src="" alt="Specialist" class="w-24 h-24 rounded-full object-cover border-4 border-slate-200 mx-auto -mt-20 mb-4">
-            <h2 class="text-2xl font-bold text-slate-800">ให้คะแนน</h2>
-            <p id="rating-specialist-name" class="text-slate-500 mb-6"></p>
-            <div id="rating-stars-container" class="flex justify-center text-4xl gap-3 rating-stars mb-6">
-                 <!-- Stars will be injected here -->
+            <!-- State 3: Transcript --><div id="roleplay-transcript-view" class="hidden w-full flex-col p-6">
+                 <div class="flex justify-between items-center mb-4 flex-shrink-0"><div class="w-6"></div><h3 class="text-xl font-bold" style="color: #A0643A;"><span class="text-2xl mr-2">✨</span>Transcript</h3><div class="w-6"></div></div>
+                <div class="flex-1 bg-white rounded-xl shadow-inner-lg p-4 custom-scrollbar overflow-y-auto" style="box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);"><img id="transcriptImg" src="" alt="Transcript" class="w-full h-auto"></div>
+                <div class="pt-6 mt-auto flex-shrink-0 flex items-center space-x-4">
+                    <button id="transcriptCloseBtn" class="w-full py-3 px-4 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400">Close</button>
+                    <button id="transcriptNextBtn" class="w-full py-3 px-4 rounded-lg text-white font-semibold" style="background-color: #A0643A;">Next</button>
+                </div>
             </div>
-            <p id="rating-feedback" class="text-green-600 h-6 mb-4"></p>
-            <button onclick="closeRatingModal()" class="btn-secondary py-2 px-6">ปิด</button>
+            <!-- State 4: Evaluation --><div id="roleplay-evaluation-view" class="hidden w-full flex-col p-6">
+                <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                    <h3 class="text-xl font-bold" style="color: #A0643A;"><span class="text-2xl mr-2">✨</span>Evaluation Result</h3>
+                    <button id="evaluationViewReportBtn" class="px-4 py-1.5 text-sm font-semibold bg-orange-100 text-orange-800 rounded-full hover:bg-orange-200 flex items-center"><i data-lucide="bar-chart-3" class="w-4 h-4 mr-2"></i>View Report</button>
+                </div>
+                <div class="flex-1 bg-white rounded-xl shadow-inner-lg p-4 custom-scrollbar overflow-y-auto" style="box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);"><img id="evaluationImg" src="" alt="Evaluation Report" class="w-full h-auto"></div>
+            </div>
         </div>
     </div>
 
-
-    <script>
-const _0xdc549f=_0x350a;(function(_0x36e1c9,_0x9f2363){const _0x4fcc7c=_0x350a,_0x5c3f65=_0x36e1c9();while(!![]){try{const _0x45bd90=-parseInt(_0x4fcc7c(0x26c))/0x1*(-parseInt(_0x4fcc7c(0x1a8))/0x2)+-parseInt(_0x4fcc7c(0x169))/0x3*(parseInt(_0x4fcc7c(0x1cf))/0x4)+-parseInt(_0x4fcc7c(0x143))/0x5*(parseInt(_0x4fcc7c(0x180))/0x6)+-parseInt(_0x4fcc7c(0x119))/0x7*(parseInt(_0x4fcc7c(0x296))/0x8)+-parseInt(_0x4fcc7c(0x247))/0x9*(-parseInt(_0x4fcc7c(0x206))/0xa)+-parseInt(_0x4fcc7c(0x18e))/0xb+parseInt(_0x4fcc7c(0x12c))/0xc;if(_0x45bd90===_0x9f2363)break;else _0x5c3f65['push'](_0x5c3f65['shift']());}catch(_0x17b14a){_0x5c3f65['push'](_0x5c3f65['shift']());}}}(_0x3f6f,0x73cbf));const customers=[{'id':0x1,'name':_0xdc549f(0xff),'age':0x3e,'gender':'male','image':'janet.png','title':'Senior\x20Business\x20Owner','segment':_0xdc549f(0x2ce),'riskAppetite':_0xdc549f(0x211),'details':{'Suitability\x20Score':'1','Main\x20bank':_0xdc549f(0x1f4),'ttb\x20Payroll':_0xdc549f(0x29c),'เคยซื้อ\x20Structured\x20Note':_0xdc549f(0x112),'เคยซื้อหุ้นกู้\x20(Bond)':'ไม่เคย','เคยซื้อ\x20MF\x20Type\x20B':_0xdc549f(0x112),'เคยซื้อกองทุนลดหย่อนภาษี':_0xdc549f(0x23e),'เคยมีประสบการณ์\x20FX':'ไม่เคย'},'summary':_0xdc549f(0x139),'personaPrompt':_0xdc549f(0xf7)},{'id':0x2,'name':'อลิสา\x20วัฒนากุล','age':0x23,'gender':'female','image':_0xdc549f(0x29a),'title':_0xdc549f(0x184),'segment':'Gold','riskAppetite':'Growth\x20Investor','details':{'Suitability\x20Score':'4','Main\x20bank':_0xdc549f(0x29c),'ttb\x20Payroll':_0xdc549f(0x29c),'เคยซื้อ\x20Structured\x20Note':'เคย','เคยซื้อหุ้นกู้\x20(Bond)':_0xdc549f(0x23e),'เคยซื้อ\x20MF\x20Type\x20B':_0xdc549f(0x23e),'เคยซื้อกองทุนลดหย่อนภาษี':_0xdc549f(0x112),'เคยมีประสบการณ์\x20FX':_0xdc549f(0x23e)},'summary':'ดิฉันเป็นผู้ก่อตั้งสตาร์ทอัพด้านเทคโนโลยี\x20มีรายได้สูงและยอมรับความเสี่ยงได้ดี\x20มองหาการลงทุนที่เติบโตสูงในระยะยาว\x20และสนใจนวัตกรรมการเงินใหม่ๆ','personaPrompt':_0xdc549f(0x198)},{'id':0x3,'name':_0xdc549f(0x2c4),'age':0x2d,'gender':'male','image':_0xdc549f(0x19e),'title':'Government\x20Officer','segment':'Silver','riskAppetite':_0xdc549f(0x18b),'details':{'Suitability\x20Score':'3','Main\x20bank':_0xdc549f(0x1f4),'ttb\x20Payroll':'เป็น','เคยซื้อ\x20Structured\x20Note':_0xdc549f(0x112),'เคยซื้อหุ้นกู้\x20(Bond)':_0xdc549f(0x23e),'เคยซื้อ\x20MF\x20Type\x20B':_0xdc549f(0x23e),'เคยซื้อกองทุนลดหย่อนภาษี':'เคย','เคยมีประสบการณ์\x20FX':_0xdc549f(0x112)},'summary':'ผมเป็นข้าราชการระดับสูง\x20มีความมั่นคงในอาชีพ\x20ต้องการวางแผนการเงินเพื่อการศึกษาบุตรและวัยเกษียณ\x20รับความเสี่ยงได้ปานกลาง\x20เน้นการลงทุนแบบสมดุล','personaPrompt':'คุณคือ\x20ปรีชา\x20ตั้งใจจริง,\x20ข้าราชการวัย\x2045\x20ปี\x20คุณมีเป้าหมายทางการเงินที่ชัดเจนคือเพื่อการศึกษาของลูกและเพื่อการเกษียณอย่างสุขสบาย\x20คุณไม่ต้องการความเสี่ยงที่สูงเกินไป\x20แต่ก็เข้าใจว่าการฝากเงินอย่างเดียวไม่เพียงพอ\x20คุณมองหาการลงทุนที่สมดุลระหว่างการเติบโตและความมั่นคง\x20คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ'},{'id':0x4,'name':'มาลินี\x20สดใส','age':0x1c,'gender':_0xdc549f(0x291),'image':_0xdc549f(0x23d),'title':'Freelance\x20Designer','segment':_0xdc549f(0x2d0),'riskAppetite':_0xdc549f(0x295),'details':{'Suitability\x20Score':'2','Main\x20bank':'เป็น','ttb\x20Payroll':_0xdc549f(0x29c),'เคยซื้อ\x20Structured\x20Note':'ไม่เคย','เคยซื้อหุ้นกู้\x20(Bond)':_0xdc549f(0x112),'เคยซื้อ\x20MF\x20Type\x20B':'ไม่เคย','เคยซื้อกองทุนลดหย่อนภาษี':'ไม่เคย','เคยมีประสบการณ์\x20FX':_0xdc549f(0x112)},'summary':_0xdc549f(0x1dd),'personaPrompt':'คุณคือ\x20มาลินี\x20สดใส,\x20ฟรีแลนซ์ดีไซน์เนอร์วัย\x2028\x20ปี\x20คุณเพิ่งเริ่มอาชีพและกำลังสร้างความมั่นคงทางการเงิน\x20คุณกลัวการขาดทุนและอยากเริ่มต้นลงทุนกับอะไรที่ปลอดภัย\x20เข้าใจง่าย\x20และสามารถนำเงินออกมาใช้ได้เมื่อจำเป็น\x20คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ'},{'id':0x5,'name':_0xdc549f(0x203),'age':0x32,'gender':_0xdc549f(0x1d2),'image':_0xdc549f(0x163),'title':'Expat\x20Executive','segment':_0xdc549f(0x2ce),'riskAppetite':_0xdc549f(0x1d6),'details':{'Suitability\x20Score':'5','Main\x20bank':_0xdc549f(0x29c),'ttb\x20Payroll':_0xdc549f(0x29c),'เคยซื้อ\x20Structured\x20Note':_0xdc549f(0x23e),'เคยซื้อหุ้นกู้\x20(Bond)':_0xdc549f(0x23e),'เคยซื้อ\x20MF\x20Type\x20B':_0xdc549f(0x23e),'เคยซื้อกองทุนลดหย่อนภาษี':_0xdc549f(0x23e),'เคยมีประสบการณ์\x20FX':_0xdc549f(0x23e)},'summary':_0xdc549f(0x21f),'personaPrompt':_0xdc549f(0x29e)}],leaderboardData=[{'rank':0x1,'name':_0xdc549f(0x1ec),'id':_0xdc549f(0x1b5),'score':72.5},{'rank':0x2,'name':'อารยา\x20สุขใจ','id':_0xdc549f(0x183),'score':70.1},{'rank':0x3,'name':_0xdc549f(0x269),'id':'55005','score':68.9},{'rank':0x4,'name':'มานี\x20ใจดี','id':_0xdc549f(0xf2),'score':65.4},{'rank':0x5,'name':'ปิติ\x20รักเรียน','id':_0xdc549f(0x1c1),'score':0x3e}],roleplayHistoryData={'55012':[{'customerName':_0xdc549f(0x19b),'date':_0xdc549f(0x2e3),'score':0x49},{'customerName':'สมชาย\x20เกียรติสกุล','date':_0xdc549f(0x107),'score':0x48}],'55018':[{'customerName':_0xdc549f(0x203),'date':'15/10/2568','score':0x47},{'customerName':_0xdc549f(0x2da),'date':_0xdc549f(0x265),'score':0x45}],'55005':[{'customerName':_0xdc549f(0x2c4),'date':_0xdc549f(0x2c0),'score':0x45}],'55023':[{'customerName':_0xdc549f(0x2da),'date':_0xdc549f(0x2e3),'score':0x41}],'55011':[{'customerName':_0xdc549f(0xff),'date':_0xdc549f(0x2e0),'score':0x3e}]},quizProducts=[{'name':_0xdc549f(0x129),'desc':_0xdc549f(0x2b3)},{'name':'บัญชี\x20ทีทีบี\x20โนฟิกซ์','desc':_0xdc549f(0x24e)},{'name':_0xdc549f(0x252),'desc':_0xdc549f(0x254)},{'name':_0xdc549f(0x250),'desc':'บัตรเครดิตสำหรับคนรักบ้าน\x20รับส่วนลดและสิทธิพิเศษที่\x20Global\x20House'},{'name':_0xdc549f(0x16d),'desc':_0xdc549f(0x128)}],specialists=[{'id':0x1,'name':_0xdc549f(0x267),'gender':_0xdc549f(0x1d2),'image':_0xdc549f(0xfb),'products':[_0xdc549f(0x281),_0xdc549f(0x16c)],'rating':4.8,'ratingsCount':0x19},{'id':0x2,'name':_0xdc549f(0x15a),'gender':_0xdc549f(0x291),'image':_0xdc549f(0x12b),'products':[_0xdc549f(0x1ea),_0xdc549f(0x1bb)],'rating':4.6,'ratingsCount':0x12},{'id':0x3,'name':_0xdc549f(0x14c),'gender':_0xdc549f(0x1d2),'image':_0xdc549f(0x1c0),'products':[_0xdc549f(0x16b),_0xdc549f(0x22c)],'rating':4.9,'ratingsCount':0x20},{'id':0x4,'name':_0xdc549f(0x1aa),'gender':_0xdc549f(0x291),'image':_0xdc549f(0x288),'products':['สินเชื่อบ้าน',_0xdc549f(0x16c)],'rating':4.7,'ratingsCount':0x15},{'id':0x5,'name':_0xdc549f(0x207),'gender':_0xdc549f(0x1d2),'image':'https://i.imgur.com/r6p6JjY.png','products':[_0xdc549f(0x1bb),'เงินฝาก'],'rating':4.5,'ratingsCount':0xf},{'id':0x6,'name':_0xdc549f(0x1d4),'gender':_0xdc549f(0x291),'image':_0xdc549f(0x224),'products':[_0xdc549f(0x1ea),_0xdc549f(0x16b)],'rating':4.8,'ratingsCount':0x1d}],productDetailsData={'บัญชี\x20ทีทีบี\x20ออลล์ฟรี':{'title':'บัญชี\x20ทีทีบี\x20ออลล์ฟรี','summary':_0xdc549f(0x19c),'points':[_0xdc549f(0x1f3),_0xdc549f(0x27c),_0xdc549f(0x153),_0xdc549f(0x29b)]},'บัญชี\x20ทีทีบี\x20โนฟิกซ์':{'title':_0xdc549f(0x273),'summary':'ทีทีบี\x20โนฟิกซ์\x20เป็นบัญชีเงินฝากออมทรัพย์ดิจิทัลที่ให้ดอกเบี้ยสูงเทียบเท่าเงินฝากประจำ\x20แต่ให้อิสระในการถอนเงินได้ตลอดเวลาโดยไม่ถูกลดดอกเบี้ย\x20เหมาะอย่างยิ่งสำหรับเป็นบัญชีพักเงินก้อนเพื่อรับผลตอบแทนที่ดีกว่าดอกเบี้ยออมทรัพย์ทั่วไป\x20แต่ยังคงสภาพคล่องไว้ใช้ในยามจำเป็น\x20สามารถเปิดบัญชีและจัดการทุกอย่างได้ง่ายผ่านแอป\x20ttb\x20touch','points':['**รับดอกเบี้ยสูง:**\x20คิดดอกเบี้ยให้ทุกวันและจ่ายให้ปีละ\x202\x20ครั้ง\x20พร้อมรับโบนัสพิเศษเมื่อใช้จ่ายผ่านบัญชี\x20all\x20free\x20ตามที่กำหนด',_0xdc549f(0x219),_0xdc549f(0x181),_0xdc549f(0x23c)]},'บัตรเครดิต\x20ทีทีบี\x20โซ\x20ฟาสต์':{'title':'บัตรเครดิต\x20ทีทีบี\x20โซ\x20ฟาสต์','summary':_0xdc549f(0x1b7),'points':['**คะแนนสะสมเร็วทุกการใช้จ่าย:**\x20ทุก\x2010\x20บาทที่ใช้จ่ายผ่านบัตร\x20รับทันที\x201\x20คะแนนสะสม\x20ทำให้คุณสะสมคะแนนได้เร็วกว่าบัตรทั่วไปถึง\x202.5\x20เท่า',_0xdc549f(0x22b),_0xdc549f(0x178),_0xdc549f(0x2d1),'**ความคุ้มครองการซื้อของออนไลน์:**\x20ช้อปปิ้งออนไลน์อย่างมั่นใจ\x20ด้วยวงเงินประกันสูงสุด\x205,000\x20บาทต่อครั้ง']},'บัตรเครดิต\x20ทีทีบี\x20โกลบอลเฮ้าส์':{'title':_0xdc549f(0x250),'summary':_0xdc549f(0x227),'points':[_0xdc549f(0x24f),'**รับส่วนลด\x205%:**\x20ที่ร้านค้าวัสดุและอุปกรณ์ตกแต่งบ้านชั้นนำอื่นๆ\x20ที่ร่วมรายการทั่วประเทศ','**คะแนนสะสม:**\x20ทุก\x2025\x20บาท\x20รับ\x201\x20คะแนน\x20เพื่อแลกของรางวัล\x20หรือใช้เป็นส่วนลดเพิ่มเติม',_0xdc549f(0x1d3),_0xdc549f(0xed)]},'สินเชื่อบ้านแลกเงิน\x20ทีทีบี':{'title':'สินเชื่อบ้านแลกเงิน\x20ทีทีบี','summary':_0xdc549f(0x286),'points':[_0xdc549f(0x1fa),_0xdc549f(0x1e8),'**ผ่อนชำระได้นาน:**\x20เลือกระยะเวลาผ่อนได้นานสูงสุดถึง\x2030\x20ปี\x20ช่วยให้ยอดผ่อนต่อเดือนไม่สูงเกินไป',_0xdc549f(0x229)]}},allQuizQuestions={'บัญชี\x20ทีทีบี\x20ออลล์ฟรี':[{'question':_0xdc549f(0x28b),'options':[_0xdc549f(0x137),_0xdc549f(0xef),_0xdc549f(0x2d2),_0xdc549f(0x1c3)],'correctAnswer':'ถูกทุกข้อ','explanation':_0xdc549f(0x2be)},{'question':_0xdc549f(0x26f),'options':[_0xdc549f(0x228),_0xdc549f(0xeb),_0xdc549f(0x25c),_0xdc549f(0x27d)],'correctAnswer':_0xdc549f(0x25c),'explanation':'เพียงมียอดเงินฝากคงเหลือในบัญชีเฉลี่ย\x205,000\x20บาทขึ้นไป\x20จะได้รับความคุ้มครองประกันอุบัติเหตุฟรี'},{'question':_0xdc549f(0x2b4),'options':[_0xdc549f(0x168),_0xdc549f(0xeb),_0xdc549f(0x261),_0xdc549f(0x25c)],'correctAnswer':'3,000\x20บาท','explanation':'ความคุ้มครองประกันอุบัติเหตุจากบัญชี\x20ttb\x20all\x20free\x20ครอบคลุมค่ารักษาพยาบาล\x203,000\x20บาทต่ออุบัติเหตุ'},{'question':_0xdc549f(0x253),'options':['แตะจ่ายแบบ\x20Contactless\x20ได้',_0xdc549f(0x287),_0xdc549f(0x1e9),'ช้อปปิ้งออนไลน์'],'correctAnswer':_0xdc549f(0x287),'explanation':_0xdc549f(0x196)},{'question':_0xdc549f(0x209),'options':[_0xdc549f(0x1ce),'100\x20บาท',_0xdc549f(0x2c5),_0xdc549f(0x2a7)],'correctAnswer':_0xdc549f(0x2c5),'explanation':_0xdc549f(0x130)},{'question':_0xdc549f(0x190),'options':[_0xdc549f(0x171),_0xdc549f(0x20d),_0xdc549f(0x11d),_0xdc549f(0x156)],'correctAnswer':'ให้ดอกเบี้ยเงินฝากสูง','explanation':_0xdc549f(0x2d9)},{'question':_0xdc549f(0x177),'options':[_0xdc549f(0x2c2),'ได้รับสินค้าแล้วแต่ไม่ถูกใจ',_0xdc549f(0x19a),'เปลี่ยนใจไม่อยากได้สินค้าแล้ว'],'correctAnswer':'จ่ายเงินแล้วแต่ไม่ได้รับสินค้า','explanation':_0xdc549f(0x179)}],'บัญชี\x20ทีทีบี\x20โนฟิกซ์':[{'question':_0xdc549f(0x285),'options':['1\x20ครั้ง',_0xdc549f(0x256),_0xdc549f(0x2a6),_0xdc549f(0x2e2)],'correctAnswer':_0xdc549f(0x256),'explanation':'บัญชี\x20ทีทีบี\x20โนฟิกซ์\x20จ่ายดอกเบี้ยปีละ\x202\x20ครั้ง\x20คือช่วงสิ้นเดือนมิถุนายนและธันวาคม'},{'question':_0xdc549f(0x275),'options':[_0xdc549f(0x2cd),_0xdc549f(0x161),_0xdc549f(0x294),'ได้รับคะแนนสะสม'],'correctAnswer':_0xdc549f(0x2cd),'explanation':'จุดเด่นหลักคือความยืดหยุ่นที่สามารถถอนเงินได้ตลอดเวลาโดยไม่เสียสิทธิ์รับดอกเบี้ยสูง'},{'question':_0xdc549f(0x292),'options':[_0xdc549f(0x15c),'500\x20บาท',_0xdc549f(0xeb),_0xdc549f(0x25c)],'correctAnswer':'ไม่มีขั้นต่ำ','explanation':_0xdc549f(0x17f)},{'question':_0xdc549f(0x24a),'options':[_0xdc549f(0x162),_0xdc549f(0x26e),_0xdc549f(0x123),_0xdc549f(0x176)],'correctAnswer':_0xdc549f(0x26e),'explanation':_0xdc549f(0xf6)},{'question':_0xdc549f(0xf0),'options':[_0xdc549f(0x191),_0xdc549f(0x13e),_0xdc549f(0x29f),_0xdc549f(0x22e)],'correctAnswer':_0xdc549f(0x29f),'explanation':_0xdc549f(0x242)},{'question':_0xdc549f(0x1d1),'options':[_0xdc549f(0x13d),_0xdc549f(0x2b0),_0xdc549f(0x2d4),'จะถูกคิดค่าธรรมเนียมการถอน'],'correctAnswer':_0xdc549f(0x2d4),'explanation':'บัญชี\x20ทีทีบี\x20โนฟิกซ์\x20ให้ความยืดหยุ่นสูง\x20สามารถถอนเงินได้ตลอดเวลาโดยที่ดอกเบี้ยยังคงถูกคำนวณจากยอดเงินคงเหลือทุกวัน'},{'question':'ลูกค้าสามารถดูยอดดอกเบี้ยสะสมของบัญชี\x20ทีทีบี\x20โนฟิกซ์\x20ได้จากช่องทางใด','options':[_0xdc549f(0x1f5),_0xdc549f(0x1b4),'แอปพลิเคชัน\x20ttb\x20touch',_0xdc549f(0x15b)],'correctAnswer':_0xdc549f(0x202),'explanation':_0xdc549f(0x293)}],'บัตรเครดิต\x20ทีทีบี\x20โซ\x20ฟาสต์':[{'question':'ข้อใดคือคุณสมบัติหลักของบัตรเครดิต\x20ทีทีบี\x20โซ\x20ฟาสต์','options':[_0xdc549f(0x210),'ทุกๆ\x2010\x20บาท\x20รับ\x201\x20คะแนน',_0xdc549f(0xfa),_0xdc549f(0x21a)],'correctAnswer':_0xdc549f(0x2c7),'explanation':_0xdc549f(0x159)},{'question':_0xdc549f(0x2b6),'options':[_0xdc549f(0x15c),'500\x20บาท',_0xdc549f(0xeb),'3,000\x20บาท'],'correctAnswer':'1,000\x20บาท','explanation':_0xdc549f(0x100)},{'question':_0xdc549f(0x20f),'options':[_0xdc549f(0x2a2),_0xdc549f(0x2df),_0xdc549f(0xf3),_0xdc549f(0x13a)],'correctAnswer':'ไม่มีค่าธรรมเนียม','explanation':_0xdc549f(0x1c7)},{'question':'หากลูกค้าใช้จ่าย\x202,500\x20บาทผ่านบัตร\x20ttb\x20so\x20fast\x20จะได้รับกี่คะแนน','options':[_0xdc549f(0x212),_0xdc549f(0x2b2),_0xdc549f(0x221),_0xdc549f(0x2d7)],'correctAnswer':_0xdc549f(0x2b2),'explanation':'การคำนวณคะแนนคือ\x20ยอดใช้จ่าย\x20/\x2010\x20ดังนั้น\x202,500\x20/\x2010\x20=\x20250\x20คะแนน'},{'question':_0xdc549f(0x110),'options':['1\x20ล้านบาท','3\x20ล้านบาท',_0xdc549f(0x127),_0xdc549f(0x199)],'correctAnswer':_0xdc549f(0x127),'explanation':_0xdc549f(0x2c9)}]},loginView=document[_0xdc549f(0x1f7)]('login-view'),mainContent=document[_0xdc549f(0x1f7)]('main-content'),nav=document['querySelector'](_0xdc549f(0x157)),loginBtn=document[_0xdc549f(0x1f7)](_0xdc549f(0x1c9)),employeeIdInput=document[_0xdc549f(0x1f7)](_0xdc549f(0x24d)),employeeNameInput=document[_0xdc549f(0x1f7)](_0xdc549f(0x226)),userInfo=document[_0xdc549f(0x1f7)]('user-info'),userDisplayName=document[_0xdc549f(0x1f7)](_0xdc549f(0x1e6)),logoutBtn=document[_0xdc549f(0x1f7)](_0xdc549f(0x1b2)),mainViews=document['querySelectorAll'](_0xdc549f(0x1b3)),roleplayView=document[_0xdc549f(0x1f7)](_0xdc549f(0x1df)),navButtons=document[_0xdc549f(0x1fb)](_0xdc549f(0x1b1)),navRoleplay=document['getElementById'](_0xdc549f(0x2c8)),navSpecialist=document[_0xdc549f(0x1f7)](_0xdc549f(0xea)),navQuiz=document[_0xdc549f(0x1f7)]('nav-quiz'),navNews=document[_0xdc549f(0x1f7)](_0xdc549f(0x1e4)),navLeaderboard=document[_0xdc549f(0x1f7)](_0xdc549f(0x259)),customerGridView=document[_0xdc549f(0x1f7)](_0xdc549f(0x1ac)),specialistGridView=document[_0xdc549f(0x1f7)](_0xdc549f(0x10e)),quizGridView=document[_0xdc549f(0x1f7)]('quiz-grid'),productDetailContent=document['getElementById'](_0xdc549f(0x1d0)),newsWrapper=document[_0xdc549f(0x1f7)](_0xdc549f(0x1ee)),infoModal=document['getElementById']('info-modal'),infoModalContent=document['getElementById'](_0xdc549f(0x1bc)),evaluationModal=document['getElementById'](_0xdc549f(0x1e0)),evaluationContent=document[_0xdc549f(0x1f7)](_0xdc549f(0x2e1)),leaderboardModal=document[_0xdc549f(0x1f7)](_0xdc549f(0x11b)),leaderboardModalContent=document[_0xdc549f(0x1f7)](_0xdc549f(0x223)),scoringModal=document[_0xdc549f(0x1f7)]('scoring-modal'),scoringModalContent=document[_0xdc549f(0x1f7)](_0xdc549f(0x2ae)),ratingModal=document[_0xdc549f(0x1f7)](_0xdc549f(0x27e)),chatContainer=document[_0xdc549f(0x1f7)]('chat-container'),chatInput=document[_0xdc549f(0x1f7)](_0xdc549f(0x23b)),sendButton=document[_0xdc549f(0x1f7)](_0xdc549f(0x1cb)),endChatButton=document[_0xdc549f(0x1f7)](_0xdc549f(0x283)),showRoleplayInfoButton=document[_0xdc549f(0x1f7)](_0xdc549f(0x19d)),contextContainer=document[_0xdc549f(0x1f7)](_0xdc549f(0x18f)),specialistChatView=document[_0xdc549f(0x1f7)]('specialist-chat-view'),specialistChatContainer=document[_0xdc549f(0x1f7)](_0xdc549f(0xf8)),specialistChatInput=document[_0xdc549f(0x1f7)](_0xdc549f(0x248)),specialistSendButton=document[_0xdc549f(0x1f7)]('specialist-send-button'),endSpecialistChatButton=document['getElementById']('end-specialist-chat-btn'),quizTitleEl=document[_0xdc549f(0x1f7)](_0xdc549f(0x165)),quizProgressEl=document[_0xdc549f(0x1f7)]('quiz-progress'),quizTimerEl=document['getElementById']('quiz-timer'),quizQuestionTextEl=document[_0xdc549f(0x1f7)](_0xdc549f(0x147)),quizOptionsEl=document[_0xdc549f(0x1f7)](_0xdc549f(0x14f)),quizFeedbackEl=document[_0xdc549f(0x1f7)](_0xdc549f(0x2db)),quizFeedbackTitleEl=document[_0xdc549f(0x1f7)](_0xdc549f(0x1c5)),quizFeedbackTextEl=document[_0xdc549f(0x1f7)](_0xdc549f(0x160)),quizNextBtn=document[_0xdc549f(0x1f7)](_0xdc549f(0x17e)),quizSoundToggle=document[_0xdc549f(0x1f7)](_0xdc549f(0x1a9));let currentUser=null,conversationHistory=[],specialistConversationHistory=[],currentCustomer=null,currentSpecialist=null,turnCount=0x0,specialistTurnCount=0x0;const maxTurns=0x5;let voices=[],isEvaluationInProgress=![],currentQuizProduct='',shuffledQuestions=[],currentQuestionIndex=0x0,score=0x0,isAnswered=![];const QUIZ_LENGTH=0x5,TIME_LIMIT=0x1e;let quizTimerInterval=null,timeLeft=0x0,isQuizMuted=![],isGlobalMuted=![];loginBtn[_0xdc549f(0x1f1)](_0xdc549f(0x189),()=>{const _0x3bb316=_0xdc549f,_0x4a9fb8=employeeIdInput[_0x3bb316(0x1f0)][_0x3bb316(0x117)](),_0xef0b1a=employeeNameInput[_0x3bb316(0x1f0)][_0x3bb316(0x117)]();_0x4a9fb8&&_0xef0b1a?(currentUser={'id':_0x4a9fb8,'name':_0xef0b1a},loginView['classList'][_0x3bb316(0x271)](_0x3bb316(0x243)),nav['classList'][_0x3bb316(0x1c2)](_0x3bb316(0x243)),mainContent['classList'][_0x3bb316(0x1c2)](_0x3bb316(0x243)),userInfo['style']['display']=_0x3bb316(0x26b),logoutBtn[_0x3bb316(0x24b)][_0x3bb316(0x1c2)](_0x3bb316(0x243)),userDisplayName['textContent']=currentUser[_0x3bb316(0x2bb)],renderCustomers(),renderSpecialists(),renderQuizzes(),renderLeaderboard(),showView('customer-list-view')):alert(_0x3bb316(0x134));}),logoutBtn[_0xdc549f(0x1f1)](_0xdc549f(0x189),()=>{const _0x30db40=_0xdc549f;currentUser=null,loginView[_0x30db40(0x24b)]['remove'](_0x30db40(0x243)),nav[_0x30db40(0x24b)][_0x30db40(0x271)](_0x30db40(0x243)),mainContent[_0x30db40(0x24b)]['add'](_0x30db40(0x243)),userInfo[_0x30db40(0xf9)][_0x30db40(0x13b)]=_0x30db40(0xfc),logoutBtn[_0x30db40(0x24b)][_0x30db40(0x271)]('hidden'),employeeIdInput[_0x30db40(0x1f0)]='',employeeNameInput[_0x30db40(0x1f0)]='';});function showView(_0x8bca95){const _0x35c48a=_0xdc549f;if(quizTimerInterval)clearInterval(quizTimerInterval);if(window[_0x35c48a(0x27f)][_0x35c48a(0x20b)])window[_0x35c48a(0x27f)]['cancel']();const _0x2e1eb9=document[_0x35c48a(0x1f7)](_0x8bca95);mainViews[_0x35c48a(0x105)](_0x2bd346=>_0x2bd346['id']===_0x8bca95?_0x2bd346[_0x35c48a(0x24b)][_0x35c48a(0x1c2)](_0x35c48a(0x243)):_0x2bd346['classList'][_0x35c48a(0x271)](_0x35c48a(0x243)));let _0xb2d4f2=_0x2e1eb9[_0x35c48a(0x2ca)][_0x35c48a(0x145)];navButtons[_0x35c48a(0x105)](_0x42d67c=>_0x42d67c['id']===_0xb2d4f2?_0x42d67c[_0x35c48a(0x24b)][_0x35c48a(0x271)](_0x35c48a(0x2a4)):_0x42d67c[_0x35c48a(0x24b)][_0x35c48a(0x1c2)](_0x35c48a(0x2a4)));}navRoleplay[_0xdc549f(0x1f1)]('click',()=>showView('customer-list-view')),navSpecialist[_0xdc549f(0x1f1)]('click',()=>showView(_0xdc549f(0x237))),navQuiz['addEventListener'](_0xdc549f(0x189),()=>showView(_0xdc549f(0x244))),navNews[_0xdc549f(0x1f1)](_0xdc549f(0x189),()=>{showView('news-view'),fetchNews();}),navLeaderboard['addEventListener'](_0xdc549f(0x189),()=>showView('leaderboard-view'));function loadVoices(){const _0x55de91=_0xdc549f;voices=window[_0x55de91(0x27f)][_0x55de91(0x241)]();}loadVoices();function _0x3f6f(){const _0x3f1651=['55018','Tech\x20Startup\x20Founder','<i\x20class=\x22fas\x20fa-star\x22></i>','การดำเนินบทสนทนาเป็นไปตามลำดับขั้นตอนการขายที่ดี\x20ตั้งแต่การเปิดสนทนาจนถึงการปิดการขาย','</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22my-2\x22>','<div\x20class=\x22flex\x20items-center\x20gap-1\x20text-amber-400\x22>','click','correctAnswer','Balanced','<div\x20class=\x22text-center\x20p-8\x20text-red-500\x22><i\x20class=\x22fas\x20fa-exclamation-triangle\x20text-4xl\x20mb-4\x22></i><p>ขออภัย,\x20ไม่สามารถดึงข้อมูลได้</p><p\x20class=\x22text-sm\x20text-slate-500\x20mt-2\x22>','</strong></li>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','9980663ooZCOu','conversation-context','ข้อใดไม่ใช่จุดเด่นหลักของบัญชี\x20ttb\x20all\x20free','เมื่อฝากเงินเกิน\x201\x20ล้านบาท','rate','<i\x20class=\x22fas\x20fa-medal\x20text-gray-400\x20text-xl\x22></i>','shiftKey','correct','บัตรเดบิต\x20ttb\x20all\x20free\x20ไม่สามารถใช้ผ่อนชำระสินค้าได้\x20แต่สามารถใช้ทำธุรกรรมอื่นๆ\x20ได้อย่างครบถ้วน','details','คุณคือ\x20อลิสา\x20วัฒนากุล,\x20CEO\x20สตาร์ทอัพเทคโนโลยีวัย\x2035\x20ปี\x20คุณมีความเข้าใจในเทคโนโลยีเป็นอย่างดีและยอมรับความเสี่ยงได้สูงเพื่อผลตอบแทนที่คุ้มค่า\x20คุณมองหาการลงทุนที่จะช่วยต่อยอดความมั่งคั่งอย่างรวดเร็ว\x20และไม่กลัวความผันผวนในระยะสั้น\x20คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ','10\x20ล้านบาท','จ่ายเงินแล้วแต่ไม่ได้รับสินค้า','อลิสา\x20วัฒนากุล','ทีทีบี\x20ออลล์ฟรี\x20คือบัญชีที่ถูกออกแบบมาเพื่อการใช้งานในชีวิตประจำวันอย่างแท้จริง\x20ให้คุณ\x20\x22ใช้ชีวิตฟรีรอบด้าน\x22\x20โดยไม่ต้องกังวลเรื่องค่าธรรมเนียมจุกจิกอีกต่อไป\x20ไม่ว่าจะเป็นการทำธุรกรรมพื้นฐานอย่างการโอนเงิน\x20กดเงิน\x20หรือจ่ายบิล\x20ก็ทำได้ฟรีไม่จำกัดจำนวนครั้งผ่านแอป\x20ttb\x20touch\x20นอกจากนี้ยังมาพร้อมกับบัตรเดบิตที่มอบสิทธิประโยชน์เหนือกว่า\x20ทั้งประกันอุบัติเหตุที่ครอบคลุมค่ารักษาพยาบาล\x20และประกันการซื้อของออนไลน์\x20เพิ่มความมั่นใจและความคุ้มค่าในบัญชีเดียว','show-roleplay-info-btn','arif.jpg','onvoiceschanged','stringify','\x20จาก\x20','toFixed','specialist-chat-profile','closeEvaluationModalAndReset','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p><strong\x20class=\x22font-semibold\x22><i\x20class=\x22fas\x20fa-bullseye\x20mr-1\x22></i>หัวข้อ:</strong>\x20','หมดเวลา!','\x27)\x22\x20class=\x22flex-1\x20btn-secondary\x20py-2\x20px-4\x20!text-sm\x22>รู้จักผลิตภัณฑ์</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22startQuiz(\x27','2iNlhjb','quiz-sound-toggle','คุณปรียา\x20(AI)','ถูกต้อง!','customer-grid','ขออภัย,\x20เกิดข้อผิดพลาด:\x20','</p></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22card\x20p-6\x22><div\x20class=\x22flex\x20items-center\x20gap-4\x22><div\x20class=\x22news-card-icon\x20bg-slate-700\x22><i\x20class=\x22fas\x20fa-gas-pump\x22></i></div><h4\x20class=\x22text-lg\x20font-bold\x22>ราคาน้ำมัน</h4></div><p\x20class=\x22text-slate-600\x20mt-3\x20text-sm\x22>','globalSituation','\x20มีข้อสงสัยเกี่ยวกับผลิตภัณฑ์\x20สามารถสอบถามได้เลยครับ/ค่ะ','.nav-btn','logout-btn','.main-view','สาขาธนาคาร','55012','</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>','บัตรเครดิตที่ออกแบบมาเพื่อสายสะสมคะแนนโดยเฉพาะ\x20ให้คุณได้รับคะแนนสะสม\x20ttb\x20rewards\x20plus\x20เร็วกว่าใครในทุกการใช้จ่าย\x20โดยทุก\x2010\x20บาท\x20รับ\x201\x20คะแนน\x20เพื่อนำไปแลกของรางวัล,\x20ไมล์สะสม,\x20หรือเครดิตเงินคืนได้อย่างคุ้มค่า\x20พร้อมสิทธิประโยชน์ด้านการผ่อนชำระและการเดินทางที่ครบครัน\x20เป็นบัตรที่ตอบโจทย์ทุกไลฟ์สไตล์ที่ต้องการความคุ้มค่าสูงสุดจากการใช้จ่าย','<p\x20class=\x22font-semibold\x20mb-1\x22>','text-red-500','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr\x20class=\x22border-b\x20border-slate-200\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22p-2\x22>','ประกัน','info-modal-content','gold','showScoringInfo','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20class=\x22text-lg\x20font-semibold\x20text-right\x22>','took.png','55011','remove','ถูกทุกข้อ','\x20ผู้เชี่ยวชาญด้าน','quiz-feedback-title','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-lg\x20text-center\x20mb-6\x22>ต้องทบทวนเพิ่มเติม!\x20ยังมีข้อมูลสำคัญที่ต้องทำความเข้าใจ</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><h4\x20class=\x22text-xl\x20font-bold\x20text-yellow-600\x20mb-2\x22><i\x20class=\x22fas\x20fa-exclamation-triangle\x20mr-2\x22></i>จุดที่ควรพัฒนา</h4><p\x20class=\x22text-slate-700\x20bg-slate-100\x20p-3\x20rounded-lg\x22>แนะนำให้กลับไปศึกษาข้อมูลผลิตภัณฑ์ในหน้า\x20\x22รู้จักผลิตภัณฑ์\x22\x20อีกครั้ง\x20โดยเน้นที่จุดเด่นและเงื่อนไขต่างๆ\x20เพื่อสร้างความมั่นใจในการให้ข้อมูลกับลูกค้า</p></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','บัตรเครดิต\x20ttb\x20so\x20fast\x20ฟรีค่าธรรมเนียมทั้งแรกเข้าและรายปีตลอดชีพ','</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-sm\x20text-slate-500\x20text-right\x22>อายุ:\x20','login-btn','map','send-button','showLeaderboardDetails','</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22p-4\x20font-bold\x20text-blue-600\x22>','ฟรี\x20ไม่มีค่าใช้จ่าย','3732072jQWTjK','product-detail-content','หากลูกค้าถอนเงินออกจากบัญชี\x20ทีทีบี\x20โนฟิกซ์\x20จะเกิดอะไรขึ้นกับดอกเบี้ย','male','**บริการแบ่งจ่าย\x200%\x20นาน\x203\x20เดือน:**\x20สามารถเปลี่ยนยอดซื้อสินค้าชิ้นใหญ่ให้เป็นยอดผ่อนชำระ\x200%\x20ได้ด้วยตนเองผ่านแอป\x20ttb\x20touch','คุณนลินี\x20(AI)','totalScore','Aggressive','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22bg-slate-100\x20p-2\x20rounded-lg\x20w-full\x20mt-2\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-sm\x20font-semibold\x20text-slate-600\x22>ให้คำปรึกษาด้าน:</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-sm\x20text-blue-600\x22>','ขออภัย,\x20ยังไม่มีชุดคำถามสำหรับผลิตภัณฑ์นี้ครบ\x20','submitRating','</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-slate-500\x22>อายุ:\x20','score','คำตอบที่ถูกต้องคือ:\x20','ฉันเป็นดีไซน์เนอร์ฟรีแลนซ์ค่ะ\x20เพิ่งเริ่มสร้างตัวและเก็บเงิน\x20มีความรู้ด้านการเงินจำกัด\x20ต้องการลงทุนที่เข้าใจง่าย\x20ความเสี่ยงต่ำ\x20และมีสภาพคล่อง','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<li\x20class=\x22flex\x20justify-between\x22><span\x20class=\x22text-slate-500\x22>','roleplay-view','evaluation-modal','<span\x20class=\x22font-semibold\x20text-slate-500\x22>','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22flex\x20flex-col\x20md:flex-row\x20items-center\x20gap-8\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22flex-shrink-0\x20text-center\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<img\x20src=\x22','speak','nav-news','leaderboard-body','user-display-name','parts','**อัตราดอกเบี้ยต่ำ:**\x20ดอกเบี้ยพิเศษเริ่มต้น\x20MRR\x20-\x202.83%\x20ต่อปี\x20ทำให้ภาระการผ่อนต่อเดือนน้อยลงอย่างเห็นได้ชัด','กดเงินสดที่ตู้\x20ATM\x20ได้ทั่วโลก','บัตรเครดิต','rating-feedback','สมศักดิ์\x20ชาญชัย','ดูผลสรุป','news-content-wrapper','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20class=\x22text-3xl\x20font-bold\x20mb-6\x20text-slate-800\x22>ประเด็นสำคัญวันนี้</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22grid\x20grid-cols-1\x20md:grid-cols-2\x20lg:grid-cols-3\x20gap-6\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22card\x20p-6\x22><div\x20class=\x22flex\x20items-center\x20gap-4\x22><div\x20class=\x22news-card-icon\x20bg-yellow-500\x22><i\x20class=\x22fas\x20fa-coins\x22></i></div><h4\x20class=\x22text-lg\x20font-bold\x22>ราคาทองคำ</h4></div><p\x20class=\x22text-slate-600\x20mt-3\x20text-sm\x22>','value','addEventListener','rating','**ฟรีค่าธรรมเนียมแบบไร้กังวล:**\x20กดเงินสดได้ทุกตู้\x20ทุกธนาคารทั่วประเทศ,\x20โอนเงินต่างธนาคาร,\x20จ่ายบิล,\x20และเติมเงิน\x20ทั้งหมดนี้ฟรีเมื่อทำผ่านแอปพลิเคชัน\x20ttb\x20touch','เป็น','ตู้\x20ATM','POST','getElementById','closeScoringModal','querySelector','**วงเงินอนุมัติสูง:**\x20ให้วงเงินสูงสุดถึง\x2015\x20ล้านบาท\x20หรือ\x20100%\x20ของราคาประเมิน\x20เพื่อให้คุณมีเงินทุนเพียงพอสำหรับทุกแผน','querySelectorAll','\x22\x20class=\x22w-14\x20h-14\x20rounded-full\x20border-2\x20border-blue-500\x22>','</div>','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22startSpecialistChat(','date','startSpecialistChat','strengths','แอปพลิเคชัน\x20ttb\x20touch','วิลเลียม\x20เฉิน','flex\x20items-center\x20gap-2','options','5334410MPusvz','คุณเจษฎา\x20(AI)','closingAbility','หากทำบัตรเดบิต\x20ttb\x20all\x20free\x20หายและต้องการออกบัตรใหม่\x20จะมีค่าธรรมเนียมเท่าไหร่','riskAppetite','speaking','showCustomerInfo','ประกันอุบัติเหตุฟรี',')\x22\x20class=\x22flex-1\x20btn-primary\x20py-2\x20px-4\x20!text-sm\x22>เริ่ม\x20Roleplay</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','บัตรเครดิต\x20ทีทีบี\x20โซ\x20ฟาสต์\x20มีค่าธรรมเนียมรายปีหรือไม่','รับเงินคืนทุกการใช้จ่าย','Pure\x20Deposit','100\x20คะแนน','dailyBriefing','gender','replace','Pattara','className','quiz-product-detail-view','**อิสระและคล่องตัว:**\x20สามารถฝาก-ถอนเมื่อไหร่ก็ได้\x20ไม่จำกัดจำนวนครั้ง\x20และไม่มีขั้นต่ำในการฝาก','ผ่อนสินค้า\x200%\x20ทุกร้านค้า','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</ul>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr\x20class=\x22border-b\x20border-slate-200\x20hover:bg-slate-50\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22p-4\x20text-center\x20w-20\x22>','keyTopics','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22flex\x20justify-center\x20gap-2\x20mt-2\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22bg-yellow-100\x20text-yellow-800\x20text-xs\x20font-medium\x20px-2.5\x20py-0.5\x20rounded-full\x22>','ผมเป็นผู้บริหารชาวต่างชาติที่ทำงานในไทย\x20มีความรู้ด้านการลงทุนเป็นอย่างดีและรับความเสี่ยงได้สูงมาก\x20มองหาโอกาสการลงทุนทั่วโลกเพื่อสร้างผลตอบแทนสูงสุด','font-bold\x20text-lg\x20text-red-600','500\x20คะแนน','</p>','leaderboard-modal-content','https://i.imgur.com/O2h5vDb.png','explanation','employee-name','บัตรเครดิตที่คนรักบ้านต้องมี!\x20มอบส่วนลดและสิทธิประโยชน์มากมายเมื่อใช้จ่ายที่โกลบอลเฮ้าส์และร้านค้าวัสดุก่อสร้างทั่วประเทศ\x20ทำให้การแต่งบ้าน,\x20ซ่อมแซม,\x20หรือต่อเติมบ้านของคุณคุ้มค่ากว่าที่เคย\x20พร้อมรับคะแนนสะสมในทุกการใช้จ่าย\x20และยังสามารถใช้บริการแบ่งจ่าย\x200%\x20เพื่อช่วยแบ่งเบาภาระค่าใช้จ่ายก้อนใหญ่ได้อีกด้วย','ไม่ต้องมีเงินคงเหลือ','**อเนกประสงค์:**\x20สามารถนำเงินไปใช้จ่ายได้ทุกวัตถุประสงค์ตามที่ต้องการ\x20ไม่ว่าจะเป็นการรวมหนี้เพื่อลดภาระดอกเบี้ย\x20หรือใช้จ่ายตามความฝัน','\x20คู่\x20(คุณถาม\x205\x20ครั้ง\x20ฉันตอบ\x205\x20ครั้ง)','**ฟรีค่าธรรมเนียม:**\x20สมัครง่ายโดยไม่มีค่าธรรมเนียมแรกเข้าและรายปี\x20ช่วยลดภาระค่าใช้จ่ายแฝง','สินเชื่อรถยนต์','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22bg-green-100\x20text-green-800\x20text-xs\x20font-medium\x20px-2.5\x20py-0.5\x20rounded-full\x22>','เมื่อคงเงินไว้ในบัญชีเกิน\x201\x20ปี','contains','title',')</p><p>','font-bold\x20text-lg\x20text-green-600','age','preventDefault','</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22p-4\x20text-slate-600\x22>','ไม่สามารถสร้างผลการประเมินได้:\x20','specialist-view','<span\x20class=\x22ml-2\x20text-xs\x20font-semibold\x20text-slate-500\x22>','chat-bubble\x20self-start\x20ai-bubble','.quiz-option','chat-input','**สะดวกสบาย:**\x20เปิดบัญชีง่ายผ่านแอป\x20ttb\x20touch\x20ไม่ต้องไปสาขา\x20และสามารถตั้งรายการโอนล่วงหน้าจากบัญชีอื่นมาเก็บไว้ได้','emily.png','เคย','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<ul\x20class=\x22space-y-1\x20text-sm\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22p-4\x20font-semibold\x20text-blue-600\x20cursor-pointer\x20hover:underline\x22\x20onclick=\x22showLeaderboardDetails(\x27','getVoices','เงื่อนไขการรับดอกเบี้ยโบนัสคือต้องมีการใช้จ่ายผ่านบัญชี\x20ทีทีบี\x20ออลล์ฟรี\x20ที่ผูกกันไว้อย่างน้อย\x205,000\x20บาทต่อเดือน','hidden','quiz-view','system','\x27)\x22\x20class=\x22btn-primary\x20py-2\x20px-4\x20!rounded-lg\x20flex\x20items-center\x20gap-2\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20เริ่มทดสอบ\x20<i\x20class=\x22fas\x20fa-arrow-right\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22card\x20p-8\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22text-center\x20bg-slate-50\x20p-6\x20rounded-lg\x20relative\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22product-sound-toggle\x22\x20class=\x22absolute\x20top-2\x20right-2\x20btn-secondary\x20!bg-blue-500\x20hover:!bg-blue-600\x20p-2\x20rounded-full\x20h-10\x20w-10\x20text-lg\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-volume-up\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20id=\x22product-summary-text\x22\x20class=\x22text-lg\x20pt-8\x22>','9nyemst','specialist-chat-input','push','บัญชี\x20ทีทีบี\x20โนฟิกซ์\x20สามารถผูกกับบัตรเดบิตได้หรือไม่','classList','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22mt-6\x20pt-6\x20border-t\x20border-slate-200\x20space-y-4\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><h4\x20class=\x22text-xl\x20font-bold\x20text-green-600\x20mb-2\x22><i\x20class=\x22fas\x20fa-check-circle\x20mr-2\x22></i>จุดแข็ง</h4><p\x20class=\x22text-slate-700\x20bg-slate-100\x20p-3\x20rounded-lg\x22>','employee-id','บัญชีออมเงินดิจิทัลที่ให้ดอกเบี้ยสูง\x20ถอนเมื่อไหร่ก็ได้','**ส่วนลดสูงสุด\x2013%\x20ที่โกลบอลเฮ้าส์:**\x20รับส่วนลดทันที\x203%\x20และสามารถใช้คะแนนสะสมเท่ายอดซื้อเพื่อแลกรับส่วนลดเพิ่มอีก\x2010%\x20ทำให้ประหยัดได้มากขึ้น','บัตรเครดิต\x20ทีทีบี\x20โกลบอลเฮ้าส์','fa-star','บัตรเครดิต\x20ทีทีบี\x20โซ\x20ฟาสต์','ข้อใดไม่ใช่คุณสมบัติของบัตรเดบิต\x20ttb\x20all\x20free','บัตรเครดิตสำหรับคนชอบสะสมคะแนน\x20รับคะแนนเร็วทุกการใช้จ่าย','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','2\x20ครั้ง','card\x20p-6\x20flex\x20flex-col\x20items-center\x20text-center','status','nav-leaderboard','onmouseout','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><div\x20class=\x22flex\x20justify-between\x20items-center\x20mb-1\x22><h4\x20class=\x22font-semibold\x22>การปิดการขาย</h4><span\x20class=\x22font-bold\x20text-lg\x22>','5,000\x20บาท','ratingsCount','.\x20โปรดตรวจสอบ\x20API\x20Key\x20และการตั้งค่าเครือข่าย','Error\x20parsing\x20evaluation\x20JSON:','points','3,000\x20บาท',').\x20Provide\x20a\x20fair\x20and\x20balanced\x20evaluation\x20with\x20moderately\x20strict\x20scoring,\x20avoiding\x20extreme\x20scores\x20unless\x20clearly\x20justified.\x20Score\x20each\x20criterion\x20out\x20of\x2015:\x201.\x20Product\x20Knowledge\x202.\x20Sales\x20Presentation\x20Skills\x203.\x20Clear\x20Sales\x20Process\x204.\x20Employee\x27s\x20Expertise\x205.\x20Closing\x20Ability.\x20Calculate\x20the\x20Total\x20Score\x20(max\x2075).\x20Provide\x20a\x20summary\x20of\x20Strengths\x20and\x20Improvements.\x20Respond\x20in\x20Thai\x20and\x20JSON\x20format\x20only:\x20{\x22scores\x22:\x20{\x22productKnowledge\x22:\x2015,\x20\x22presentationSkills\x22:\x2015,\x20\x22salesProcess\x22:\x2015,\x20\x22expertise\x22:\x2015,\x20\x22closingAbility\x22:\x2015},\x20\x22totalScore\x22:\x2075,\x20\x22summary\x22:\x20{\x22strengths\x22:\x20\x22...\x22,\x20\x22improvements\x22:\x20\x22...\x22}}','salesProcess','<i\x20class=\x22fas\x20fa-medal\x20text-orange-500\x20text-xl\x22></i>','11/10/2568','ความรู้ด้านผลิตภัณฑ์','อ.\x20ซัน','Daily\x20Briefing','วิชัย\x20มีมานะ','chat-bubble\x20self-end\x20user-bubble','flex','214953NCSZRP','Quiz:\x20','ไม่ได้','ลูกค้าต้องมียอดเงินคงเหลือในบัญชี\x20ttb\x20all\x20free\x20เฉลี่ยเท่าไหร่\x20จึงจะได้รับความคุ้มครองประกันอุบัติเหตุ','</span></li>','add','model','บัญชี\x20ทีทีบี\x20โนฟิกซ์','</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-slate-500\x20text-sm\x20mt-1\x22>','ข้อใดคือจุดเด่นที่สุดของบัญชี\x20ทีทีบี\x20โนฟิกซ์','\x20ปี</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22flex\x20space-x-2\x20w-full\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22showCustomerInfo(','random','\x20ปี</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<img\x20src=\x22','<i\x20class=\x22fas\x20fa-spinner\x20fa-spin\x22></i>\x20กำลังคิด...','\x20(AI)</p><div\x20class=\x22ai-response-text\x22>','\x20วินาที','**ความคุ้มครองที่เหนือกว่า:**\x20รับฟรีประกันอุบัติเหตุ\x20เพียงคงเงินในบัญชีไว้เฉลี่ย\x205,000\x20บาทขึ้นไป\x20ก็ได้รับความคุ้มครองชีวิตสูงสุด\x203\x20ล้านบาท\x20และค่ารักษาพยาบาลจากอุบัติเหตุครั้งละ\x203,000\x20บาท\x20โดยไม่ต้องสำรองจ่ายก่อน','10,000\x20บาท','rating-modal','speechSynthesis','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<table\x20class=\x22w-full\x20text-left\x20mt-2\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<thead\x20class=\x22bg-slate-100\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th\x20class=\x22p-2\x20text-sm\x20font-semibold\x22>ลูกค้า</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th\x20class=\x22p-2\x20text-sm\x20font-semibold\x22>วันที่</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th\x20class=\x22p-2\x20text-sm\x20font-semibold\x22>คะแนน</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tbody>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','เงินฝาก','\x20ดาวครับ/ค่ะ!','end-chat-btn','<i\x20class=\x22fas\x20fa-volume-up\x22></i>','บัญชี\x20ทีทีบี\x20โนฟิกซ์\x20จ่ายดอกเบี้ยให้ลูกค้าปีละกี่ครั้ง','เปลี่ยนบ้านที่ปลอดภาระหนี้สินของคุณให้กลายเป็นเงินก้อนโต\x20เพื่อเพิ่มสภาพคล่องทางการเงิน\x20นำไปใช้จ่ายได้ตามความต้องการ\x20ไม่ว่าจะเป็นการต่อเติมบ้าน,\x20เป็นทุนการศึกษาบุตร,\x20ปิดหนี้บัตรเครดิต,\x20หรือเป็นเงินทุนหมุนเวียนธุรกิจ\x20ด้วยจุดเด่นที่ดอกเบี้ยต่ำกว่าและผ่อนสบายกว่าสินเชื่อประเภทอื่น\x20ทำให้คุณสามารถจัดการภาระหนี้และวางแผนการเงินได้อย่างมีประสิทธิภาพ','ผ่อนชำระสินค้า\x200%','https://i.imgur.com/Q9p5d7A.png','และ','User\x20rated\x20','ข้อใดคือสิทธิประโยชน์ด้านค่าธรรมเนียมของบัญชี\x20ttb\x20all\x20free\x20เมื่อทำธุรกรรมผ่านแอป\x20ttb\x20touch','voice','<i\x20class=\x22fas\x20fa-star\x22\x20onclick=\x22submitRating(','</p></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','scores','</span>','female','การเปิดบัญชี\x20ทีทีบี\x20โนฟิกซ์\x20ต้องมีเงินฝากขั้นต่ำเท่าไหร่','ลูกค้าสามารถตรวจสอบยอดดอกเบี้ยสะสมที่ได้รับในแต่ละวันได้ง่ายๆ\x20ผ่านแอป\x20ttb\x20touch','ฟรีค่าธรรมเนียมทุกอย่าง','Conservative','136UVUJLB','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><div\x20class=\x22flex\x20justify-between\x20items-center\x20mb-1\x22><h4\x20class=\x22font-semibold\x22>ความสามารถในการนำเสนอขาย</h4><span\x20class=\x22font-bold\x20text-lg\x22>','quiz-evaluation','find','michael.png','**คล่องตัวทุกการใช้งาน:**\x20สามารถเปิดบัญชีได้โดยไม่มีขั้นต่ำ\x20และใช้งานบัตรเดบิตเพื่อแตะจ่าย\x20(Contactless)\x20หรือรูดซื้อสินค้าได้ทั่วโลกที่มีสัญลักษณ์\x20Visa','ไม่เป็น','cancel','คุณคือ\x20วิลเลียม\x20เฉิน,\x20ผู้บริหารระดับสูงวัย\x2050\x20ปี\x20คุณมีประสบการณ์การลงทุนทั่วโลกและมองหาผลตอบแทนที่ดีที่สุดเสมอ\x20คุณไม่กลัวความเสี่ยงและสนใจผลิตภัณฑ์การเงินที่ซับซ้อนที่สามารถสร้าง\x20Alpha\x20ได้\x20คุณต้องการคุยกับที่ปรึกษาที่เข้าใจตลาดโลกและนำเสนอไอเดียที่น่าสนใจได้\x20คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ','เมื่อใช้จ่ายผ่านบัญชี\x20all\x20free\x205,000\x20บาท/เดือน','text-yellow-500','customer-list-view','มี\x20500\x20บาท','\x22\x20alt=\x22','active','application/json','4\x20ครั้ง','300\x20บาท','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22mt-6\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h4\x20class=\x22text-xl\x20font-bold\x20border-b\x20border-slate-200\x20pb-2\x22>ประวัติการ\x20Roleplay</h4>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22p-2\x22>',')\x22\x20class=\x22flex-1\x20btn-secondary\x20py-2\x20px-4\x20!text-sm\x22>ข้อมูลลูกค้า</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22startRoleplay(','expertise','ความเข้าใจในผลิตภัณฑ์ที่นำเสนอ\x20สามารถตอบคำถามและให้ข้อมูลที่ถูกต้องครบถ้วน','parse','scoring-modal-content','user','จะไม่ได้รับดอกเบี้ยในเดือนนั้น','https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=','250\x20คะแนน','บัญชีเพื่อใช้\x20ที่ให้คุณใช้ชีวิตฟรีรอบด้าน','บัญชี\x20ttb\x20all\x20free\x20มอบค่ารักษาพยาบาลจากอุบัติเหตุสูงสุดครั้งละเท่าไหร่','back-to-list-btn','บริการ\x20ttb\x20so\x20goood\x20สำหรับบัตรเครดิต\x20ttb\x20so\x20fast\x20มีเงื่อนไขยอดใช้จ่ายขั้นต่ำเท่าไหร่ในการทำรายการแบ่งจ่าย','textContent','Error\x20calling\x20Gemini\x20API:',')\x22></i>','text','name','ขั้นตอนการขายที่ชัดเจน','startQuiz','บัญชี\x20ttb\x20all\x20free\x20ฟรีค่าธรรมเนียมการทำธุรกรรมพื้นฐานทุกประเภทเมื่อใช้ผ่านแอป\x20ttb\x20touch','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22text-center\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-user-circle\x20text-6xl\x20text-slate-400\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20class=\x22text-3xl\x20font-bold\x20mt-4\x22>','13/10/2568','</p></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22card\x20p-6\x22><div\x20class=\x22flex\x20items-center\x20gap-4\x22><div\x20class=\x22news-card-icon\x20bg-red-500\x22><i\x20class=\x22fas\x20fa-chart-line\x22></i></div><h4\x20class=\x22text-lg\x20font-bold\x22>ตลาดหุ้นไทย</h4></div><p\x20class=\x22text-slate-600\x20mt-3\x20text-sm\x22>','สินค้าที่ได้รับมีตำหนิเล็กน้อย','\x27)\x22\x20class=\x22flex-1\x20btn-primary\x20py-2\x20px-4\x20!text-sm\x22>เริ่มทดสอบ</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','ปรีชา\x20ตั้งใจจริง','200\x20บาท','productKnowledge','ทุกๆ\x2010\x20บาท\x20รับ\x201\x20คะแนน','nav-roleplay','ผู้ถือบัตรจะได้รับความคุ้มครองประกันอุบัติเหตุระหว่างการเดินทางสูงสุด\x206\x20ล้านบาท\x20เมื่อชำระค่าตั๋วโดยสารผ่านบัตร','dataset','presentationSkills','เวลาที่เหลือ:\x20','ดอกเบี้ยสูงเหมือนฝากประจำ\x20แต่ถอนได้','Platinum','Enter','Basic','**ประกันการเดินทาง:**\x20อุ่นใจทุกการเดินทางด้วยวงเงินคุ้มครองอุบัติเหตุสูงสุด\x206\x20ล้านบาท\x20เมื่อชำระค่าตั๋วเครื่องบินผ่านบัตร','กดเงินไม่ใช้บัตรฟรี','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</ul>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','ไม่เกิดอะไรขึ้น\x20ยังคงคำนวณดอกเบี้ยตามปกติ','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20class=\x22text-3xl\x20font-bold\x20text-center\x20mb-6\x20text-transparent\x20bg-clip-text\x20bg-gradient-to-r\x20from-green-500\x20to-blue-500\x22>เกณฑ์การให้คะแนน</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22space-y-4\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','card\x20p-6\x20flex\x20flex-col\x20items-center\x20text-center\x20space-y-4','2,500\x20คะแนน','Fetch\x20Error:','ttb\x20all\x20free\x20เป็นบัญชีเพื่อ\x20\x22ใช้\x22\x20ที่เน้นฟรีค่าธรรมเนียมและประกัน\x20ไม่ใช่บัญชีเพื่อ\x20\x22ออม\x22\x20ที่เน้นดอกเบี้ยสูง','มาลินี\x20สดใส','quiz-feedback','<i\x20class=\x22fas\x20fa-spinner\x20fa-spin\x22></i>\x20กำลังค้นหาข้อมูล...','\x20ปี)</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-blue-600\x20font-semibold\x22>','rank','มี\x201,000\x20บาท','10/10/2568','evaluation-content','12\x20ครั้ง','14/10/2568','src','keydown','nav-specialist','1,000\x20บาท','length','**ฟรีค่าธรรมเนียม:**\x20ไม่มีค่าธรรมเนียมแรกเข้าและรายปี','closeInfoModal','จ่ายบิลฟรี','ลูกค้าจะได้รับอัตราดอกเบี้ยโบนัสสำหรับบัญชี\x20ทีทีบี\x20โนฟิกซ์\x20ได้อย่างไร','/15</span></div>','55023','ไม่มีค่าธรรมเนียม','showProductDetail','\x22\x20class=\x22w-24\x20h-24\x20rounded-full\x20object-cover\x20border-4\x20border-slate-200\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20class=\x22text-xl\x20font-bold\x20mt-4\x22>','เพื่อความปลอดภัย\x20บัญชี\x20ทีทีบี\x20โนฟิกซ์\x20ถูกออกแบบมาเพื่อเป็นบัญชีเก็บเงินโดยเฉพาะ\x20จึงไม่สามารถผูกกับบัตรเดบิตได้','คุณคือ\x20สมชาย\x20เกียรติสกุล,\x20เจ้าของธุรกิจวัย\x2062\x20ปีที่ประสบความสำเร็จและกำลังวางแผนเกษียณ\x20คุณเป็นคนรอบคอบมากเรื่องการเงิน\x20ไม่ชอบความเสี่ยง\x20และให้ความสำคัญกับการรักษาเงินต้นสูงสุด\x20คุณมีประสบการณ์ลงทุนในกองทุนลดหย่อนภาษีบ้าง\x20แต่ไม่เคยแตะผลิตภัณฑ์ที่ซับซ้อน\x20เป้าหมายของคุณคือหาผลตอบแทนที่ชนะเงินเฟ้อโดยไม่ต้องเสี่ยงมากเกินไป\x20คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ','specialist-chat-container','style','ฟรีประกันการเดินทาง','sun.jpg','none','focus','image','สมชาย\x20เกียรติสกุล','บริการ\x20ttb\x20so\x20goood\x20สามารถเปลี่ยนยอดใช้จ่ายตั้งแต่\x201,000\x20บาทขึ้นไปให้เป็นยอดแบ่งจ่าย\x200%\x20นาน\x203\x20เดือนได้','slice','appendChild','ขออภัย,\x20เกิดข้อผิดพลาดในการเชื่อมต่อ:\x20','<i\x20class=\x22far\x20fa-star\x22></i>','forEach','rating-stars-container','12/10/2568','sort','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-lg\x20text-center\x20mb-6\x22>ยอดเยี่ยม!\x20คุณมีความเข้าใจในผลิตภัณฑ์อย่างลึกซึ้ง</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><h4\x20class=\x22text-xl\x20font-bold\x20text-green-600\x20mb-2\x22><i\x20class=\x22fas\x20fa-check-circle\x20mr-2\x22></i>จุดแข็ง</h4><p\x20class=\x22text-slate-700\x20bg-slate-100\x20p-3\x20rounded-lg\x22>คุณมีความรู้ความเข้าใจในจุดเด่นและเงื่อนไขของผลิตภัณฑ์เป็นอย่างดีเยี่ยม\x20สามารถให้ข้อมูลกับลูกค้าได้อย่างมั่นใจ</p></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','<p\x20class=\x22text-slate-500\x22>ยังไม่มีข้อมูลการ\x20Roleplay</p>','error','products','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-2xl\x20font-bold\x20text-blue-600\x20mt-2\x22>คะแนนเฉลี่ย:\x20','specialist-grid','summary','วงเงินคุ้มครองประกันอุบัติเหตุจากการเดินทางของบัตร\x20ttb\x20so\x20fast\x20คือเท่าไหร่','\x27)\x22>','ไม่เคย','createElement','message','<i\x20class=\x22fas\x20fa-star-half-alt\x22></i>','คำถาม\x20','trim','</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>','139923slXXSe','target','leaderboard-modal','startRoleplay','ให้ดอกเบี้ยเงินฝากสูง','indexOf','join','content','innerHTML','scrollTop','ได้เฉพาะบัตรเครดิต','div','<div\x20class=\x22w-full\x20bg-slate-200\x20rounded-full\x20h-2.5\x22><div\x20class=\x22bg-gradient-to-r\x20from-blue-500\x20to-cyan-400\x20h-2.5\x20rounded-full\x22\x20style=\x22width:\x20','th-TH','6\x20ล้านบาท','เปลี่ยนบ้านเป็นเงินก้อน\x20เพิ่มสภาพคล่องในยามจำเป็น','บัญชี\x20ทีทีบี\x20ออลล์ฟรี','improvements','top.jpg','30570864kSlOdu','statusText','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-lg\x20text-center\x20mb-6\x22>ทำได้ดี!\x20คุณมีความรู้ผลิตภัณฑ์ในระดับที่ดี</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><h4\x20class=\x22text-xl\x20font-bold\x20text-green-600\x20mb-2\x22><i\x20class=\x22fas\x20fa-check-circle\x20mr-2\x22></i>จุดแข็ง</h4><p\x20class=\x22text-slate-700\x20bg-slate-100\x20p-3\x20rounded-lg\x22>คุณเข้าใจภาพรวมและจุดเด่นหลักของผลิตภัณฑ์ได้ดี\x20แต่ยังมีรายละเอียดบางส่วนที่สามารถทบทวนเพิ่มเติมเพื่อความแม่นยำยิ่งขึ้น</p></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><h4\x20class=\x22text-xl\x20font-bold\x20text-yellow-600\x20mb-2\x22><i\x20class=\x22fas\x20fa-exclamation-triangle\x20mr-2\x22></i>จุดที่ควรพัฒนา</h4><p\x20class=\x22text-slate-700\x20bg-slate-100\x20p-3\x20rounded-lg\x22>ลองทบทวนเงื่อนไขเฉพาะต่างๆ\x20ของผลิตภัณฑ์\x20เช่น\x20ตัวเลขค่าธรรมเนียม\x20หรือข้อกำหนดในการรับสิทธิประโยชน์เพิ่มเติม</p></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22flex\x20justify-between\x20items-center\x20mb-8\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22showView(\x27quiz-view\x27)\x22\x20class=\x22btn-secondary\x20py-2\x20px-4\x20!rounded-lg\x20flex\x20items-center\x20gap-2\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-arrow-left\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20กลับ\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h1\x20class=\x22text-3xl\x20font-bold\x20text-transparent\x20bg-clip-text\x20bg-gradient-to-r\x20from-purple-600\x20to-pink-500\x22>','การออกบัตรเดบิตทดแทนกรณีหาย/ชำรุด\x20จะมีค่าธรรมเนียม\x20200\x20บาท','ทักษะการนำเสนอที่น่าสนใจ\x20เชื่อมโยงกับความต้องการของลูกค้าได้ดี','คำถามถัดไป','onclick','กรุณากรอกรหัสพนักงานและชื่อ-นามสกุล','\x20คะแนน</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-sm\x20text-slate-600\x20mt-1\x22>','children','โอนเงินต่างธนาคารฟรี','button','ผมเป็นเจ้าของธุรกิจใหญ่ใกล้เกษียณ\x20มีความมั่งคั่งสูง\x20แต่กังวลเรื่องความเสี่ยงและเน้นการรักษาเงินต้นเป็นหลัก\x20สนใจการลงทุนที่ให้ผลตอบแทนดีกว่าเงินฝากแต่ต้องปลอดภัยสูง','ฟรีเฉพาะปีแรก','display','oil','ดอกเบี้ยจะถูกปรับลดลง','เมื่อแนะนำเพื่อนมาเปิดบัญชี','question','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','json','Raw\x20text:','1069165HNztZz','product-sound-toggle','parentNav','from','quiz-question-text','</p></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><h4\x20class=\x22text-xl\x20font-bold\x20text-yellow-600\x20mb-2\x22><i\x20class=\x22fas\x20fa-exclamation-triangle\x20mr-2\x22></i>สิ่งที่ควรปรับปรุง</h4><p\x20class=\x22text-slate-700\x20bg-slate-100\x20p-3\x20rounded-lg\x22>','incorrect','internationalMarkets','\x20stars.','อ.\x20ตุ๊ก','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22bg-gradient-to-br\x20from-teal-500\x20to-green-600\x20text-white\x20p-8\x20rounded-2xl\x20shadow-lg\x20mb-8\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20class=\x22text-3xl\x20font-bold\x22>','.ai-response-text','quiz-options','segment','ความสามารถในการนำเสนอขาย','\x22\x20class=\x22w-40\x20h-40\x20rounded-full\x20object-cover\x20border-4\x20border-slate-200\x20mx-auto\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20class=\x22text-2xl\x20font-bold\x20mt-4\x22>','**ช้อปออนไลน์อย่างอุ่นใจ:**\x20บัตรเดบิต\x20ttb\x20all\x20free\x20มาพร้อมประกันซื้อสินค้าออนไลน์\x20กรณีไม่ได้ของหรือสินค้าไม่ตรงปก\x20คุ้มครองสูงสุด\x205,000\x20บาทต่อครั้ง','quiz-results-score','disabled','ไม่มีขั้นต่ำในการเปิดบัญชี','nav','lang','จุดเด่นที่สุดของบัตร\x20ttb\x20so\x20fast\x20คือการสะสมคะแนนที่รวดเร็ว\x20โดยทุก\x2010\x20บาทที่ใช้จ่ายจะได้รับ\x201\x20คะแนนสะสม','อ.\x20ท๊อป','Call\x20Center','ไม่มีขั้นต่ำ','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22flex\x20space-x-2\x20w-full\x20mt-4\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22showProductDetail(\x27','You\x20are\x20a\x20helpful\x20assistant\x20that\x20responds\x20in\x20valid\x20JSON\x20format\x20only,\x20without\x20any\x20markdown.','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<img\x20src=\x22','quiz-feedback-text','ใช้รูดซื้อสินค้าได้','ได้','sofia.png','\x0aบทสนทนาต้องไม่เกิน\x20','quiz-title','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20class=\x22font-bold\x20text-xl\x20mt-8\x20mb-4\x22>จุดเด่นผลิตภัณฑ์:</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<ul\x20class=\x22space-y-3\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','tools','ไม่คุ้มครอง','3vgwNIq','\x22\x20class=\x22w-14\x20h-14\x20rounded-full\x20border-2\x20border-teal-500\x22>','สินเชื่อบุคคล','การลงทุน','สินเชื่อบ้านแลกเงิน\x20ทีทีบี','<p\x20class=\x22text-red-500\x22>','<div\x20class=\x22text-center\x20p-8\x22><i\x20class=\x22fas\x20fa-spinner\x20fa-spin\x20text-4xl\x20text-blue-500\x22></i><p\x20class=\x22mt-4\x22>กำลังดึงข้อมูลล่าสุด...</p></div>','scrollHeight','ฟรีค่าธรรมเนียม','back-to-specialist-list-btn','</h1>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22startQuiz(\x27','log','rating-specialist-image','ได้เฉพาะกรณีพิเศษ','ลูกค้าจะได้รับความคุ้มครองประกันช้อปปิ้งออนไลน์ในกรณีใด','**แบ่งจ่าย\x200%\x20นาน\x203\x20เดือน\x20(ttb\x20so\x20goood):**\x20เปลี่ยนทุกยอดใช้จ่าย\x201,000\x20บาทขึ้นไป\x20ให้เป็นยอดแบ่งจ่าย\x200%\x20นาน\x203\x20เดือนได้ด้วยตัวเองผ่านแอป\x20ttb\x20touch\x20เพิ่มความยืดหยุ่นในการบริหารค่าใช้จ่าย','ประกันช้อปออนไลน์จะคุ้มครองกรณีไม่ได้รับสินค้า\x20หรือได้รับสินค้าไม่ตรงตามสเปกที่สั่งซื้อ','stopPropagation','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x27space-y-1\x27>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p><strong\x20class=\x22font-semibold\x22>ลูกค้า:</strong>\x20','\x20with\x20','Act\x20as\x20a\x20senior\x20financial\x20analyst.\x20Provide\x20a\x20daily\x20market\x20summary\x20for\x20today\x20in\x20Thai.\x20The\x20response\x20MUST\x20be\x20a\x20valid\x20JSON\x20object\x20without\x20any\x20markdown\x20formatting.\x20The\x20JSON\x20object\x20should\x20have\x20the\x20structure:\x20{\x22date\x22:\x20\x22ข้อมูลตลาดประจำวันที่\x20[DD\x20Month\x20YYYY]\x22,\x20\x22dailyBriefing\x22:\x20\x22A\x20concise\x20summary\x20of\x20today\x27s\x20market\x20situation.\x22,\x20\x22keyTopics\x22:\x20{\x22gold\x22:\x20\x22Analysis\x20of\x20gold\x20prices.\x22,\x20\x22internationalMarkets\x22:\x20\x22Analysis\x20of\x20international\x20stock\x20markets\x20(S&P\x20500,\x20Nasdaq).\x22,\x20\x22thaiMarkets\x22:\x20\x22Analysis\x20of\x20the\x20Thai\x20stock\x20market\x20(SET\x20Index).\x22,\x20\x22oil\x22:\x20\x22Analysis\x20of\x20oil\x20prices\x20(WTI,\x20Brent).\x22,\x20\x22globalSituation\x22:\x20\x22Analysis\x20of\x20key\x20global\x20situations\x20affecting\x20the\x20market.\x22}}\x20Ensure\x20all\x20text\x20is\x20in\x20Thai.','quiz-next-btn','ลูกค้าสามารถเปิดบัญชี\x20ทีทีบี\x20โนฟิกซ์\x20ได้โดยไม่มีกำหนดยอดเงินฝากขั้นต่ำ','18DlnQzo','**ปลอดภัย:**\x20เป็นบัญชีสำหรับเก็บเงินโดยเฉพาะ\x20ไม่ผูกกับบัตรเดบิต\x20จึงช่วยลดความเสี่ยงจากการถูกโจรกรรมข้อมูลบัตร','</p></div>'];_0x3f6f=function(){return _0x3f1651;};return _0x3f6f();}speechSynthesis[_0xdc549f(0x19f)]!==undefined&&(speechSynthesis['onvoiceschanged']=loadVoices);const speakText=(_0x33fa41,_0x583455='female',_0x435e05=![])=>{const _0x1d09b1=_0xdc549f;if(_0x435e05&&isQuizMuted)return;if(!_0x435e05&&isGlobalMuted)return;window['speechSynthesis']['speaking']&&window[_0x1d09b1(0x27f)][_0x1d09b1(0x29d)](),setTimeout(()=>{const _0x1334e1=_0x1d09b1,_0x9e4c5d=new SpeechSynthesisUtterance(_0x33fa41);_0x9e4c5d[_0x1334e1(0x158)]=_0x1334e1(0x126),_0x9e4c5d[_0x1334e1(0x192)]=0.95;const _0x594396=voices['filter'](_0x1ff2a8=>_0x1ff2a8[_0x1334e1(0x158)]==='th-TH');if(_0x594396[_0x1334e1(0xec)]>0x0){let _0x2cc304=_0x583455===_0x1334e1(0x1d2)?_0x594396[_0x1334e1(0x299)](_0xf01199=>_0xf01199[_0x1334e1(0x2bb)]['includes'](_0x1334e1(0x216))):null;if(!_0x2cc304)_0x2cc304=_0x594396[0x0];_0x9e4c5d[_0x1334e1(0x28c)]=_0x2cc304;}window[_0x1334e1(0x27f)][_0x1334e1(0x1e3)](_0x9e4c5d);},0x64);},renderCustomers=()=>{const _0x2642f2=_0xdc549f;customerGridView[_0x2642f2(0x121)]='',customers['forEach'](_0x55ef4e=>{const _0xa671f6=_0x2642f2,_0x2b7e56=document['createElement']('div');_0x2b7e56[_0xa671f6(0x217)]=_0xa671f6(0x2d6),_0x2b7e56[_0xa671f6(0x121)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<img\x20src=\x22'+_0x55ef4e[_0xa671f6(0xfe)]+'\x22\x20alt=\x22'+_0x55ef4e[_0xa671f6(0x2bb)]+'\x22\x20class=\x22w-32\x20h-32\x20rounded-full\x20object-cover\x20border-4\x20border-slate-200\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20class=\x22text-xl\x20font-bold\x22>'+_0x55ef4e['name']+_0xa671f6(0x1da)+_0x55ef4e[_0xa671f6(0x233)]+_0xa671f6(0x276)+_0x55ef4e['id']+_0xa671f6(0x2aa)+_0x55ef4e['id']+_0xa671f6(0x20e),customerGridView['appendChild'](_0x2b7e56);});};function _0x350a(_0x2ce35e,_0x472344){const _0x3f6f04=_0x3f6f();return _0x350a=function(_0x350ab7,_0xebf63b){_0x350ab7=_0x350ab7-0xea;let _0xbeb4d1=_0x3f6f04[_0x350ab7];return _0xbeb4d1;},_0x350a(_0x2ce35e,_0x472344);}window[_0xdc549f(0x20c)]=_0xee7cf6=>{const _0x1c2fe6=_0xdc549f,_0x279346=customers[_0x1c2fe6(0x299)](_0x2a023b=>_0x2a023b['id']===_0xee7cf6);infoModalContent[_0x1c2fe6(0x121)]=_0x1c2fe6(0x1e2)+_0x279346[_0x1c2fe6(0xfe)]+_0x1c2fe6(0x2a3)+_0x279346[_0x1c2fe6(0x2bb)]+_0x1c2fe6(0x152)+_0x279346[_0x1c2fe6(0x2bb)]+'\x20('+_0x279346['age']+_0x1c2fe6(0x2dd)+_0x279346[_0x1c2fe6(0x230)]+_0x1c2fe6(0x21e)+_0x279346[_0x1c2fe6(0x150)]+_0x1c2fe6(0x22d)+_0x279346[_0x1c2fe6(0x20a)]+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22w-full\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h4\x20class=\x22text-lg\x20font-semibold\x20border-b\x20border-slate-200\x20pb-2\x20mb-3\x22>ข้อมูลเบื้องต้น</h4>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-sm\x20text-slate-600\x20mb-4\x20bg-slate-50\x20p-3\x20rounded-lg\x22>'+_0x279346[_0x1c2fe6(0x10f)]+_0x1c2fe6(0x23f)+Object['entries'](_0x279346[_0x1c2fe6(0x197)])['map'](([_0x42a3ab,_0x3e00b2])=>_0x1c2fe6(0x1de)+_0x42a3ab+':</span>\x20<strong>'+_0x3e00b2+_0x1c2fe6(0x18d))['join']('')+_0x1c2fe6(0x21b),speakText(_0x279346[_0x1c2fe6(0x10f)],_0x279346[_0x1c2fe6(0x214)],![]),infoModal['classList'][_0x1c2fe6(0x1c2)]('hidden'),infoModal[_0x1c2fe6(0x24b)][_0x1c2fe6(0x271)](_0x1c2fe6(0x26b));},window[_0xdc549f(0xee)]=()=>{const _0x3bc500=_0xdc549f;if(_0x3bc500(0x27f)in window)window['speechSynthesis'][_0x3bc500(0x29d)]();infoModal['classList']['add'](_0x3bc500(0x243)),infoModal['classList']['remove']('flex');},window[_0xdc549f(0x11c)]=_0x273130=>{const _0x57e43b=_0xdc549f;currentCustomer=customers[_0x57e43b(0x299)](_0x171e7e=>_0x171e7e['id']===_0x273130),turnCount=0x0,isEvaluationInProgress=![],conversationHistory=[{'role':'system','parts':[{'text':currentCustomer['personaPrompt']+_0x57e43b(0x164)+maxTurns+_0x57e43b(0x22a)}]}],document[_0x57e43b(0x1f7)]('roleplay-customer-profile')[_0x57e43b(0x121)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20class=\x22text-lg\x20font-semibold\x20text-right\x22>'+currentCustomer['name']+_0x57e43b(0x1c8)+currentCustomer[_0x57e43b(0x233)]+_0x57e43b(0x278)+currentCustomer[_0x57e43b(0xfe)]+_0x57e43b(0x2a3)+currentCustomer[_0x57e43b(0x2bb)]+_0x57e43b(0x1fc),contextContainer[_0x57e43b(0x121)]=_0x57e43b(0x17b)+currentCustomer['name']+'\x20('+currentCustomer[_0x57e43b(0x233)]+'\x20ปี)</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p><strong\x20class=\x22font-semibold\x22>ตำแหน่ง:</strong>\x20'+currentCustomer[_0x57e43b(0x230)]+_0x57e43b(0x1a5)+currentCustomer[_0x57e43b(0x10f)]+_0x57e43b(0x140),chatContainer[_0x57e43b(0x121)]='',endChatButton[_0x57e43b(0x155)]=!![],chatInput[_0x57e43b(0x155)]=![],sendButton[_0x57e43b(0x155)]=![],roleplayView[_0x57e43b(0x24b)][_0x57e43b(0x1c2)](_0x57e43b(0x243)),chatInput[_0x57e43b(0xfd)](),navButtons[_0x57e43b(0x105)](_0x6801c0=>_0x6801c0[_0x57e43b(0x24b)]['remove'](_0x57e43b(0x2a4))),navRoleplay[_0x57e43b(0x24b)][_0x57e43b(0x271)](_0x57e43b(0x2a4));},document[_0xdc549f(0x1f7)](_0xdc549f(0x2b5))['addEventListener'](_0xdc549f(0x189),()=>{const _0x58fc53=_0xdc549f;if(_0x58fc53(0x27f)in window)window[_0x58fc53(0x27f)]['cancel']();roleplayView[_0x58fc53(0x24b)][_0x58fc53(0x271)]('hidden'),showView(_0x58fc53(0x2a1));});const handleSendMessage=()=>{const _0x181ddd=_0xdc549f,_0x172ca9=chatInput[_0x181ddd(0x1f0)][_0x181ddd(0x117)]();_0x172ca9&&!isEvaluationInProgress&&(addUserMessage(chatContainer,_0x172ca9),handleUserTurn(_0x172ca9),chatInput[_0x181ddd(0x1f0)]='');};sendButton[_0xdc549f(0x1f1)](_0xdc549f(0x189),handleSendMessage),chatInput[_0xdc549f(0x1f1)](_0xdc549f(0x2e5),_0x5c4182=>{const _0x3732c5=_0xdc549f;_0x5c4182['key']===_0x3732c5(0x2cf)&&!_0x5c4182[_0x3732c5(0x194)]&&(_0x5c4182[_0x3732c5(0x234)](),handleSendMessage());}),endChatButton['addEventListener'](_0xdc549f(0x189),()=>!isEvaluationInProgress&&getFinalEvaluation()),showRoleplayInfoButton[_0xdc549f(0x1f1)](_0xdc549f(0x189),()=>currentCustomer&&showCustomerInfo(currentCustomer['id']));const addUserMessage=(_0x40dce0,_0x1cefd0)=>{const _0x5671d2=_0xdc549f,_0x20cf6a=document[_0x5671d2(0x113)](_0x5671d2(0x124));_0x20cf6a['className']=_0x5671d2(0x26a),_0x20cf6a[_0x5671d2(0x121)]='<p\x20class=\x22font-semibold\x20mb-1\x22>คุณ\x20('+currentUser['name']+_0x5671d2(0x231)+_0x1cefd0+_0x5671d2(0x222),_0x40dce0[_0x5671d2(0x102)](_0x20cf6a),_0x40dce0[_0x5671d2(0x122)]=_0x40dce0[_0x5671d2(0x170)];},addAiMessage=(_0x2c1007,_0x5a1b8d,_0x4dfa22)=>{const _0x566bb6=_0xdc549f,_0x3cb62b=document[_0x566bb6(0x113)](_0x566bb6(0x124));return _0x3cb62b[_0x566bb6(0x217)]=_0x566bb6(0x239),_0x3cb62b[_0x566bb6(0x121)]=_0x566bb6(0x1b8)+_0x5a1b8d+_0x566bb6(0x27a)+_0x4dfa22+_0x566bb6(0x1fd),_0x2c1007[_0x566bb6(0x102)](_0x3cb62b),_0x2c1007[_0x566bb6(0x122)]=_0x2c1007[_0x566bb6(0x170)],_0x3cb62b[_0x566bb6(0x1f9)](_0x566bb6(0x14e));},handleUserTurn=async _0x2be2bf=>{const _0x104ca3=_0xdc549f;turnCount++,conversationHistory[_0x104ca3(0x249)]({'role':_0x104ca3(0x2af),'parts':[{'text':_0x2be2bf}]});const _0x279c71=addAiMessage(chatContainer,currentCustomer[_0x104ca3(0x2bb)],_0x104ca3(0x279));chatInput['disabled']=!![],sendButton[_0x104ca3(0x155)]=!![],endChatButton[_0x104ca3(0x155)]=!![];const _0x2774d6=await getAIResponse(conversationHistory);conversationHistory['push']({'role':'model','parts':[{'text':_0x2774d6}]}),_0x279c71[_0x104ca3(0x121)]=_0x2774d6,speakText(_0x2774d6,currentCustomer[_0x104ca3(0x214)],![]),chatInput['disabled']=![],sendButton[_0x104ca3(0x155)]=![],chatInput[_0x104ca3(0xfd)](),turnCount>=0x5&&(endChatButton[_0x104ca3(0x155)]=![]);};async function callGemini(_0x40aeb9){const _0x3f29d7=_0xdc549f,_0x359de0='AIzaSyBFUWczi94LOnK3df4sSzHfBTlzTTeNInA',_0x4367e7=_0x3f29d7(0x2b1)+_0x359de0;try{const _0x16acf5=await fetch(_0x4367e7,{'method':_0x3f29d7(0x1f6),'headers':{'Content-Type':_0x3f29d7(0x2a5)},'body':JSON[_0x3f29d7(0x1a0)](_0x40aeb9)});if(!_0x16acf5['ok']){const _0x1fd1be=await _0x16acf5[_0x3f29d7(0x141)]()['catch'](()=>({'error':{'message':_0x16acf5[_0x3f29d7(0x12d)]}}));console[_0x3f29d7(0x10b)]('API\x20Error\x20Response:',_0x1fd1be);throw new Error('API\x20error\x20('+_0x16acf5[_0x3f29d7(0x258)]+'):\x20'+_0x1fd1be[_0x3f29d7(0x10b)][_0x3f29d7(0x114)]);}const _0x2349b7=await _0x16acf5[_0x3f29d7(0x141)]();return _0x2349b7['candidates'][0x0][_0x3f29d7(0x120)][_0x3f29d7(0x1e7)][0x0][_0x3f29d7(0x2ba)];}catch(_0x3bc078){return console[_0x3f29d7(0x10b)](_0x3f29d7(0x2d8),_0x3bc078),_0x3f29d7(0x103)+_0x3bc078[_0x3f29d7(0x114)]+_0x3f29d7(0x25e);}}async function getAIResponse(_0x1615c9,_0x1d7014=![]){const _0x55fa11=_0xdc549f;try{const _0x2012d2={'contents':_0x1615c9['slice'](0x1),'systemInstruction':_0x1615c9[0x0]};_0x1d7014&&(_0x2012d2[_0x55fa11(0x167)]=[{'google_search':{}}]);const _0x1c0458=await callGemini(_0x2012d2);return _0x1c0458;}catch(_0x533536){return console[_0x55fa11(0x10b)](_0x55fa11(0x2b8),_0x533536),_0x55fa11(0x1ad)+_0x533536[_0x55fa11(0x114)];}}async function fetchNews(){const _0x40fb33=_0xdc549f;newsWrapper[_0x40fb33(0x121)]=_0x40fb33(0x16f);const _0x26d58d=_0x40fb33(0x17d);try{const _0x22c0f5=[{'role':_0x40fb33(0x245),'parts':[{'text':_0x40fb33(0x15e)}]},{'role':_0x40fb33(0x2af),'parts':[{'text':_0x26d58d}]}];let _0x2e1697=await getAIResponse(_0x22c0f5,!![]);_0x2e1697=_0x2e1697['replace'](/^```json\s*|```$/g,'')[_0x40fb33(0x117)]();const _0x23778e=JSON[_0x40fb33(0x2ad)](_0x2e1697);renderNews(_0x23778e),speakText(_0x23778e[_0x40fb33(0x213)],_0x40fb33(0x291),![]);}catch(_0x482d39){console[_0x40fb33(0x10b)]('Error\x20fetching\x20news:',_0x482d39),newsWrapper[_0x40fb33(0x121)]=_0x40fb33(0x18c)+_0x482d39[_0x40fb33(0x114)]+_0x40fb33(0x182);}}function renderNews(_0x5055bf){const _0x30c811=_0xdc549f;newsWrapper['innerHTML']=_0x30c811(0x14d)+(_0x5055bf[_0x30c811(0x1ff)]||_0x30c811(0x268))+'</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22mt-3\x22\x20id=\x22daily-briefing-text-news\x22>'+_0x5055bf['dailyBriefing']+_0x30c811(0x1ef)+_0x5055bf[_0x30c811(0x21d)][_0x30c811(0x1bd)]+'</p></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22card\x20p-6\x22><div\x20class=\x22flex\x20items-center\x20gap-4\x22><div\x20class=\x22news-card-icon\x20bg-sky-500\x22><i\x20class=\x22fas\x20fa-globe-americas\x22></i></div><h4\x20class=\x22text-lg\x20font-bold\x22>ตลาดหุ้นต่างประเทศ</h4></div><p\x20class=\x22text-slate-600\x20mt-3\x20text-sm\x22>'+_0x5055bf[_0x30c811(0x21d)][_0x30c811(0x14a)]+_0x30c811(0x2c1)+_0x5055bf[_0x30c811(0x21d)]['thaiMarkets']+_0x30c811(0x1ae)+_0x5055bf[_0x30c811(0x21d)][_0x30c811(0x13c)]+'</p></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22card\x20p-6\x22><div\x20class=\x22flex\x20items-center\x20gap-4\x22><div\x20class=\x22news-card-icon\x20bg-purple-500\x22><i\x20class=\x22fas\x20fa-satellite-dish\x22></i></div><h4\x20class=\x22text-lg\x20font-bold\x22>สถานการณ์โลก</h4></div><p\x20class=\x22text-slate-600\x20mt-3\x20text-sm\x22>'+_0x5055bf[_0x30c811(0x21d)][_0x30c811(0x1af)]+'</p></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>';}quizSoundToggle[_0xdc549f(0x1f1)](_0xdc549f(0x189),()=>{const _0x59d98d=_0xdc549f;isQuizMuted=!isQuizMuted,quizSoundToggle['innerHTML']=isQuizMuted?'<i\x20class=\x22fas\x20fa-volume-mute\x22></i>':'<i\x20class=\x22fas\x20fa-volume-up\x22></i>',isQuizMuted&&window['speechSynthesis']['speaking']&&window['speechSynthesis'][_0x59d98d(0x29d)]();});function renderQuizzes(){const _0x5d8137=_0xdc549f;quizGridView[_0x5d8137(0x121)]='',quizProducts[_0x5d8137(0x105)](_0x3bc148=>{const _0x2ef042=_0x5d8137,_0x4d60df=document[_0x2ef042(0x113)]('div');_0x4d60df[_0x2ef042(0x217)]='card\x20p-6\x20flex\x20flex-col\x20items-start\x20text-left',_0x4d60df[_0x2ef042(0x121)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22bg-purple-100\x20text-purple-600\x20p-3\x20rounded-lg\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-file-alt\x20text-2xl\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22mt-4\x20flex-1\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20class=\x22text-xl\x20font-bold\x22>'+_0x3bc148['name']+_0x2ef042(0x274)+_0x3bc148['desc']+_0x2ef042(0x15d)+_0x3bc148[_0x2ef042(0x2bb)]+_0x2ef042(0x1a7)+_0x3bc148[_0x2ef042(0x2bb)]+_0x2ef042(0x2c3),quizGridView[_0x2ef042(0x102)](_0x4d60df);});}window[_0xdc549f(0xf4)]=_0x13d980=>{const _0x3cc77c=_0xdc549f,_0x33dcc4=productDetailsData[_0x13d980];if(!_0x33dcc4)return;isGlobalMuted=![],productDetailContent[_0x3cc77c(0x121)]=_0x3cc77c(0x12f)+_0x33dcc4[_0x3cc77c(0x230)]+_0x3cc77c(0x173)+_0x13d980+_0x3cc77c(0x246)+_0x33dcc4['summary']+_0x3cc77c(0x166)+_0x33dcc4[_0x3cc77c(0x260)][_0x3cc77c(0x1ca)](_0x4f772f=>'<li\x20class=\x22flex\x20items-start\x20gap-3\x22><i\x20class=\x22fas\x20fa-check-circle\x20text-green-500\x20mt-1\x22></i><span>'+_0x4f772f[_0x3cc77c(0x215)](/\*\*(.*?)\*\*/g,'<strong>$1</strong>')+_0x3cc77c(0x270))[_0x3cc77c(0x11f)]('')+_0x3cc77c(0x2d3);const _0xe11335=document['getElementById'](_0x3cc77c(0x144));_0xe11335[_0x3cc77c(0x1f1)](_0x3cc77c(0x189),()=>{const _0x17baac=_0x3cc77c;isGlobalMuted=!isGlobalMuted,_0xe11335['innerHTML']=isGlobalMuted?'<i\x20class=\x22fas\x20fa-volume-mute\x22></i>':_0x17baac(0x284);if(isGlobalMuted)window[_0x17baac(0x27f)][_0x17baac(0x29d)]();else speakText(_0x33dcc4[_0x17baac(0x10f)],_0x17baac(0x291),![]);}),showView(_0x3cc77c(0x218)),speakText(_0x33dcc4[_0x3cc77c(0x10f)],'female',![]);},window[_0xdc549f(0x2bd)]=_0x39ba5d=>{const _0x1ec9f6=_0xdc549f;currentQuizProduct=_0x39ba5d;const _0x4bdd1e=allQuizQuestions[_0x39ba5d];if(!_0x4bdd1e||_0x4bdd1e[_0x1ec9f6(0xec)]<QUIZ_LENGTH){alert(_0x1ec9f6(0x1d8)+QUIZ_LENGTH+'\x20ข้อ');return;}shuffledQuestions=_0x4bdd1e[_0x1ec9f6(0x108)](()=>0.5-Math[_0x1ec9f6(0x277)]())[_0x1ec9f6(0x101)](0x0,QUIZ_LENGTH),currentQuestionIndex=0x0,score=0x0,showView('quiz-interface-view'),displayCurrentQuestion();};function displayCurrentQuestion(){const _0x37c9da=_0xdc549f;if(quizTimerInterval)clearInterval(quizTimerInterval);isAnswered=![];const _0x58e965=shuffledQuestions[currentQuestionIndex];quizTitleEl[_0x37c9da(0x2b7)]=_0x37c9da(0x26d)+currentQuizProduct,quizProgressEl[_0x37c9da(0x2b7)]=_0x37c9da(0x116)+(currentQuestionIndex+0x1)+_0x37c9da(0x1a1)+QUIZ_LENGTH,quizQuestionTextEl['textContent']=_0x58e965[_0x37c9da(0x13f)],speakText(_0x58e965[_0x37c9da(0x13f)],_0x37c9da(0x291),!![]),quizOptionsEl[_0x37c9da(0x121)]='',_0x58e965[_0x37c9da(0x205)][_0x37c9da(0x105)](_0x4ca48d=>{const _0x4ac417=_0x37c9da,_0x3d7618=document[_0x4ac417(0x113)]('div');_0x3d7618[_0x4ac417(0x217)]=_0x4ac417(0x204);const _0xb72641=document[_0x4ac417(0x113)](_0x4ac417(0x138));_0xb72641[_0x4ac417(0x217)]='flex-1\x20btn-secondary\x20p-4\x20text-left\x20rounded-lg\x20text-base\x20quiz-option',_0xb72641[_0x4ac417(0x2b7)]=_0x4ca48d,_0xb72641[_0x4ac417(0x133)]=()=>selectAnswer(_0x4ca48d,_0xb72641);const _0x365f9c=document[_0x4ac417(0x113)](_0x4ac417(0x138));_0x365f9c[_0x4ac417(0x217)]='btn-secondary\x20!bg-sky-500\x20hover:!bg-sky-600\x20p-3\x20rounded-lg\x20h-full\x20aspect-square\x20flex\x20items-center\x20justify-center',_0x365f9c[_0x4ac417(0x121)]=_0x4ac417(0x284),_0x365f9c[_0x4ac417(0x133)]=_0x5c5768=>{const _0x3deee0=_0x4ac417;_0x5c5768[_0x3deee0(0x17a)](),speakText(_0x4ca48d,_0x3deee0(0x291),!![]);},_0x3d7618[_0x4ac417(0x102)](_0xb72641),_0x3d7618[_0x4ac417(0x102)](_0x365f9c),quizOptionsEl[_0x4ac417(0x102)](_0x3d7618);}),quizFeedbackEl[_0x37c9da(0x24b)][_0x37c9da(0x271)]('hidden'),quizNextBtn['classList']['add'](_0x37c9da(0x243)),timeLeft=TIME_LIMIT,quizTimerEl[_0x37c9da(0x2b7)]=_0x37c9da(0x2cc)+timeLeft+_0x37c9da(0x27b),quizTimerInterval=setInterval(()=>{const _0x3c68b2=_0x37c9da;timeLeft--,quizTimerEl[_0x3c68b2(0x2b7)]=_0x3c68b2(0x2cc)+timeLeft+_0x3c68b2(0x27b),timeLeft<=0x0&&(clearInterval(quizTimerInterval),handleTimeUp());},0x3e8);}function handleTimeUp(){const _0x5f9cac=_0xdc549f;if(isAnswered)return;isAnswered=!![];const _0x3f823b=shuffledQuestions[currentQuestionIndex];quizFeedbackTitleEl[_0x5f9cac(0x2b7)]=_0x5f9cac(0x1a6),quizFeedbackTitleEl['className']=_0x5f9cac(0x220),Array[_0x5f9cac(0x146)](quizOptionsEl[_0x5f9cac(0x1fb)](_0x5f9cac(0x138)))[_0x5f9cac(0x105)](_0x482b27=>_0x482b27[_0x5f9cac(0x155)]=!![]),Array[_0x5f9cac(0x146)](quizOptionsEl[_0x5f9cac(0x136)])[_0x5f9cac(0x105)](_0x5791e7=>{const _0x62a2a6=_0x5f9cac,_0x21b700=_0x5791e7[_0x62a2a6(0x1f9)](_0x62a2a6(0x23a));_0x21b700['textContent']===_0x3f823b[_0x62a2a6(0x18a)]&&_0x21b700[_0x62a2a6(0x24b)][_0x62a2a6(0x271)](_0x62a2a6(0x195));}),quizFeedbackTextEl[_0x5f9cac(0x2b7)]=_0x5f9cac(0x1dc)+_0x3f823b['correctAnswer']+'.\x20'+_0x3f823b[_0x5f9cac(0x225)],quizFeedbackEl[_0x5f9cac(0x24b)][_0x5f9cac(0x1c2)](_0x5f9cac(0x243)),quizNextBtn[_0x5f9cac(0x24b)][_0x5f9cac(0x1c2)](_0x5f9cac(0x243)),quizTimerEl[_0x5f9cac(0x2b7)]='',currentQuestionIndex===QUIZ_LENGTH-0x1?quizNextBtn[_0x5f9cac(0x2b7)]='ดูผลสรุป':quizNextBtn[_0x5f9cac(0x2b7)]=_0x5f9cac(0x132);}function selectAnswer(_0x99d37c,_0x1a2a26){const _0x297417=_0xdc549f;if(isAnswered)return;isAnswered=!![],clearInterval(quizTimerInterval),quizTimerEl[_0x297417(0x2b7)]='',window[_0x297417(0x27f)][_0x297417(0x29d)]();const _0x1b6fe1=shuffledQuestions[currentQuestionIndex],_0x5b4e16=_0x99d37c===_0x1b6fe1[_0x297417(0x18a)];Array[_0x297417(0x146)](quizOptionsEl[_0x297417(0x1fb)](_0x297417(0x138)))[_0x297417(0x105)](_0x4748f3=>_0x4748f3['disabled']=!![]),_0x5b4e16?(score++,_0x1a2a26[_0x297417(0x24b)][_0x297417(0x271)](_0x297417(0x195)),quizFeedbackTitleEl['textContent']=_0x297417(0x1ab),quizFeedbackTitleEl[_0x297417(0x217)]=_0x297417(0x232)):(_0x1a2a26[_0x297417(0x24b)][_0x297417(0x271)](_0x297417(0x149)),quizFeedbackTitleEl[_0x297417(0x2b7)]='คำตอบผิด',quizFeedbackTitleEl['className']=_0x297417(0x220),Array['from'](quizOptionsEl[_0x297417(0x136)])[_0x297417(0x105)](_0x1109fd=>{const _0x385a9c=_0x297417,_0x1db64b=_0x1109fd[_0x385a9c(0x1f9)](_0x385a9c(0x23a));_0x1db64b[_0x385a9c(0x2b7)]===_0x1b6fe1[_0x385a9c(0x18a)]&&_0x1db64b[_0x385a9c(0x24b)][_0x385a9c(0x271)](_0x385a9c(0x195));})),quizFeedbackTextEl[_0x297417(0x2b7)]=_0x1b6fe1['explanation'],quizFeedbackEl[_0x297417(0x24b)][_0x297417(0x1c2)](_0x297417(0x243)),quizNextBtn[_0x297417(0x24b)]['remove'](_0x297417(0x243)),currentQuestionIndex===QUIZ_LENGTH-0x1?quizNextBtn[_0x297417(0x2b7)]=_0x297417(0x1ed):quizNextBtn[_0x297417(0x2b7)]=_0x297417(0x132);}function displayNextQuestion(){currentQuestionIndex++,currentQuestionIndex<QUIZ_LENGTH?displayCurrentQuestion():showQuizResults();}function showQuizResults(){const _0x2eee16=_0xdc549f;showView('quiz-results-view'),document['getElementById']('quiz-results-product')[_0x2eee16(0x2b7)]='Quiz:\x20'+currentQuizProduct,document[_0x2eee16(0x1f7)](_0x2eee16(0x154))['innerHTML']=score+'<span\x20class=\x22text-3xl\x20text-slate-400\x22>/'+QUIZ_LENGTH+_0x2eee16(0x290);let _0x5b4745='';if(score===0x5)_0x5b4745=_0x2eee16(0x109);else score>=0x3?_0x5b4745=_0x2eee16(0x12e):_0x5b4745=_0x2eee16(0x1c6);document[_0x2eee16(0x1f7)](_0x2eee16(0x298))[_0x2eee16(0x121)]=_0x5b4745;}function getRankIcon(_0x15cbf1){const _0x3267ed=_0xdc549f;if(_0x15cbf1===0x1)return'<i\x20class=\x22fas\x20fa-medal\x20text-yellow-400\x20text-xl\x22></i>';if(_0x15cbf1===0x2)return _0x3267ed(0x193);if(_0x15cbf1===0x3)return _0x3267ed(0x264);return _0x3267ed(0x1e1)+_0x15cbf1+_0x3267ed(0x290);}function renderLeaderboard(){const _0x358f94=_0xdc549f,_0x388575=document['getElementById'](_0x358f94(0x1e5));_0x388575[_0x358f94(0x121)]='',leaderboardData[_0x358f94(0x105)](_0x2784be=>{const _0x5259f0=_0x358f94,_0x5cabbd=_0x5259f0(0x21c)+getRankIcon(_0x2784be[_0x5259f0(0x2de)])+_0x5259f0(0x235)+_0x2784be['id']+_0x5259f0(0x240)+_0x2784be['id']+_0x5259f0(0x111)+_0x2784be[_0x5259f0(0x2bb)]+_0x5259f0(0x1cd)+_0x2784be[_0x5259f0(0x1db)][_0x5259f0(0x1a2)](0x1)+_0x5259f0(0x118);_0x388575['innerHTML']+=_0x5cabbd;});}window[_0xdc549f(0x1cc)]=_0x13414f=>{const _0x578fb5=_0xdc549f,_0x50cc89=leaderboardData[_0x578fb5(0x299)](_0xcdc7c1=>_0xcdc7c1['id']===_0x13414f),_0x3a734a=roleplayHistoryData[_0x13414f]||[];let _0x11db30=_0x578fb5(0x10a);_0x3a734a[_0x578fb5(0xec)]>0x0&&(_0x11db30=_0x578fb5(0x280)+_0x3a734a[_0x578fb5(0x1ca)](_0x5a380c=>_0x578fb5(0x1ba)+_0x5a380c['customerName']+_0x578fb5(0x2a9)+_0x5a380c[_0x578fb5(0x1ff)]+'</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22p-2\x20font-bold\x22>'+_0x5a380c[_0x578fb5(0x1db)]+_0x578fb5(0x1b6))[_0x578fb5(0x11f)]('')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tbody>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</table>'),leaderboardModalContent['innerHTML']=_0x578fb5(0x2bf)+_0x50cc89[_0x578fb5(0x2bb)]+'</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-slate-500\x22>รหัสพนักงาน:\x20'+_0x50cc89['id']+_0x578fb5(0x10d)+_0x50cc89[_0x578fb5(0x1db)][_0x578fb5(0x1a2)](0x1)+_0x578fb5(0x2a8)+_0x11db30+_0x578fb5(0x255),leaderboardModal[_0x578fb5(0x24b)]['remove'](_0x578fb5(0x243)),leaderboardModal[_0x578fb5(0x24b)][_0x578fb5(0x271)]('flex');},window['closeLeaderboardModal']=()=>{const _0x4a4fa7=_0xdc549f;leaderboardModal[_0x4a4fa7(0x24b)]['add'](_0x4a4fa7(0x243)),leaderboardModal[_0x4a4fa7(0x24b)][_0x4a4fa7(0x1c2)]('flex');},window[_0xdc549f(0x1be)]=()=>{const _0x1a6be9=_0xdc549f,_0x1719f1=[{'title':_0x1a6be9(0x266),'desc':_0x1a6be9(0x2ac),'score':0xf},{'title':_0x1a6be9(0x151),'desc':_0x1a6be9(0x131),'score':0xf},{'title':_0x1a6be9(0x2bc),'desc':_0x1a6be9(0x186),'score':0xf},{'title':'ความรอบรู้ของพนักงาน','desc':'ความรู้รอบด้านเกี่ยวกับตลาด\x20การลงทุน\x20และปัจจัยที่ส่งผลกระทบ\x20เพื่อให้คำแนะนำที่น่าเชื่อถือ','score':0xf},{'title':'การปิดการขาย','desc':'ความสามารถในการสรุปและโน้มน้าวให้ลูกค้าตัดสินใจลงทุน','score':0xf}];scoringModalContent[_0x1a6be9(0x121)]=_0x1a6be9(0x2d5)+_0x1719f1['map'](_0x3c0916=>'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22bg-slate-50\x20p-4\x20rounded-lg\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22flex\x20justify-between\x20items-center\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h4\x20class=\x22font-bold\x20text-slate-800\x22>'+_0x3c0916[_0x1a6be9(0x230)]+'</h4>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22font-bold\x20text-blue-600\x20text-lg\x22>'+_0x3c0916['score']+_0x1a6be9(0x135)+_0x3c0916['desc']+'</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20')[_0x1a6be9(0x11f)]('')+_0x1a6be9(0x255),scoringModal['classList']['remove'](_0x1a6be9(0x243)),scoringModal[_0x1a6be9(0x24b)][_0x1a6be9(0x271)](_0x1a6be9(0x26b));},window[_0xdc549f(0x1f8)]=()=>{const _0x497f66=_0xdc549f;scoringModal[_0x497f66(0x24b)][_0x497f66(0x271)](_0x497f66(0x243)),scoringModal[_0x497f66(0x24b)]['remove'](_0x497f66(0x26b));};async function getFinalEvaluation(){const _0x45f21d=_0xdc549f;if(isEvaluationInProgress)return;isEvaluationInProgress=!![],chatInput[_0x45f21d(0x155)]=!![],sendButton['disabled']=!![],endChatButton[_0x45f21d(0x155)]=!![],addAiMessage(chatContainer,currentCustomer[_0x45f21d(0x2bb)],'บทสนทนาสิ้นสุดแล้ว\x20กำลังสร้างผลประเมิน...');const _0x5ee55f='Based\x20on\x20the\x20entire\x20conversation,\x20evaluate\x20the\x20employee\x27s\x20sales\x20performance\x20as\x20the\x20customer\x20('+currentCustomer[_0x45f21d(0x2bb)]+_0x45f21d(0x262),_0x117ee5=[...conversationHistory];_0x117ee5['push']({'role':_0x45f21d(0x2af),'parts':[{'text':_0x5ee55f}]});const _0x4809f2=await getAIResponse(_0x117ee5,![]);try{const _0x147cc6=_0x4809f2['replace'](/^```json\s*|```$/g,'')[_0x45f21d(0x117)](),_0x19fa5e=JSON['parse'](_0x147cc6);displayEvaluation(_0x19fa5e);}catch(_0x135a72){console[_0x45f21d(0x10b)](_0x45f21d(0x25f),_0x135a72,_0x45f21d(0x142),_0x4809f2),displayEvaluation({'error':_0x45f21d(0x236)+_0x135a72[_0x45f21d(0x114)]});}}const createScoreBar=(_0x40f7a3,_0xe3bd57=0xf)=>{const _0x506fb5=_0xdc549f,_0x56b6a9=_0x40f7a3/_0xe3bd57*0x64;return _0x506fb5(0x125)+_0x56b6a9+'%\x22></div></div>';},displayEvaluation=_0x30f793=>{const _0x4811d9=_0xdc549f;if(_0x30f793[_0x4811d9(0x10b)])evaluationContent['innerHTML']=_0x4811d9(0x16e)+_0x30f793['error']+_0x4811d9(0x222);else{const _0x3d0bbc=_0x30f793[_0x4811d9(0x1d5)]>=0x3c?'text-green-500':_0x30f793['totalScore']>=0x2d?_0x4811d9(0x2a0):_0x4811d9(0x1b9);evaluationContent[_0x4811d9(0x121)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22text-center\x20mb-6\x22><h3\x20class=\x22text-xl\x20font-semibold\x22>คะแนนรวม</h3><p\x20class=\x22text-6xl\x20font-bold\x20'+_0x3d0bbc+'\x22>'+_0x30f793['totalScore']+'\x20<span\x20class=\x22text-3xl\x20font-medium\x20text-slate-500\x22>/\x2075</span></p></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22space-y-4\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><div\x20class=\x22flex\x20justify-between\x20items-center\x20mb-1\x22><h4\x20class=\x22font-semibold\x22>ความรู้ด้านผลิตภัณฑ์</h4><span\x20class=\x22font-bold\x20text-lg\x22>'+_0x30f793[_0x4811d9(0x28f)]['productKnowledge']+_0x4811d9(0xf1)+createScoreBar(_0x30f793[_0x4811d9(0x28f)][_0x4811d9(0x2c6)])+_0x4811d9(0x297)+_0x30f793[_0x4811d9(0x28f)][_0x4811d9(0x2cb)]+_0x4811d9(0xf1)+createScoreBar(_0x30f793[_0x4811d9(0x28f)][_0x4811d9(0x2cb)])+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><div\x20class=\x22flex\x20justify-between\x20items-center\x20mb-1\x22><h4\x20class=\x22font-semibold\x22>ขั้นตอนการขายที่ชัดเจน</h4><span\x20class=\x22font-bold\x20text-lg\x22>'+_0x30f793[_0x4811d9(0x28f)][_0x4811d9(0x263)]+_0x4811d9(0xf1)+createScoreBar(_0x30f793[_0x4811d9(0x28f)][_0x4811d9(0x263)])+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><div\x20class=\x22flex\x20justify-between\x20items-center\x20mb-1\x22><h4\x20class=\x22font-semibold\x22>ความรอบรู้ของพนักงาน</h4><span\x20class=\x22font-bold\x20text-lg\x22>'+_0x30f793[_0x4811d9(0x28f)][_0x4811d9(0x2ab)]+_0x4811d9(0xf1)+createScoreBar(_0x30f793[_0x4811d9(0x28f)][_0x4811d9(0x2ab)])+_0x4811d9(0x25b)+_0x30f793[_0x4811d9(0x28f)][_0x4811d9(0x208)]+_0x4811d9(0xf1)+createScoreBar(_0x30f793[_0x4811d9(0x28f)][_0x4811d9(0x208)])+_0x4811d9(0x24c)+_0x30f793['summary'][_0x4811d9(0x201)]+_0x4811d9(0x148)+_0x30f793[_0x4811d9(0x10f)][_0x4811d9(0x12a)]+_0x4811d9(0x28e);}evaluationModal[_0x4811d9(0x24b)][_0x4811d9(0x1c2)](_0x4811d9(0x243)),evaluationModal[_0x4811d9(0x24b)][_0x4811d9(0x271)]('flex');};window[_0xdc549f(0x1a4)]=()=>{const _0x5463ba=_0xdc549f;evaluationModal[_0x5463ba(0x24b)][_0x5463ba(0x271)](_0x5463ba(0x243)),evaluationModal['classList']['remove'](_0x5463ba(0x26b)),roleplayView[_0x5463ba(0x24b)][_0x5463ba(0x271)](_0x5463ba(0x243)),showView(_0x5463ba(0x2a1));};const getStarRatingHTML=(_0x2247cc,_0x498588)=>{const _0x4ee6b3=_0xdc549f;let _0x2a9742=_0x4ee6b3(0x188);for(let _0x27e254=0x1;_0x27e254<=0x5;_0x27e254++){if(_0x2247cc>=_0x27e254)_0x2a9742+=_0x4ee6b3(0x185);else{if(_0x2247cc>=_0x27e254-0.5)_0x2a9742+=_0x4ee6b3(0x115);else _0x2a9742+=_0x4ee6b3(0x104);}}return _0x2a9742+=_0x4ee6b3(0x238)+_0x2247cc['toFixed'](0x1)+'\x20('+_0x498588+')</span></div>',_0x2a9742;},renderSpecialists=()=>{specialistGridView['innerHTML']='',specialists['forEach'](_0x5b7b65=>{const _0x2ce440=_0x350a,_0xa7609d=document[_0x2ce440(0x113)]('div');_0xa7609d[_0x2ce440(0x217)]=_0x2ce440(0x257),_0xa7609d[_0x2ce440(0x121)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<img\x20src=\x22'+_0x5b7b65['image']+_0x2ce440(0x2a3)+_0x5b7b65[_0x2ce440(0x2bb)]+_0x2ce440(0xf5)+_0x5b7b65[_0x2ce440(0x2bb)]+_0x2ce440(0x187)+getStarRatingHTML(_0x5b7b65['rating'],_0x5b7b65[_0x2ce440(0x25d)])+_0x2ce440(0x1d7)+_0x5b7b65[_0x2ce440(0x10c)][_0x2ce440(0x11f)](',\x20')+_0x2ce440(0x1fe)+_0x5b7b65['id']+')\x22\x20class=\x22btn-primary\x20w-full\x20mt-4\x20py-2\x22>สอบถาม</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20',specialistGridView['appendChild'](_0xa7609d);});};window[_0xdc549f(0x200)]=_0x29dfd1=>{const _0x4e2f6a=_0xdc549f;currentSpecialist=specialists[_0x4e2f6a(0x299)](_0x2b2113=>_0x2b2113['id']===_0x29dfd1),specialistConversationHistory=[{'role':_0x4e2f6a(0x245),'parts':[{'text':'คุณคือผู้เชี่ยวชาญด้านผลิตภัณฑ์ของ\x20ttb\x20bank\x20(ttb\x20product\x20specialist)\x20หน้าที่ของคุณคือการตอบคำถามเกี่ยวกับผลิตภัณฑ์และบริการของธนาคาร\x20โดยต้องใช้ข้อมูลจากเว็บไซต์\x20https://www.ttbbank.com/th/\x20เป็นหลักในการตอบเพื่อให้ข้อมูลถูกต้องและเป็นปัจจุบันที่สุด\x20ตอบคำถามอย่างสุภาพและเป็นมืออาชีพ\x20เป็นภาษาไทย'}]}],document[_0x4e2f6a(0x1f7)](_0x4e2f6a(0x1a3))[_0x4e2f6a(0x121)]=_0x4e2f6a(0x1bf)+currentSpecialist[_0x4e2f6a(0x2bb)]+'</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-sm\x20text-slate-500\x20text-right\x22>เชี่ยวชาญด้าน:\x20'+currentSpecialist[_0x4e2f6a(0x10c)][_0x4e2f6a(0x11f)](',\x20')+_0x4e2f6a(0x15f)+currentSpecialist[_0x4e2f6a(0xfe)]+'\x22\x20alt=\x22'+currentSpecialist[_0x4e2f6a(0x2bb)]+_0x4e2f6a(0x16a),specialistChatContainer[_0x4e2f6a(0x121)]='',specialistTurnCount=0x0,endSpecialistChatButton[_0x4e2f6a(0x155)]=!![];const _0x51a995='สวัสดีครับ/ค่ะ\x20ผม/ดิฉัน\x20'+currentSpecialist[_0x4e2f6a(0x2bb)]+_0x4e2f6a(0x1c4)+currentSpecialist['products']['join'](_0x4e2f6a(0x289))+_0x4e2f6a(0x1b0);specialistConversationHistory['push']({'role':_0x4e2f6a(0x272),'parts':[{'text':_0x51a995}]}),addAiMessage(specialistChatContainer,currentSpecialist[_0x4e2f6a(0x2bb)],_0x51a995),speakText(_0x51a995,currentSpecialist[_0x4e2f6a(0x214)],![]),specialistChatInput['value']='',specialistChatInput[_0x4e2f6a(0x155)]=![],specialistSendButton['disabled']=![],specialistChatView['classList']['remove'](_0x4e2f6a(0x243)),specialistChatInput[_0x4e2f6a(0xfd)]();},document[_0xdc549f(0x1f7)](_0xdc549f(0x172))[_0xdc549f(0x1f1)](_0xdc549f(0x189),()=>{const _0x2c41c5=_0xdc549f;specialistChatView[_0x2c41c5(0x24b)][_0x2c41c5(0x271)](_0x2c41c5(0x243)),showView(_0x2c41c5(0x237));});const handleSpecialistSendMessage=async()=>{const _0x57356f=_0xdc549f,_0x25fe09=specialistChatInput['value'][_0x57356f(0x117)]();if(_0x25fe09){addUserMessage(specialistChatContainer,_0x25fe09),specialistTurnCount++,specialistChatInput[_0x57356f(0x1f0)]='',specialistChatInput[_0x57356f(0x155)]=!![],specialistSendButton[_0x57356f(0x155)]=!![];specialistTurnCount>=0x5&&(endSpecialistChatButton[_0x57356f(0x155)]=![]);specialistConversationHistory['push']({'role':'user','parts':[{'text':_0x25fe09}]});const _0x5da1d5=addAiMessage(specialistChatContainer,currentSpecialist[_0x57356f(0x2bb)],_0x57356f(0x2dc)),_0x5316d1=await getAIResponse(specialistConversationHistory,!![]);specialistConversationHistory[_0x57356f(0x249)]({'role':_0x57356f(0x272),'parts':[{'text':_0x5316d1}]}),_0x5da1d5['innerHTML']=_0x5316d1[_0x57356f(0x215)](/\n/g,'<br>'),speakText(_0x5316d1,currentSpecialist['gender'],![]),specialistChatInput['disabled']=![],specialistSendButton[_0x57356f(0x155)]=![],specialistChatInput[_0x57356f(0xfd)]();}};endSpecialistChatButton[_0xdc549f(0x1f1)](_0xdc549f(0x189),()=>{currentSpecialist&&showRatingModal();});function showRatingModal(){const _0x24cff8=_0xdc549f;document[_0x24cff8(0x1f7)](_0x24cff8(0x175))[_0x24cff8(0x2e4)]=currentSpecialist['image'],document[_0x24cff8(0x1f7)]('rating-specialist-name')['textContent']=currentSpecialist[_0x24cff8(0x2bb)];const _0x3840ff=document[_0x24cff8(0x1f7)](_0x24cff8(0x106));_0x3840ff[_0x24cff8(0x121)]='';for(let _0x4d7046=0x1;_0x4d7046<=0x5;_0x4d7046++){_0x3840ff[_0x24cff8(0x121)]+=_0x24cff8(0x28d)+_0x4d7046+_0x24cff8(0x2b9);}_0x3840ff[_0x24cff8(0x2ca)][_0x24cff8(0x1f2)]=0x0,_0x3840ff['onmouseover']=_0x35e6ee=>{const _0x562f54=_0x24cff8;if(_0x35e6ee[_0x562f54(0x11a)]['classList'][_0x562f54(0x22f)](_0x562f54(0x251))){const _0x27ee07=Array[_0x562f54(0x146)](_0x3840ff['children'])[_0x562f54(0x11e)](_0x35e6ee[_0x562f54(0x11a)])+0x1;_0x3840ff[_0x562f54(0x2ca)][_0x562f54(0x1f2)]=_0x27ee07;}},_0x3840ff[_0x24cff8(0x25a)]=()=>{const _0x10fa95=_0x24cff8;_0x3840ff[_0x10fa95(0x2ca)][_0x10fa95(0x1f2)]=0x0;},document[_0x24cff8(0x1f7)](_0x24cff8(0x1eb))[_0x24cff8(0x2b7)]='',ratingModal['classList'][_0x24cff8(0x1c2)](_0x24cff8(0x243)),ratingModal[_0x24cff8(0x24b)][_0x24cff8(0x271)]('flex');}function closeRatingModal(){const _0x1a63ae=_0xdc549f;ratingModal[_0x1a63ae(0x24b)][_0x1a63ae(0x271)]('hidden'),ratingModal['classList']['remove'](_0x1a63ae(0x26b)),specialistChatView[_0x1a63ae(0x24b)][_0x1a63ae(0x271)](_0x1a63ae(0x243)),showView('specialist-view');}window[_0xdc549f(0x1d9)]=_0x5c7fa2=>{const _0x4859b7=_0xdc549f;console[_0x4859b7(0x174)](_0x4859b7(0x28a)+currentSpecialist['name']+_0x4859b7(0x17c)+_0x5c7fa2+_0x4859b7(0x14b));const _0x4d139b=document[_0x4859b7(0x1f7)]('rating-feedback');_0x4d139b[_0x4859b7(0x2b7)]='ขอบคุณสำหรับคะแนน\x20'+_0x5c7fa2+_0x4859b7(0x282);const _0x13b92e=document['getElementById']('rating-stars-container');_0x13b92e['dataset'][_0x4859b7(0x1f2)]=_0x5c7fa2,_0x13b92e['onmouseover']=null,_0x13b92e[_0x4859b7(0x25a)]=null,Array[_0x4859b7(0x146)](_0x13b92e[_0x4859b7(0x136)])[_0x4859b7(0x105)](_0x15841d=>_0x15841d[_0x4859b7(0x133)]=null),setTimeout(closeRatingModal,0x5dc);},specialistSendButton[_0xdc549f(0x1f1)](_0xdc549f(0x189),handleSpecialistSendMessage),specialistChatInput[_0xdc549f(0x1f1)](_0xdc549f(0x2e5),_0x5dfe3a=>{const _0x5c5a91=_0xdc549f;_0x5dfe3a['key']===_0x5c5a91(0x2cf)&&!_0x5dfe3a[_0x5c5a91(0x194)]&&(_0x5dfe3a['preventDefault'](),handleSpecialistSendMessage());});
-
+        <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
         
-    </script>
+        // --- DATA ---
+        const customerData = {
+            "A": { id: "A", name: "คุณ A", age: 67, title: "Senior Business Owner age > 60", aum: "32362613", segment: "W1", risk: "Pure Deposit", riskLevel: 1, personality: "Steadiness - ถนอมจิต", personalityValue: "road", hasKids: true, gender: "male", group: "G1", tier: "Platinum", lifestyle: ["Eating: Standard Domestic Dinner", "Self-Care: Fitness member", "Shopping: Luxury Watches", "Travel: Luxury Hotel, Full-Service Flights", "Hospital visit: Occasional Checkup"], productMaturity: "Term Deposit – Oct, Dec", productHolding: {ใช้: ["CC Reserve Infinite", "CC So Smart"], คุ้มครอง: ["Global Index 15/5 Plus เบี้ยปีละ 500,000 บาท"], ออมและลงทุน: ["All Free: 1,121,119 บาท", "No Fixed: 14,434,948 บาท", "Term Deposit: 15,295,088 บาท", "เงินฝากอื่นๆ: 1,511,458 บาท"], กู้ยืม: ["N/A"]}},
+            "B": { id: "B", name: "คุณ B", age: 64, title: "Senior Professional age > 60", aum: "6254365", segment: "W2", risk: "Low Risk", riskLevel: 2, personality: "Compliance - คิดคำนวณ", personalityValue: "calculate", hasKids: true, gender: "female", group: "G2", tier: "Gold", lifestyle: ["Eating: Standard Domestic Dinner & Food Delivery Lovers", "Self-Care: Fitness member", "Travel: Premium Low-Cost Flyers, Frequent Booking Platform Users", "Hospital visit: Occasional Checkup"], productMaturity: "Term Fund – Nov, Dec", productHolding: {ใช้: ["CC Reserve Signature", "CC So Smart"], คุ้มครอง: ["N/A"], ออมและลงทุน: ["All Free: 25,677 บาท", "No Fixed: 2,869,627 บาท", "Term Deposit: 1,169,214 บาท", "เงินฝากอื่นๆ: - บาท", "MF (Type B): - บาท", "MF อื่นๆ: 2,189,847 บาท"], กู้ยืม: ["N/A"]}},
+            "C": { id: "C", name: "คุณ C", age: 50, title: "Wealth Business Owner age 41-60", aum: "10020188", segment: "W3", risk: "Medium to High Risk", riskLevel: 4, personality: "Influence - หนึ่งดารา", personalityValue: "star", hasKids: false, gender: "female", group: "G2", tier: "Gold", lifestyle: ["Eating: Dine in Lover, Standard International Diners", "Shopping: Luxury Shopping, Luxury Fashion", "Travel: Luxury Hotel, Full-Service Flights", "Asset Allocation: Regular Investors", "Hospital visit: Occasional Checkup"], productMaturity: "Term Fund - Oct, Nov, Structured Fund - Nov", productHolding: {ใช้: ["CC Reserve Signature", "CC So Smart"], คุ้มครอง: ["Happy Retire 90 เบี้ยปีละ 100,000 บาท"], ออมและลงทุน: ["All Free: 23,407 บาท", "No Fixed: 1,060 บาท", "เงินฝากอื่นๆ: 152,102 บาท", "MF (Type B): 2,815,000 บาท", "Term Fund: 2,028,540 บาท", "MF อื่นๆ: 5,000,079 บาท"], กู้ยืม: ["N/A"]}},
+            "D": { id: "D", name: "คุณ D", age: 46, title: "Wealth Professional age 41-60", aum: "6086239", segment: "W4", risk: "Low Risk", riskLevel: 2, personality: "Dominance - เป้าประสงค์", personalityValue: "goal", hasKids: true, gender: "male", group: "G2", tier: "Gold", lifestyle: ["Eating : Dine in Lover & Food delivery", "Self – Care : Fitness member", "Entertainment : Movie", "Travel : Luxury Hotel", "Hospital visit : Occasional Checkup"], productMaturity: "No", productHolding: {ใช้: ["CC Reserve Signature"], คุ้มครอง: ["ttb global index principal protect 15/5 plus เบี้ยปีละ 1,500,000 บาท"], ออมและลงทุน: ["All Free: 1,064,310 บาท", "No Fixed: 1,647,297 บาท", "Term Deposit: 1,075,106 บาท", "Term Fund: - บาท", "MF อื่นๆ: 2,299,580 บาท"], กู้ยืม: ["N/A"]}},
+            "E": { id: "E", name: "คุณ E", age: 37, title: "Junior Wealth age ≤ 40", aum: "4467291", segment: "W5", risk: "Medium to High Risk", riskLevel: 5, personality: "Compliance - คิดคำนวณ", personalityValue: "calculate", hasKids: false, gender: "male", group: "G3", tier: "Silver", lifestyle: ["Eating: Food delivery", "Self-Care: Fitness member", "Travel: Luxury Hotel", "Asset Allocation: Regular Investors"], productMaturity: "Term Deposit - Oct, Dec", productHolding: {ใช้: ["CC Absolute"], คุ้มครอง: ["N/A"], ออมและลงทุน: ["All Free: 620,695 บาท", "No Fixed: 6,473 บาท", "MF (Type B): 2,107,241 บาท", "MF อื่นๆ: 1,711,882 บาท"], กู้ยืม: ["N/A"]} },
+        };
+               
+        const imagePaths = {
+            customerPortraits: {
+                "A": "./images/CustomerA.jpg",
+                "B": "./images/CustomerB.jpg",
+                "C": "./images/CustomerC.jpg",
+                "D": "./images/CustomerD.jpg",
+                "E": "./images/CustomerE.jpg",
+            },
+            roleplay: {
+                transcript: "./images/transcript.png",
+                evaluation: "./images/evaluation.png",
+            },
+            mainDashboardKPIs: "./images/page-1.jpg",
+            viewReport: "./images/transcript.png",
+            viewReport: "./images/evaluation.png",
+            viewReport2: "./images/transcript.png",
+            customerTabs: {
+                "A": { 
+                    profile: "./images/w1/W1-profile.jpg", 
+                    asset: "./images/w1/W1-AssetMovement.jpg", 
+                    account: "./images/w1/W1-AssetMovement.jpg", 
+                    kys: "./images/w1/W1-4ผลตอบรับ.jpg",
+                    accountManagement: {
+                        theme: "./images/w1/W1-3.1Account.jpg",
+                        lifestyle: "./images/w1/W1-3.2Lifestyle.jpg", // Kept specific lifestyle image
+                        use: "./images/w1/W1-3.3ฉลาดใช้.jpg",
+                        invest: "./images/w1/W1-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
+                        protect: "./images/w1/W1-3.5คุ้มครองที่อุ่นใจ.jpg",
+                        loan: "./images/w1/W1-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
+                    }
+                },
+                "B": { 
+                    profile: "./images/w2/W2-1Customer Profile.jpg", 
+                    asset: "./images/w2/W2-2AssetMovement.jpg", 
+                    account: "./images/w2/W2-AssetMovement.jpg", 
+                    kys: "./images/w2/W2-4ผลตอบรับ.jpg",
+                    accountManagement: {
+                        theme: "./images/w2/W2-3.1Account.jpg",
+                        lifestyle: "./images/w2/W2-3.2Lifestyle.jpg", // Kept specific lifestyle image
+                        use: "./images/w2/W2-3.3ฉลาดใช้.jpg",
+                        invest: "./images/w2/W2-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
+                        protect: "./images/w2/W2-3.5คุ้มครองที่อุ่นใจ.jpg",
+                        loan: "./images/w2/W2-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
+                    }
+                },
+                "C": { 
+                    profile: "./images/w3/W3-1Customer Profile.jpg", 
+                    asset: "./images/w3/W3-2AssetMovement.jpg", 
+                    account: "./images/w3/W3-AssetMovement.jpg", 
+                    kys: "./images/w3/W3-4ผลตอบรับ.jpg",
+                    accountManagement: {
+                        theme: "./images/w3/W3-3.1Account.jpg",
+                        lifestyle: "./images/w3/W3-3.2Lifestyle.jpg", // Kept specific lifestyle image
+                        use: "./images/w3/W3-3.3ฉลาดใช้.jpg",
+                        invest: "./images/w3/W3-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
+                        protect: "./images/w3/W3-3.5คุ้มครองที่อุ่นใจ.jpg",
+                        loan: "./images/w3/W3-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
+                    }
+                },
+                "D": { 
+                    profile: "./images/w4/W4-1Customer Profile.jpg", 
+                    asset: "./images/w4/W4-2AssetMovement.jpg", 
+                    account: "./images/w4/W4-AssetMovement.jpg", 
+                    kys: "./images/w4/W4-4ผลตอบรับ.jpg",
+                    accountManagement: {
+                        theme: "./images/w4/W4-3.1Account.jpg",
+                        lifestyle: "./images/w4/W4-3.2Lifestyle.jpg", // Kept specific lifestyle image
+                        use: "./images/w4/W4-3.3ฉลาดใช้.jpg",
+                        invest: "./images/w4/W4-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
+                        protect: "./images/w4/W4-3.5คุ้มครองที่อุ่นใจ.jpg",
+                        loan: "./images/w4/W4-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
+                    }
+                },
+                "E": { 
+                    profile: "./images/w5/W5-1Customer Profile.jpg", 
+                    asset: "./images/w5/W5-2AssetMovement.jpg", 
+                    account: "./images/w5/W5-AssetMovement.jpg", 
+                    kys: "./images/w5/W5-4ผลตอบรับ.jpg",
+                    accountManagement: {
+                        theme: "./images/w5/W5-3.1Account.jpg",
+                        lifestyle: "./images/w5/W5-3.2Lifestyle.jpg", // Kept specific lifestyle image
+                        use: "./images/w5/W5-3.3ฉลาดใช้.jpg",
+                        invest: "./images/w5/W5-3.4ฉลาดออมและลงทุน.jpg", // Kept specific invest image
+                        protect: "./images/w5/W5-3.5คุ้มครองที่อุ่นใจ.jpg",
+                        loan: "./images/w5/W5-3.6รอบรู้กู้ยืม.jpg" // Kept specific loan image
+                    }
+                },
+            },
+            /* (4) Removed the static accountManagementTabs object from here */
+        };
+
+        let currentCustomer = null;
+        
+        // --- HELPERS ---
+        const setupSimpleLightbox = (btnId, lightboxId, closeBtnIds) => {
+            const button = document.getElementById(btnId);
+            const lightbox = document.getElementById(lightboxId);
+            if (!button || !lightbox) return;
+            const open = () => lightbox.classList.remove('hidden');
+            const close = () => lightbox.classList.add('hidden');
+            button.addEventListener('click', open);
+            closeBtnIds.forEach(id => {
+                const closeBtn = document.getElementById(id);
+                if (closeBtn) closeBtn.addEventListener('click', close);
+            });
+        };
+
+        // --- INITIALIZATION ---
+        setupSimpleLightbox('exportFileBtn', 'exportFileLightbox', ['closeExportLightboxBtn']);
+        // setupSimpleLightbox('viewReportBtn', 'viewReportLightbox', ['closeViewReportBtn', 'closeViewReportBtn2']);
+        
+        document.getElementById('main-dashboard-kpi-img').src = imagePaths.mainDashboardKPIs;
+        document.getElementById('viewReportImg').src = imagePaths.viewReport;
+        document.getElementById('personaReportImg').src = imagePaths.viewReport;
+        document.getElementById('transcriptImg').src = imagePaths.roleplay.transcript;
+        document.getElementById('evaluationImg').src = imagePaths.roleplay.evaluation;
+        document.getElementById('evaluationReportImg').src = imagePaths.viewReport2;
+
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('toggleSidebarBtn');
+        const collapseIcon = document.getElementById('collapse-icon');
+        const expandIcon = document.getElementById('expand-icon');
+        const sidebarTitle = document.getElementById('sidebar-title');
+        const sidebarLinkTexts = document.querySelectorAll('.sidebar-link-text');
+        const navLinks = sidebar.querySelectorAll('nav a');
+
+        if (toggleBtn && sidebar) {
+            toggleBtn.addEventListener('click', () => {
+                const isCollapsed = sidebar.classList.contains('w-16');
+                sidebar.classList.toggle('w-16', !isCollapsed);
+                sidebar.classList.toggle('w-64', isCollapsed);
+                sidebarTitle.classList.toggle('hidden');
+                collapseIcon.classList.toggle('hidden');
+                expandIcon.classList.toggle('hidden');
+                sidebarLinkTexts.forEach(text => text.classList.toggle('hidden'));
+                navLinks.forEach(link => link.classList.toggle('justify-center'));
+            });
+        }
+        
+        const portfolioView = document.getElementById('portfolio-view');
+        const customerView = document.getElementById('customer-view');
+        const navMyPortfolio = document.getElementById('navMyPortfolio');
+        const navMyCustomer = document.getElementById('navMyCustomer');
+        const mainHeaderTitle = document.getElementById('mainHeaderTitle');
+        const customerDetailsTable = document.getElementById('customer-details-table');
+        const customerNavContainer = document.querySelector('.customer-nav');
+        
+        // --- Prompob Lightbox Elements ---
+        const prompobBtn = document.getElementById('prompobBtn');
+        const prompobLightbox = document.getElementById('prompobLightbox');
+        const closePrompobLightboxBtn = document.getElementById('closePrompobLightboxBtn');
+        const closePrompobBtnBottom = document.getElementById('closePrompobBtnBottom');
+        const personaNextBtn = document.getElementById('personaNextBtn');
+        const roleplayStartLightbox = document.getElementById('roleplayStartLightbox');
+        const personaSelectionContent = document.getElementById('persona-selection-content');
+        const personaCustomerName = document.getElementById('persona-customer-name');
+        const personaViewReportBtn = document.getElementById('personaViewReportBtn');
+        const personaReportLightbox = document.getElementById('personaReportLightbox');
+        const personaReportBackBtn = document.getElementById('personaReportBackBtn');
+        const closePersonaReportBtn = document.getElementById('closePersonaReportBtn');
+        const evaluationReportLightbox = document.getElementById('evaluationReportLightbox');
+        const closeEvaluationReportBtn = document.getElementById('closeEvaluationReportBtn');
+
+        // Roleplay views and panels
+        const roleplayContainer = document.getElementById('roleplay-container');
+        const roleplayLeftPanel = document.getElementById('roleplay-left-panel');
+        const roleplayRightPanel = document.getElementById('roleplay-right-panel');
+        const roleplayIntroView = document.getElementById('roleplay-intro-view');
+        const roleplayInProgressView = document.getElementById('roleplay-inprogress-view');
+        const roleplayTranscriptView = document.getElementById('roleplay-transcript-view');
+        const roleplayEvaluationView = document.getElementById('roleplay-evaluation-view');
+        
+        // Roleplay buttons & timer
+        const roleplayBackBtn = document.getElementById('roleplayBackBtn');
+        const roleplayStartBtn = document.getElementById('roleplayStartBtn');
+        const roleplayEndBtn = document.getElementById('roleplayEndBtn');
+        const transcriptCloseBtn = document.getElementById('transcriptCloseBtn');
+        const transcriptNextBtn = document.getElementById('transcriptNextBtn');
+        const mainRoleplayCloseBtn = document.getElementById('mainRoleplayCloseBtn');
+        const introViewCloseBtn = document.getElementById('introViewCloseBtn');
+        const evaluationViewReportBtn = document.getElementById('evaluationViewReportBtn');
+        let timerInterval;
+        let seconds = 0;
+        
+        // Additional notes elements
+        const additionalNotesTextarea = document.getElementById('additionalNotesTextarea');
+        const saveNotesBtn = document.getElementById('saveNotesBtn');
+
+        const updateDateTime = () => {
+            const now = new Date();
+            const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            const formattedDateTime = now.toLocaleString('th-TH', options);
+            const span = document.getElementById('data-updated-span');
+            if (span) {
+                span.textContent = `Data updated ${formattedDateTime}`;
+            }
+        };
+        updateDateTime();
+        
+        // --- TIMER FUNCTIONS ---
+        const stopTimer = () => {
+            clearInterval(timerInterval);
+            seconds = 0;
+        };
+        
+        // --- ROLEPLAY LOGIC ---
+        const closeRoleplay = () => {
+            stopTimer();
+            roleplayStartLightbox.classList.add('hidden');
+        }
+        
+        const showRoleplayView = (viewToShow) => {
+            // Hide all views first
+            [roleplayIntroView, roleplayInProgressView, roleplayTranscriptView, roleplayEvaluationView].forEach(view => {
+                view.classList.add('hidden');
+                view.classList.remove('flex');
+            });
+
+            // Handle the layout
+            if (viewToShow === roleplayEvaluationView || viewToShow === roleplayTranscriptView) {
+                // These views take up the whole container, so hide the right panel which contains the other views
+                roleplayContainer.classList.remove('flex-row');
+                roleplayRightPanel.classList.add('hidden');
+                viewToShow.classList.remove('hidden');
+                viewToShow.classList.add('flex');
+            } else {
+                // These views (intro, in-progress) are inside the right panel
+                roleplayContainer.classList.add('flex-row');
+                roleplayRightPanel.classList.remove('hidden'); // Ensure right panel is visible
+                viewToShow.classList.remove('hidden');
+                viewToShow.classList.add('flex');
+            }
+        };
+        
+        if (prompobBtn) prompobBtn.addEventListener('click', () => {
+             populatePersonaSelection(currentCustomer);
+             prompobLightbox.classList.remove('hidden');
+        });
+        if (closePrompobLightboxBtn) closePrompobLightboxBtn.addEventListener('click', () => prompobLightbox.classList.add('hidden'));
+        if (closePrompobBtnBottom) closePrompobBtnBottom.addEventListener('click', () => prompobLightbox.classList.add('hidden'));
+        
+        if (personaNextBtn) personaNextBtn.addEventListener('click', () => {
+            prompobLightbox.classList.add('hidden');
+            populateRoleplayView(currentCustomer);
+            showRoleplayView(roleplayIntroView);
+            roleplayStartLightbox.classList.remove('hidden');
+        });
+        
+        if (roleplayBackBtn) roleplayBackBtn.addEventListener('click', () => {
+            roleplayStartLightbox.classList.add('hidden');
+            prompobLightbox.classList.remove('hidden');
+            stopTimer();
+        });
+        if (roleplayStartBtn) roleplayStartBtn.addEventListener('click', () => {
+            const inProgressContent = document.getElementById('roleplay-inprogress-content');
+            inProgressContent.innerHTML = `<iframe src="https://www.ttbbank.com/th/rates/deposit-rates" class="w-full h-full border-0 rounded-xl"></iframe>`;
+            showRoleplayView(roleplayInProgressView);
+        });
+        if (roleplayEndBtn) roleplayEndBtn.addEventListener('click', () => {
+            showRoleplayView(roleplayTranscriptView);
+            stopTimer();
+        });
+        if (transcriptNextBtn) transcriptNextBtn.addEventListener('click', () => showRoleplayView(roleplayEvaluationView));
+        
+        [mainRoleplayCloseBtn, introViewCloseBtn, transcriptCloseBtn].forEach(btn => {
+            if(btn) btn.addEventListener('click', closeRoleplay);
+        });
+
+        // View Report buttons
+        if(personaViewReportBtn) personaViewReportBtn.addEventListener('click', () => personaReportLightbox.classList.remove('hidden'));
+        if(closePersonaReportBtn) closePersonaReportBtn.addEventListener('click', () => personaReportLightbox.classList.add('hidden'));
+        if (personaReportCloseBtnBottom) personaReportCloseBtnBottom.addEventListener('click', () => personaReportLightbox.classList.add('hidden'));
+
+        if (evaluationViewReportBtn) evaluationViewReportBtn.addEventListener('click', () => {
+            evaluationReportLightbox.classList.remove('hidden');
+        });
+        if (closeEvaluationReportBtn) closeEvaluationReportBtn.addEventListener('click', () => evaluationReportLightbox.classList.add('hidden'));
+        
+
+        if (additionalNotesTextarea && saveNotesBtn) {
+            additionalNotesTextarea.addEventListener('input', () => {
+                if (additionalNotesTextarea.value.length >= 5) {
+                    saveNotesBtn.disabled = false;
+                    saveNotesBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                    saveNotesBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                } else {
+                    saveNotesBtn.disabled = true;
+                    saveNotesBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+                    saveNotesBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                }
+            });
+        }
+        
+        // --- DYNAMIC CONTENT FUNCTIONS ---
+        const populatePersonaSelection = (customer) => {
+            if (!customer) return;
+            personaCustomerName.textContent = customer.name;
+            personaSelectionContent.querySelectorAll('.persona-btn').forEach(btn => btn.classList.remove('selected-persona'));
+            
+            const selectRandom = (group) => {
+                const buttons = group.querySelectorAll('.persona-btn');
+                const randomIndex = Math.floor(Math.random() * buttons.length);
+                buttons[randomIndex].classList.add('selected-persona');
+            };
+
+            const groups = personaSelectionContent.querySelectorAll('.persona-group');
+            groups.forEach(group => {
+                const groupName = group.dataset.group;
+                let valueToSelect;
+                switch(groupName) {
+                    case 'gender': valueToSelect = customer.gender; break;
+                    case 'wealth': valueToSelect = customer.segment.toLowerCase(); break;
+                    case 'risk': valueToSelect = customer.risk.toLowerCase().replace(/ /g, '-'); break;
+                    case 'personality': valueToSelect = customer.personalityValue; break;
+                    case 'children': valueToSelect = customer.hasKids ? 'yes' : 'no'; break;
+                    default: selectRandom(group); return;
+                }
+                const btn = group.querySelector(`[data-value="${valueToSelect}"]`);
+                if (btn) btn.classList.add('selected-persona');
+                else selectRandom(group);
+            });
+        };
+        
+        personaSelectionContent.addEventListener('click', (e) => {
+            if (e.target.classList.contains('persona-btn')) {
+                const group = e.target.closest('.persona-group');
+                if (group) {
+                    group.querySelectorAll('.persona-btn').forEach(btn => btn.classList.remove('selected-persona'));
+                    e.target.classList.add('selected-persona');
+                }
+            }
+        });
+
+        const populateRoleplayView = (customer) => {
+            if (!customer) return;
+
+            const personalityColorMap = {
+                road: 'bg-blue-500', // Steadiness
+                calculate: 'bg-green-500', // Compliance
+                star: 'bg-red-500', // Influence
+                goal: 'bg-purple-500' // Dominance
+            };
+            const personalityBgColor = personalityColorMap[customer.personalityValue] || 'bg-gray-500';
+
+            const formatList = (items) => (items || []).map(item => `<li>${item}</li>`).join('');
+            const formatProductHolding = (holding) => {
+                 if (!holding) return '';
+                 return Object.entries(holding).map(([category, products]) => {
+                    const productList = Array.isArray(products) ? products.map(p => `<li class="truncate">${p}</li>`).join('') : `<p class="text-xs text-gray-600">${products}</p>`;
+                    const iconMap = {'ใช้': 'landmark', 'คุ้มครอง': 'shield-check', 'ออมและลงทุน': 'area-chart', 'กู้ยืม': 'repeat'};
+                    const colorMap = {'ใช้': 'blue', 'คุ้มครอง': 'green', 'ออมและลงทุน': 'indigo', 'กู้ยืม': 'orange'};
+                    const icon = iconMap[category] || 'zap';
+                    const color = colorMap[category] || 'gray';
+
+                    return `<div>
+                                <div class="flex items-center mb-1"><i data-lucide="${icon}" class="w-4 h-4 mr-2 text-${color}-500"></i><h6 class="font-semibold">ฉลาด${category}</h6></div>
+                                ${Array.isArray(products) ? `<ul class="text-xs text-gray-600 list-disc list-inside">${productList}</ul>` : productList}
+                            </div>`;
+                }).join('');
+            };
+
+            const leftPanel = document.getElementById('roleplay-customer-details');
+            leftPanel.innerHTML = `
+                <div class="text-center mb-6">
+                    <div class="relative inline-block">
+                        <img src="${imagePaths.customerPortraits[customer.id]}" alt="Customer" class="w-32 h-32 rounded-full mx-auto shadow-md">
+                        <span class="absolute bottom-1 right-1 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">${customer.segment}</span>
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-800 mt-4">${customer.name} อายุ ${customer.age} ปี</h4>
+                    <span class="inline-block bg-blue-600 text-white text-sm font-semibold px-4 py-1 rounded-full mt-2">${customer.title}</span>
+                </div>
+                <div class="space-y-4 text-sm">
+                    <div class="bg-white p-3 rounded-lg shadow-sm">
+                         <div class="flex items-center justify-between">
+                            <span class="text-gray-500">${customer.group}</span>
+                            <span class="font-semibold text-gray-800">AUM ${new Intl.NumberFormat('th-TH').format(customer.aum)} บาท</span>
+                            <span class="text-gray-500">${customer.tier}</span>
+                         </div>
+                         <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                            <div class="bg-gradient-to-r from-yellow-400 to-orange-500 h-2.5 rounded-full" style="width: ${Math.min(parseInt(customer.aum) / 50000000 * 100, 100)}%"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h5 class="font-bold text-gray-700 mb-3">Risk Appetite</h5>
+                        <div class="flex items-center mb-3">
+                            <span class="font-semibold text-sm mr-4">${customer.risk}</span>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="bg-blue-800 h-3 rounded-full" style="width: ${customer.riskLevel * 20}%;"></div>
+                            </div>
+                        </div>
+                        <ul class="space-y-1 text-xs text-gray-600">
+                            <li class="flex justify-between py-2 px-1 border-b border-gray-200"><span>- Suitability Score</span> <span class="font-mono">${customer.riskLevel}</span></li>
+                            <li class="flex justify-between py-2 px-1 border-b border-gray-200 bg-gray-50"><span>- Main bank</span> <span class="text-gray-400">เป็น</span></li>
+                            <li class="flex justify-between py-2 px-1 border-b border-gray-200"><span>- ttb Payroll</span> <span class="text-gray-400">ไม่เป็น</span></li>
+                            <li class="flex justify-between py-2 px-1 border-b border-gray-200 bg-gray-50"><span>- เคยซื้อ Structured Note</span> <span class="text-gray-400">ไม่เคย</span></li>
+                            <li class="flex justify-between py-2 px-1 border-b border-gray-200"><span>- เคยซื้อหุ้นกู้ (Bond)</span> <span class="text-gray-400">ไม่เคย</span></li>
+                            <li class="flex justify-between py-2 px-1 bg-gray-50"><span>- เคยซื้อ MF Type B</span> <span class="text-gray-400">เคย</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-600 text-white p-4 rounded-lg shadow-sm">
+                        <h5 class="font-bold mb-2">Lifestyle</h5>
+                        <ul class="list-disc list-inside text-sm space-y-1">${formatList(customer.lifestyle)}</ul>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center">
+                            <span class="font-semibold text-gray-700">Have Kids?</span>
+                            <div class="flex items-center">
+                                <span class="font-bold ${customer.hasKids ? 'text-green-600' : 'text-red-600'} mr-1">${customer.hasKids ? 'Yes' : 'No'}</span>
+                                <i data-lucide="${customer.hasKids ? 'check-circle-2' : 'x-circle'}" class="w-5 h-5 ${customer.hasKids ? 'text-green-500' : 'text-red-500'}"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center">
+                            <span class="font-semibold text-gray-700">Product Maturity?</span>
+                            <div class="flex items-center">
+                                <span class="font-bold text-green-600 mr-1">Yes</span>
+                                <i data-lucide="check-circle-2" class="w-5 h-5 text-green-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg shadow-sm text-center">
+                        <h5 class="font-bold text-gray-700 mb-3">Personality Type</h5>
+                        <div class="inline-block ${personalityBgColor} text-white text-sm font-semibold px-4 py-1 rounded-md mb-4">${customer.personality}</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h5 class="font-bold text-gray-700 mb-2">Product Holding</h5>
+                        <div class="grid grid-cols-2 gap-x-6 gap-y-4">${formatProductHolding(customer.productHolding)}</div>
+                    </div>
+                </div>
+             `;
+            
+             const rightIntro = document.getElementById('roleplay-intro-content');
+             rightIntro.innerHTML = `<p class="font-semibold text-orange-900 mb-4">MWIBOT</p><img src="${imagePaths.customerPortraits[customer.id]}" alt="AI Persona" class="w-48 h-48 rounded-full border-4 border-white shadow-lg mb-6 flex-shrink-0"><h4 class="text-2xl font-bold text-orange-900 mb-2">สวัสดีครับ ผมชื่อ "${customer.name}"</h4><p class="text-gray-600 max-w-md mx-auto">${customer.title}, อายุ ${customer.age} ปี, ความเสี่ยง ${customer.risk}. <br>วันนี้มาเล่นเป็นลูกค้าเพื่อเป็นคู่ซ้อม Roleplay<br>ให้คุณเป็นเจ้าหน้าที่ เพื่อให้คุณฝึกก่อนไปเจอลูกค้าจริง<br><br>หลังจากที่คุณ คัด นัด เรียบร้อยแล้ว ถ้าคุณอยากฝึกก่อนพบลูกค้าจริง <br>ให้กดปุ่ม Start และเริ่มพูดคุบกับผมได้เลยครับ</p>`;
+             
+             lucide.createIcons();
+        };
+        
+        // --- PAGE NAVIGATION LOGIC ---
+        const setActiveNav = (activeElement) => {
+            [navMyPortfolio, navMyCustomer].forEach(item => {
+                const link = item.querySelector('a');
+                link.classList.remove('bg-gray-200', 'text-gray-900', 'font-semibold', 'border-blue-600');
+                link.classList.add('text-gray-700', 'hover:bg-gray-100', 'border-transparent');
+            });
+            const activeLink = activeElement.querySelector('a');
+            activeLink.classList.add('bg-gray-200', 'text-gray-900', 'font-semibold', 'border-blue-600');
+            activeLink.classList.remove('text-gray-700', 'hover:bg-gray-100', 'border-transparent');
+        };
+
+        const showPortfolioView = (e) => {
+            if (e) e.preventDefault();
+            portfolioView.classList.remove('hidden');
+            customerView.classList.add('hidden');
+            mainHeaderTitle.textContent = 'My Portfolio';
+            setActiveNav(navMyPortfolio);
+        };
+
+        const showCustomerView = (e, customerId = null) => {
+            if (e) e.preventDefault();
+            
+            currentCustomer = customerData[customerId] || null;
+            if(!currentCustomer) {
+                console.error("Customer not found:", customerId);
+                return;
+            }
+
+            portfolioView.classList.add('hidden');
+            customerView.classList.remove('hidden');
+            mainHeaderTitle.textContent = `My Customer - ${currentCustomer.name}`;
+            setActiveNav(navMyCustomer);
+            
+            document.getElementById('customer-view-title').textContent = `Wealth Customer Management Solution`;
+            
+            // Set main tab images
+            document.querySelector('#profile-content img').src = imagePaths.customerTabs[customerId].profile;
+            document.querySelector('#asset-content img').src = imagePaths.customerTabs[customerId].asset;
+            document.querySelector('#kys-content img').src = imagePaths.customerTabs[customerId].kys;
+            
+            // (5) Updated logic to pull customer-specific sub-tab images
+            // Set account management sub-tab images
+            const customerSubImages = imagePaths.customerTabs[customerId].accountManagement;
+            document.querySelector('#theme-subcontent img').src = customerSubImages.theme;
+            document.querySelector('#lifestyle-subcontent img').src = customerSubImages.lifestyle;
+            document.querySelector('#use-subcontent img').src = customerSubImages.use;
+            document.querySelector('#invest-subcontent img').src = customerSubImages.invest;
+            document.querySelector('#protect-subcontent img').src = customerSubImages.protect;
+            document.querySelector('#loan-subcontent img').src = customerSubImages.loan;
+
+
+            const firstTabLink = document.querySelector('.customer-nav a[data-tab="profile"]');
+            if (firstTabLink) firstTabLink.click();
+        };
+        
+        if (customerNavContainer) {
+            customerNavContainer.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+                if (!link) return;
+                e.preventDefault();
+                const targetTab = link.dataset.tab;
+                customerNavContainer.querySelectorAll('a').forEach(l => {
+                    l.classList.remove('bg-[#0056ff]', 'text-white');
+                    l.classList.add('text-gray-700', 'bg-white', 'border', 'border-gray-300', 'hover:bg-gray-50');
+                });
+                link.classList.add('bg-[#0056ff]', 'text-white');
+                link.classList.remove('text-gray-700', 'bg-white', 'border', 'border-gray-300', 'hover:bg-gray-50');
+                customerView.querySelectorAll('.customer-tab-content').forEach(tab => {
+                    tab.classList.toggle('hidden', tab.id !== `${targetTab}-content`);
+                });
+                // (6) Default to the first button ("theme") since it's now enabled
+                if(targetTab === 'account') {
+                    // Use setTimeout to allow the DOM to update before clicking
+                    setTimeout(() => {
+                        document.querySelector('.account-management-nav button[data-subtab="theme"]').click();
+                    }, 0);
+                }
+            });
+        }
+        
+        const accountManagementNav = document.querySelector('.account-management-nav');
+        if(accountManagementNav) {
+            accountManagementNav.addEventListener('click', (e) => {
+                const button = e.target.closest('button');
+                if(!button || button.disabled) return;
+                
+                accountManagementNav.querySelectorAll('button:not([disabled])').forEach(btn => {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('bg-white', 'text-gray-700', 'hover:bg-gray-50');
+                });
+                button.classList.add('bg-blue-600', 'text-white');
+                button.classList.remove('bg-white', 'text-gray-700', 'hover:bg-gray-50');
+
+                const targetSubTab = button.dataset.subtab;
+                document.querySelectorAll('.account-sub-content').forEach(content => {
+                    content.classList.toggle('hidden', content.id !== `${targetSubTab}-subcontent`);
+                });
+            });
+        }
+        
+        if(customerDetailsTable) {
+            customerDetailsTable.addEventListener('click', (e) => {
+                if (e.target.classList.contains('view-profile-btn')) {
+                    const customerId = e.target.dataset.customerId;
+                    showCustomerView(null, customerId);
+                }
+            });
+        }
+
+        if(navMyPortfolio) navMyPortfolio.addEventListener('click', showPortfolioView);
+        if(navMyCustomer) navMyCustomer.addEventListener('click', (e) => showCustomerView(e, 'A')); // Default to A if clicked directly
+    });
+</script>
+
 </body>
 </html>
+
+
 
