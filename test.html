@@ -269,8 +269,10 @@
             function updateUI() {
                 const s = getMarketStatus();
                 const m = document.getElementById('market-badge');
-                m.innerText = s;
-                m.className = `text-[9px] font-bold px-2 py-1 rounded-md border uppercase tracking-wider italic ${s === "MARKET OPEN" ? "text-emerald-500 bg-emerald-50 border-emerald-100" : s === "PRE-OPENING" ? "text-amber-500 bg-amber-50 border-amber-100" : "text-rose-500 bg-rose-50 border-rose-100"}`;
+                if (m) {
+                    m.innerText = s;
+                    m.className = `text-[9px] font-bold px-2 py-1 rounded-md border uppercase tracking-wider italic ${s === "MARKET OPEN" ? "text-emerald-500 bg-emerald-50 border-emerald-100" : s === "PRE-OPENING" ? "text-amber-500 bg-amber-50 border-amber-100" : "text-rose-500 bg-rose-50 border-rose-100"}`;
+                }
 
                 document.getElementById('live-gold-thai-sell').innerText = appData.gold.sell;
                 document.getElementById('live-gold-thai-buy').innerText = appData.gold.buy;
@@ -279,17 +281,20 @@
                 document.getElementById('live-set-turnover').innerText = appData.set.volume;
                 
                 const sList = document.getElementById('stock-list');
-                sList.innerHTML = '';
-                appData.stocks.forEach(st => {
-                    const r1 = document.createElement('tr');
-                    r1.className = "stock-row-main";
-                    r1.innerHTML = `<td class="px-5 pt-3 font-black text-slate-800">${st.symbol}</td><td class="px-5 pt-3 text-right font-black">${st.price}</td><td class="px-5 pt-3 text-right"><div class="inline-block px-2 py-0.5 rounded font-black text-[11px] bg-emerald-50 text-emerald-600">${st.change}</div></td>`;
-                    const r2 = document.createElement('tr');
-                    r2.className = "stock-row-sub border-b border-slate-50";
-                    r2.innerHTML = `<td colspan="3" class="px-5 pb-3"><div class="flex items-center gap-1.5 text-[10px] font-bold text-emerald-500"><i data-lucide="trending-up" class="w-3 h-3"></i>เพิ่ม(ลด) ${st.absChange} บาท</div></td>`;
-                    sList.appendChild(r1); sList.appendChild(r2);
-                });
-                document.getElementById('live-time-status').innerText = `Live Sync: ${new Date().toLocaleTimeString('th-TH')}`;
+                if (sList) {
+                    sList.innerHTML = '';
+                    appData.stocks.forEach(st => {
+                        const r1 = document.createElement('tr');
+                        r1.className = "stock-row-main";
+                        r1.innerHTML = `<td class="px-5 pt-3 font-black text-slate-800">${st.symbol}</td><td class="px-5 pt-3 text-right font-black">${st.price}</td><td class="px-5 pt-3 text-right"><div class="inline-block px-2 py-0.5 rounded font-black text-[11px] bg-emerald-50 text-emerald-600">${st.change}</div></td>`;
+                        const r2 = document.createElement('tr');
+                        r2.className = "stock-row-sub border-b border-slate-50";
+                        r2.innerHTML = `<td colspan="3" class="px-5 pb-3"><div class="flex items-center gap-1.5 text-[10px] font-bold text-emerald-500"><i data-lucide="trending-up" class="w-3 h-3"></i>เพิ่ม(ลด) ${st.absChange} บาท</div></td>`;
+                        sList.appendChild(r1); sList.appendChild(r2);
+                    });
+                }
+                const timeStatus = document.getElementById('live-time-status');
+                if (timeStatus) timeStatus.innerText = `Live Sync: ${new Date().toLocaleTimeString('th-TH')}`;
                 lucide.createIcons();
             }
 
@@ -301,13 +306,12 @@
                 }
             }
 
-            // --- AUDIO FIX: PREVENT OVERLAP ---
             async function stopAudio() {
                 appData.isAudioPlaying = false;
                 audioEl.pause();
                 audioEl.onended = null;
                 audioEl.currentTime = 0;
-                audioEl.src = ""; // Clear source to fully stop buffer
+                audioEl.src = ""; 
                 updateAudioUI(false);
                 document.querySelectorAll('.chat-audio-btn [data-lucide]').forEach(icon => {
                     icon.setAttribute('data-lucide', 'volume-2');
@@ -321,18 +325,17 @@
             }
 
             async function playAudioBriefing() {
-                // Prevent duplicate calls immediately
                 if (appData.isAudioPlaying) { await stopAudio(); return; }
-                appData.isAudioPlaying = true; // Lock immediately
+                appData.isAudioPlaying = true; 
                 
                 await unlockAudio();
                 updateAudioUI(true);
                 
                 const bText = `รายงานภาวะการลงทุนวันที่ 3 กุมภาพันธ์ครับ ดัชนีเซตปิดที่ ${appData.set.index} จุด สำหรับทองคำแท่งในประเทศล่าสุดบาทละ ${appData.gold.sell} บาทครับ`;
-                await generateAndPlayAudio(bText, stopAudio);
+                await generateAndPlayAudio(bText, stopAudio, 1.15);
             }
 
-            async function generateAndPlayAudio(text, onEnded) {
+            async function generateAndPlayAudio(text, onEnded, speed = 1.0) {
                 try {
                     const r = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`, {
                         method: 'POST',
@@ -345,37 +348,42 @@
                     });
                     const res = await r.json();
                     const pcm = res.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-                    if (pcm && appData.isAudioPlaying) { // Double check flag
+                    if (pcm && appData.isAudioPlaying) { 
                         const blob = pcmToWavBlob(pcm);
                         audioEl.src = URL.createObjectURL(blob);
-                        audioEl.play().catch(() => { showError("แตะหน้าจอเพื่ออนุญาตเสียง"); onEnded(); });
+                        audioEl.playbackRate = speed; 
+                        audioEl.play().then(() => {
+                            audioEl.playbackRate = speed;
+                        }).catch(() => { showError("แตะหน้าจอเพื่ออนุญาตเสียง"); onEnded(); });
                         audioEl.onended = onEnded;
                     } else { onEnded(); }
                 } catch (e) { showError("โหลดเสียงล้มเหลว"); onEnded(); }
             }
 
             function updateAudioUI(playing) {
-                audioIcon.setAttribute('data-lucide', playing ? 'square' : 'play');
-                audioStatusText.innerText = playing ? "กำลังบรรยายสรุปข่าวล่าสุด..." : "สรุปดัชนี & ราคาทองล่าสุดประจำวัน";
-                masterAudioBtn.classList.toggle('audio-playing', playing);
-                audioVisualizer.classList.toggle('hidden', !playing);
+                if (audioIcon) audioIcon.setAttribute('data-lucide', playing ? 'square' : 'play');
+                if (audioStatusText) audioStatusText.innerText = playing ? "กำลังบรรยายสรุปข่าวล่าสุด..." : "สรุปดัชนี & ราคาทองล่าสุดประจำวัน";
+                if (masterAudioBtn) masterAudioBtn.classList.toggle('audio-playing', playing);
+                if (audioVisualizer) audioVisualizer.classList.toggle('hidden', !playing);
                 lucide.createIcons();
             }
 
             function pcmToWavBlob(pcm) {
                 const b = window.atob(pcm);
-                const l = b.length;
-                const bytes = new Uint8Array(l);
-                for (let i = 0; i < l; i++) bytes[i] = b.charCodeAt(i);
+                const bytes = new Uint8Array(b.length);
+                // Fixed loop to prevent SyntaxError
+                for (let i = 0; i < b.length; i++) {
+                    bytes[i] = b.charCodeAt(i);
+                }
                 const h = new ArrayBuffer(44);
                 const v = new DataView(h);
-                v.setUint32(0, 0x52494646, false); v.setUint32(4, 36 + l, true); v.setUint32(8, 0x57415645, false); v.setUint32(12, 0x666d7420, false); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, 24000, true); v.setUint32(28, 24000 * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); v.setUint32(36, 0x64617461, false); v.setUint32(40, l, true);
+                v.setUint32(0, 0x52494646, false); v.setUint32(4, 36 + b.length, true); v.setUint32(8, 0x57415645, false); v.setUint32(12, 0x666d7420, false); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, 24000, true); v.setUint32(28, 24000 * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); v.setUint32(36, 0x64617461, false); v.setUint32(40, b.length, true);
                 return new Blob([h, bytes], { type: 'audio/wav' });
             }
 
             async function getAIChatResponse(userInput) {
                 appData.isChatLoading = true;
-                sendBtn.innerHTML = '<div class="loader"></div>';
+                if (sendBtn) sendBtn.innerHTML = '<div class="loader"></div>';
                 try {
                     const r = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
                         method: 'POST',
@@ -386,7 +394,7 @@
                     const aiText = res.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (aiText) addMessage('ai', aiText);
                 } catch (e) { showError("ระบบ AI ไม่ตอบสนอง"); }
-                finally { appData.isChatLoading = false; sendBtn.innerHTML = '<i data-lucide="send" class="w-5 h-5"></i>'; lucide.createIcons(); }
+                finally { appData.isChatLoading = false; if (sendBtn) sendBtn.innerHTML = '<i data-lucide="send" class="w-5 h-5"></i>'; lucide.createIcons(); }
             }
 
             window.switchTab = function(tabId) {
@@ -399,16 +407,16 @@
                 if (tabId !== 'home') stopAudio();
             };
 
-            masterAudioBtn.addEventListener('click', (e) => { e.stopPropagation(); playAudioBriefing(); });
-            topRefreshBtn.addEventListener('click', (e) => { e.stopPropagation(); updateUI(); });
-            sendBtn.addEventListener('click', () => {
+            if (masterAudioBtn) masterAudioBtn.addEventListener('click', (e) => { e.stopPropagation(); playAudioBriefing(); });
+            if (topRefreshBtn) topRefreshBtn.addEventListener('click', (e) => { e.stopPropagation(); updateUI(); });
+            if (sendBtn) sendBtn.addEventListener('click', () => {
                 const v = chatInput.value.trim();
                 if (!v || appData.isChatLoading) return;
                 addMessage('user', v);
                 chatInput.value = '';
                 getAIChatResponse(v);
             });
-            chatInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendBtn.click(); });
+            if (chatInput) chatInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendBtn.click(); });
 
             function addMessage(role, text) {
                 const div = document.createElement('div');
@@ -416,25 +424,36 @@
                 if (role === 'ai') {
                     div.innerHTML = `<div class="max-w-[85%] p-4 rounded-3xl bg-white text-slate-700 border border-slate-100 rounded-tl-none text-sm shadow-sm leading-relaxed">${text}</div><button class="chat-audio-btn mb-1 p-2 bg-slate-100 text-slate-500 rounded-full active:bg-indigo-600 active:text-white transition-all shadow-sm flex items-center justify-center"><i data-lucide="volume-2" class="w-3.5 h-3.5"></i></button>`;
                     const b = div.querySelector('.chat-audio-btn');
-                    b.onclick = async (e) => {
-                        e.stopPropagation();
-                        if (appData.isAudioPlaying) { await stopAudio(); return; }
-                        appData.isAudioPlaying = true;
-                        const icon = b.querySelector('[data-lucide]');
-                        if (icon) { icon.setAttribute('data-lucide', 'square'); lucide.createIcons(); }
-                        await unlockAudio();
-                        await generateAndPlayAudio(text, stopAudio);
-                    };
+                    if (b) {
+                        b.onclick = async (e) => {
+                            e.stopPropagation();
+                            if (appData.isAudioPlaying) { await stopAudio(); return; }
+                            appData.isAudioPlaying = true;
+                            
+                            // Safe icon selection after Lucide conversion
+                            const icon = b.querySelector('[data-lucide]');
+                            if (icon) { 
+                                icon.setAttribute('data-lucide', 'square'); 
+                                lucide.createIcons(); 
+                            }
+                            
+                            await unlockAudio();
+                            // Speed 1.3x for chat as requested
+                            await generateAndPlayAudio(text, stopAudio, 1.3);
+                        };
+                    }
                 } else {
                     div.innerHTML = `<div class="max-w-[85%] p-4 rounded-3xl bg-indigo-600 text-white rounded-tr-none text-sm shadow-sm leading-relaxed">${text}</div>`;
                 }
-                chatMessages.appendChild(div);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                if (chatMessages) {
+                    chatMessages.appendChild(div);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
                 lucide.createIcons();
             }
 
-            window.hideError = function() { document.getElementById('error-overlay').style.display = 'none'; };
-            function showError(m) { const o = document.getElementById('error-overlay'); document.getElementById('error-message').innerText = m; o.style.display = 'flex'; setTimeout(hideError, 5000); }
+            window.hideError = function() { const err = document.getElementById('error-overlay'); if (err) err.style.display = 'none'; };
+            function showError(m) { const o = document.getElementById('error-overlay'); if (o) { document.getElementById('error-message').innerText = m; o.style.display = 'flex'; setTimeout(hideError, 5000); } }
 
             updateUI();
             addMessage('ai', "สวัสดีครับ! ข้อมูลล่าสุดวันที่ 3 ก.พ. 2569: SET 1,336.11 และ ทองแท่ง 73,600 บาท สอบถามบทวิเคราะห์เพิ่มเติมได้เลยครับ");
