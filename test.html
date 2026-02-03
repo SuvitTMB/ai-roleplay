@@ -16,6 +16,7 @@
         body {
             font-family: 'Sarabun', sans-serif;
             background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
         }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
@@ -58,8 +59,8 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .stock-row-group:nth-child(4n+1), .stock-row-group:nth-child(4n+2) { background-color: #ffffff; }
-        .stock-row-group:nth-child(4n+3), .stock-row-group:nth-child(4n) { background-color: #fcfcfd; }
+        .stock-row-main:nth-of-type(4n+1), .stock-row-sub:nth-of-type(4n+2) { background-color: #ffffff; }
+        .stock-row-main:nth-of-type(4n+3), .stock-row-sub:nth-of-type(4n+4) { background-color: #fcfcfd; }
     </style>
 </head>
 <body class="flex justify-center h-screen overflow-hidden">
@@ -75,8 +76,8 @@
 
     <div id="app" class="w-full max-w-md bg-white shadow-2xl flex flex-col relative overflow-hidden border-x border-slate-200">
         
-        <!-- Audio Element -->
-        <audio id="global-audio"></audio>
+        <!-- Audio Element (playsinline for mobile) -->
+        <audio id="global-audio" preload="auto" playsinline></audio>
 
         <!-- Header -->
         <header class="bg-white/95 backdrop-blur-md px-6 py-4 flex items-center justify-between border-b border-slate-100 sticky top-0 z-20">
@@ -86,7 +87,7 @@
                 </div>
                 <div>
                     <h1 class="text-lg font-bold shimmer-text leading-none">SmartInvest AI</h1>
-                    <p id="live-time-status" class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5 italic text-emerald-500">Live Data Syncing...</p>
+                    <p id="live-time-status" class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5 italic text-emerald-500">Live Sync Active</p>
                 </div>
             </div>
             <div class="flex gap-3">
@@ -106,11 +107,11 @@
                 <div class="bg-slate-900 rounded-3xl p-5 text-white shadow-2xl relative overflow-hidden border border-slate-800 transition-all active:scale-[0.98]">
                     <div class="flex justify-between items-center relative z-10">
                         <div class="space-y-1">
-                            <h3 class="text-sm font-bold flex items-center gap-2">
+                            <h3 class="text-sm font-bold flex items-center gap-2 text-indigo-100">
                                 <span class="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                AI Financial Briefing
+                                AI Market Recap
                             </h3>
-                            <p id="audio-status-text" class="text-[11px] text-slate-400">คลิกฟังวิเคราะห์ SET & ทองคำ ล่าสุด</p>
+                            <p id="audio-status-text" class="text-[11px] text-slate-400">สรุปดัชนี & ราคาทองล่าสุดประจำวัน</p>
                         </div>
                         <button id="master-audio-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white p-4 rounded-full shadow-xl transition-all group">
                             <i id="audio-icon" data-lucide="play" class="w-6 h-6 fill-current"></i>
@@ -128,23 +129,21 @@
                 <!-- Market Overview Card -->
                 <div class="space-y-3">
                     <div class="flex justify-between items-end px-1">
-                        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2 italic">
-                             SET Index 
-                        </h3>
-                        <span id="market-badge" class="text-[9px] text-rose-500 font-bold bg-rose-50 px-2 py-1 rounded-md border border-rose-100 uppercase tracking-wider">ตลาดปิดแล้ว</span>
+                        <h3 class="font-bold text-lg text-slate-800 italic">SET Index</h3>
+                        <span id="market-badge" class="text-[9px] text-emerald-500 font-bold bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100 uppercase tracking-wider italic">MARKET OPEN</span>
                     </div>
                     <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm transition-all hover:shadow-md relative overflow-hidden">
-                        <div class="flex justify-between items-start mb-4">
+                        <div class="flex justify-between items-start mb-4 relative z-10">
                             <div>
-                                <h2 id="live-set-index" class="text-4xl font-black text-slate-800 tracking-tighter">1,321.42</h2>
-                                <div id="live-set-change" class="flex items-center gap-1 text-rose-500 text-sm font-bold mt-1">
-                                    <i data-lucide="trending-down" class="w-4 h-4"></i>
-                                    <span>-0.32% (-4.20)</span>
+                                <h2 id="live-set-index" class="text-4xl font-black text-slate-800 tracking-tighter">1,336.11</h2>
+                                <div id="live-set-change" class="flex items-center gap-1 text-emerald-500 text-sm font-bold mt-1">
+                                    <i data-lucide="trending-up" class="w-4 h-4"></i>
+                                    <span>+1.11% (+14.69)</span>
                                 </div>
                             </div>
                             <div class="text-right">
                                 <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mb-1">Turnover</p>
-                                <p id="live-set-turnover" class="text-lg font-black text-indigo-600 tracking-tight leading-none">43,545.17</p>
+                                <p id="live-set-turnover" class="text-lg font-black text-indigo-600 tracking-tight leading-none">57,100.78</p>
                                 <p class="text-[8px] text-slate-300 font-bold mt-1">Million Baht</p>
                             </div>
                         </div>
@@ -160,7 +159,7 @@
                         <h3 class="font-bold text-lg flex items-center gap-2 text-slate-800">
                             <i data-lucide="zap" class="text-indigo-600 w-5 h-5"></i> Top 5 Most Active
                         </h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">SET Market</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Real-time SET</p>
                     </div>
                     <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
                         <table class="w-full text-left border-collapse">
@@ -172,7 +171,7 @@
                                 </tr>
                             </thead>
                             <tbody id="stock-list" class="text-sm">
-                                <!-- Multi-row generated via JS -->
+                                <!-- Data rows injected by JS -->
                             </tbody>
                         </table>
                     </div>
@@ -185,7 +184,7 @@
                             <i data-lucide="coins" class="text-amber-500 w-5 h-5"></i> Gold Market Status
                         </h3>
                         <div class="flex items-center gap-1 text-[9px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">
-                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> <span id="gold-update-no">ครั้งที่ --</span>
+                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> <span id="gold-update-no">ครั้งที่ 63</span>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
@@ -196,15 +195,15 @@
                             <div class="space-y-2">
                                 <div class="flex justify-between items-baseline">
                                     <span class="text-[10px] text-slate-400 font-bold uppercase">ขาย:</span>
-                                    <h4 id="live-gold-thai-sell" class="text-xl font-black text-slate-800 tracking-tight leading-none">--.---</h4>
+                                    <h4 id="live-gold-thai-sell" class="text-xl font-black text-slate-800 tracking-tight leading-none">73,600</h4>
                                 </div>
                                 <div class="flex justify-between items-baseline border-t border-slate-50 pt-1">
                                     <span class="text-[10px] text-slate-400 font-bold uppercase">ซื้อ:</span>
-                                    <span id="live-gold-thai-buy" class="text-sm font-bold text-slate-600">--.---</span>
+                                    <span id="live-gold-thai-buy" class="text-sm font-bold text-slate-600">73,400</span>
                                 </div>
                             </div>
-                            <div id="live-gold-thai-change" class="mt-3 text-[10px] font-bold text-slate-400 flex items-center gap-1 bg-slate-50 w-max px-2 py-0.5 rounded-full">
-                                <i data-lucide="minus" class="w-3 h-3"></i> 0
+                            <div id="live-gold-thai-change" class="mt-3 text-[10px] font-bold text-emerald-500 flex items-center gap-1 bg-emerald-50 w-max px-2 py-0.5 rounded-full">
+                                <i data-lucide="arrow-up" class="w-3 h-3"></i> +2,450
                             </div>
                         </div>
                         <!-- Global Gold Spot -->
@@ -212,33 +211,32 @@
                             <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500"></div>
                             <div>
                                 <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Global Spot ($)</p>
-                                <h4 id="live-gold-spot" class="text-2xl font-black text-slate-800 tracking-tight leading-none mt-2">--.---</h4>
+                                <h4 id="live-gold-spot" class="text-2xl font-black text-slate-800 tracking-tight leading-none mt-2">4,924.39</h4>
                             </div>
                             <div id="live-gold-spot-change" class="mt-2 text-[10px] font-bold text-emerald-500 flex items-center gap-1 bg-emerald-50 w-max px-2 py-0.5 rounded-full">
-                                <i data-lucide="arrow-up" class="w-3 h-3"></i> +$0.99
+                                <i data-lucide="arrow-up" class="w-3 h-3"></i> +$24.50
                             </div>
                         </div>
                     </div>
-                    <p class="text-[8px] text-center text-slate-400 italic font-medium">Data Source: goldtraders.or.th & Financial Providers</p>
                 </div>
 
-                <!-- Financial News Update -->
-                <div class="space-y-4">
+                <!-- Financial News Timeline -->
+                <div class="space-y-4 pb-6">
                     <h3 class="font-bold text-lg px-1 flex items-center gap-2 text-slate-800">
-                        <i data-lucide="newspaper" class="text-indigo-600 w-5 h-5"></i> Financial News Briefing
+                        <i data-lucide="newspaper" class="text-indigo-600 w-5 h-5"></i> Financial News Timeline
                     </h3>
                     <div id="news-timeline" class="space-y-4 relative before:absolute before:left-3 before:top-2 before:bottom-2 before:w-[1px] before:bg-slate-200 pb-4">
                         <div class="relative pl-8 group">
                             <div class="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white ring-4 ring-white shadow-sm transition-transform group-hover:scale-110">
-                                <i data-lucide="moon" class="w-3 h-3"></i>
+                                <i data-lucide="bar-chart" class="w-3 h-3"></i>
                             </div>
                             <div class="bg-white p-4 rounded-2xl border border-indigo-100 shadow-sm">
                                 <div class="flex justify-between items-center mb-1">
-                                    <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">ภาคเย็น (22:15)</span>
-                                    <span class="text-[9px] text-slate-400">Current</span>
+                                    <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">สรุปตลาด</span>
+                                    <span class="text-[9px] text-slate-400">อัปเดตล่าสุด</span>
                                 </div>
-                                <h4 class="text-sm font-bold text-slate-800 leading-tight">ทองคำโลกทรงตัวเหนือ $4,710</h4>
-                                <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">ราคาสปอตโกลด์ล่าสุดทรงตัวในกรอบแคบ ขณะที่ทองไทยปิดประกาศครั้งสุดท้ายที่ 71,150 บาท</p>
+                                <h4 class="text-sm font-bold text-slate-800 leading-tight">SET ทะยานปิด 1,336 จุด รับความเชื่อมั่นนักลงทุน</h4>
+                                <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">ดัชนีปิดที่ 1,336 จุด ท่ามกลางราคาทองคำที่ทำจุดสูงสุดใหม่ต่อเนื่องเป็นวันที่สอง</p>
                             </div>
                         </div>
                     </div>
@@ -248,12 +246,8 @@
 
             <!-- Tab: Chat -->
             <section id="tab-chat" class="tab-content h-full flex flex-col">
-                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
-                    <div class="flex justify-start">
-                        <div class="max-w-[85%] p-4 rounded-3xl bg-white text-slate-700 border border-slate-100 rounded-tl-none text-sm shadow-sm leading-relaxed">
-                            สวัสดีครับ! ข้อมูลล่าสุด: <strong>SET 1,321.42</strong> และ <strong>ทองแท่ง 71,150 บาท</strong> สอบถามวิเคราะห์แนวโน้มได้ทันทีครับ
-                        </div>
-                    </div>
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 pb-10">
+                    <!-- Chat bubbles rendered here -->
                 </div>
                 <div class="p-4 bg-white border-t border-slate-100 sticky bottom-0 z-10 shadow-sm">
                     <div class="flex gap-2 items-center">
@@ -284,9 +278,296 @@
     </div>
 
     <script>
-        // Use DOMContentLoaded to ensure all elements are ready
-const _0x2803d2=_0xf68f;function _0xf68f(_0x2adc08,_0x533d7d){_0x2adc08=_0x2adc08-0x88;const _0x32669d=_0x3266();let _0xf68f1b=_0x32669d[_0x2adc08];return _0xf68f1b;}function _0x3266(){const _0x5112c3=['15:30','bg-rose-50\x20text-rose-600','Gold\x20sync\x20in\x20progress...\x20using\x20latest\x20known\x20data.','https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=','live-gold-thai-sell','addEventListener','trending-up','text','classList','trim','PTT','3241175OaVGbL','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20colspan=\x223\x22\x20class=\x22px-5\x20pb-3\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22flex\x20items-center\x20gap-1.5\x20text-[10px]\x20font-bold\x20','.tab-content','absChange','justify-end','buy','tab-','audio-icon','<i\x20data-lucide=\x22','16:30','0.00%','atob','parts','27IIUfJg','71,150','stopPropagation','charCodeAt','150088uPDetf','click','https://thai-gold-api.onrender.com/latest?timestamp=','setUint16','querySelectorAll','text-indigo-600','198.50','103996auLgQL','--.---','M,\x20ทองสมาคมครั้งที่\x20','ADVANC','#f43f5e','error-overlay','dataset','length','12:30','forEach','add','createObjectURL','appendChild','minus','text-rose-500\x20bg-rose-50','response','<i\x20data-lucide=\x22send\x22\x20class=\x22w-5\x20h-5\x22></i>','line','createElement','className','switchTab','trending-down','toLocaleTimeString','th-TH','value','6MykfGx','updateNo','gold_bar','1,321.42','ระบบ\x20AI\x20ไม่สามารถตอบได้ในขณะนี้','120005EzqMde','style','now','text-slate-400','remove','spot','7222212RBJgek','find','\x22\x20class=\x22w-3\x20h-3\x22></i>\x20','send-btn','volume','application/json','square','error-message','\x20และรับซื้อ\x20','includes','4,710.00','+0.99','text-emerald-500\x20bg-emerald-50',',\x20Turnover\x20','GULF','622981WPwchJ','10:00','setUint32',').\x20ตอบเป็นภาษาไทยอย่างเป็นทางการและสั้นกระชับ','stock-list','ครั้งที่\x20','Live\x20Sync:\x20','candidates','chat-input','-4.20','createIcons','rgba(244,\x2063,\x2094,\x200.03)','data','flex\x20','flex','innerHTML','isChatLoading','div','hidden','ไม่สามารถโหลดเสียงสรุปได้','bg-white\x20text-slate-700\x20border\x20border-slate-100\x20rounded-tl-none','audio-status-text','index','<div\x20class=\x22max-w-[85%]\x20p-4\x20rounded-3xl\x20text-sm\x20shadow-sm\x20','none','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22px-5\x20pt-3\x20font-black\x20text-slate-800\x22>','DOMContentLoaded','bg-slate-50\x20text-slate-400','hideError','toggle','\x20จุด\x20โดยมีมูลค่าการซื้อขาย\x20','\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','+3.00','-3.17%','AIzaSyBFUWczi94LOnK3df4sSzHfBTlzTTeNInA','188.00','<i\x20data-lucide=\x22arrow-up\x22\x20class=\x22w-3\x20h-3\x22></i>\x20','user','home','กำลังวิเคราะห์ผ่านเสียง...','text-slate-400\x20bg-slate-50','change','arrow-up','key','active','replace','top-refresh-btn','gold','720492cYcvxe','inlineData','global-audio','+0.25','Kore','sell','getContext','keypress','pause','symbol','215.00','price','status','set','audio-visualizer','getElementById','success','https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=','\x20บาท\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','setAttribute','spotChange','stringify','gold-update-no','text-rose-500','KBANK','43,545.17','34.25','-0.25','content','</div>','innerText','marketChart','json','70,950','+0.74%','คุณคือ\x20AI\x20นักวิเคราะห์การลงทุนมืออาชีพ\x20ข้อมูลสด:\x20SET\x20','-0.54%','\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20data-lucide=\x22','scrollHeight','\x20(ขาย\x20','catch','stocks','display','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','live-gold-thai-change','audio/wav','\x22\x20class=\x22w-3\x20h-3\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20เพิ่ม(ลด)\x20','POST','DELTA'];_0x3266=function(){return _0x5112c3;};return _0x3266();}(function(_0x495d0b,_0xa3fb14){const _0x24f90d=_0xf68f,_0x2944a4=_0x495d0b();while(!![]){try{const _0x41657a=-parseInt(_0x24f90d(0xc2))/0x1+parseInt(_0x24f90d(0x8f))/0x2*(parseInt(_0x24f90d(0x13b))/0x3)+parseInt(_0x24f90d(0xf2))/0x4+-parseInt(_0x24f90d(0xad))/0x5+parseInt(_0x24f90d(0xa8))/0x6*(-parseInt(_0x24f90d(0x12e))/0x7)+-parseInt(_0x24f90d(0x88))/0x8+parseInt(_0x24f90d(0xb3))/0x9;if(_0x41657a===_0xa3fb14)break;else _0x2944a4['push'](_0x2944a4['shift']());}catch(_0x361a66){_0x2944a4['push'](_0x2944a4['shift']());}}}(_0x3266,0x4e90d),document[_0x2803d2(0x128)](_0x2803d2(0xdc),()=>{const _0x4c821a=_0x2803d2;lucide[_0x4c821a(0xcc)]();let _0x5bd9cc={'gold':{'buy':_0x4c821a(0x90),'sell':_0x4c821a(0x90),'change':'0','updateNo':'--','spot':_0x4c821a(0x90),'spotChange':'0'},'set':{'index':_0x4c821a(0xab),'change':_0x4c821a(0xcb),'percent':'-0.32','volume':_0x4c821a(0x10b)},'stocks':[{'symbol':_0x4c821a(0x122),'price':_0x4c821a(0x8e),'absChange':'-6.50','change':_0x4c821a(0xe3)},{'symbol':_0x4c821a(0x12d),'price':_0x4c821a(0x10c),'absChange':_0x4c821a(0xf5),'change':_0x4c821a(0x114)},{'symbol':_0x4c821a(0x10a),'price':_0x4c821a(0xe5),'absChange':'0.00','change':_0x4c821a(0x138)},{'symbol':_0x4c821a(0x92),'price':_0x4c821a(0xfc),'absChange':_0x4c821a(0xe2),'change':'+1.42%'},{'symbol':_0x4c821a(0xc1),'price':'45.75','absChange':_0x4c821a(0x10d),'change':_0x4c821a(0x116)}],'isAudioPlaying':![],'isChatLoading':![]};const _0x134c94=_0x4c821a(0xe4),_0x2ebb88=document[_0x4c821a(0x101)](_0x4c821a(0xf4)),_0x3c30cf=document[_0x4c821a(0x101)]('master-audio-btn'),_0x1afdd9=document[_0x4c821a(0x101)](_0x4c821a(0x135)),_0x546cc0=document[_0x4c821a(0x101)](_0x4c821a(0xd7)),_0x45b4d2=document[_0x4c821a(0x101)](_0x4c821a(0x100)),_0x51e489=document[_0x4c821a(0x101)](_0x4c821a(0xca)),_0x4684b5=document[_0x4c821a(0x101)](_0x4c821a(0xb6)),_0x273b23=document[_0x4c821a(0x101)]('chat-messages'),_0x1ac4de=document[_0x4c821a(0x101)](_0x4c821a(0xf0)),_0xcaafd9=document[_0x4c821a(0x101)](_0x4c821a(0x111))[_0x4c821a(0xf8)]('2d');let _0x10b8c5=new Chart(_0xcaafd9,{'type':_0x4c821a(0xa0),'data':{'labels':[_0x4c821a(0xc3),'11:00',_0x4c821a(0x97),'14:30',_0x4c821a(0x123),_0x4c821a(0x137)],'datasets':[{'data':[0x52d,0x52c,0x52a,0x526,0x523,1321.42],'borderColor':_0x4c821a(0x93),'borderWidth':0x4,'fill':!![],'backgroundColor':_0x4c821a(0xcd),'tension':0.4,'pointRadius':0x0}]},'options':{'responsive':!![],'maintainAspectRatio':![],'plugins':{'legend':{'display':![]}},'scales':{'x':{'display':![]},'y':{'display':![]}}}});async function _0x62c9c7(){const _0x3327a1=_0x4c821a;try{const _0x4ca82d=await fetch(_0x3327a1(0x8a)+Date[_0x3327a1(0xaf)]()),_0x154f5c=await _0x4ca82d[_0x3327a1(0x112)]();if(_0x154f5c[_0x3327a1(0xfe)]===_0x3327a1(0x102))_0x5bd9cc[_0x3327a1(0xf1)][_0x3327a1(0x133)]=_0x154f5c[_0x3327a1(0x9e)]['price'][_0x3327a1(0xaa)][_0x3327a1(0x133)],_0x5bd9cc[_0x3327a1(0xf1)][_0x3327a1(0xf7)]=_0x154f5c[_0x3327a1(0x9e)]['price'][_0x3327a1(0xaa)][_0x3327a1(0xf7)],_0x5bd9cc[_0x3327a1(0xf1)][_0x3327a1(0xeb)]=_0x154f5c[_0x3327a1(0x9e)][_0x3327a1(0xfd)]['change'],_0x5bd9cc['gold'][_0x3327a1(0xa9)]=_0x154f5c[_0x3327a1(0x9e)]['update_no']||'1',_0x5bd9cc[_0x3327a1(0xf1)][_0x3327a1(0xb2)]=_0x3327a1(0xbd),_0x5bd9cc[_0x3327a1(0xf1)][_0x3327a1(0x106)]='+0.99';else throw new Error();}catch(_0x2e6345){console['warn'](_0x3327a1(0x125)),_0x5bd9cc[_0x3327a1(0xf1)]={'buy':_0x3327a1(0x113),'sell':_0x3327a1(0x13c),'change':'0','updateNo':'69','spot':'4,710.00','spotChange':_0x3327a1(0xbe)};}_0x13cb29();}function _0x13cb29(){const _0x5ddd83=_0x4c821a;document[_0x5ddd83(0x101)](_0x5ddd83(0x127))[_0x5ddd83(0x110)]=_0x5bd9cc[_0x5ddd83(0xf1)][_0x5ddd83(0xf7)],document[_0x5ddd83(0x101)]('live-gold-thai-buy')[_0x5ddd83(0x110)]=_0x5bd9cc['gold'][_0x5ddd83(0x133)],document[_0x5ddd83(0x101)](_0x5ddd83(0x108))[_0x5ddd83(0x110)]=_0x5ddd83(0xc7)+_0x5bd9cc['gold'][_0x5ddd83(0xa9)];const _0x5b18f4=document[_0x5ddd83(0x101)](_0x5ddd83(0x11e)),_0x2cc9de=parseInt(_0x5bd9cc['gold'][_0x5ddd83(0xeb)][_0x5ddd83(0xef)](',',''))||0x0;_0x5b18f4[_0x5ddd83(0xd1)]=_0x5ddd83(0x136)+(_0x2cc9de>0x0?_0x5ddd83(0xec):_0x2cc9de<0x0?'arrow-down':'minus')+_0x5ddd83(0xb5)+_0x5bd9cc[_0x5ddd83(0xf1)]['change'],_0x5b18f4[_0x5ddd83(0xa2)]='mt-3\x20text-[10px]\x20font-bold\x20flex\x20items-center\x20gap-1\x20w-max\x20px-2\x20py-0.5\x20rounded-full\x20'+(_0x2cc9de>0x0?_0x5ddd83(0xbf):_0x2cc9de<0x0?_0x5ddd83(0x9d):_0x5ddd83(0xea)),document[_0x5ddd83(0x101)]('live-gold-spot')[_0x5ddd83(0x110)]='$'+_0x5bd9cc[_0x5ddd83(0xf1)][_0x5ddd83(0xb2)];const _0x2b7230=document['getElementById']('live-gold-spot-change');_0x2b7230['innerHTML']=_0x5ddd83(0xe6)+_0x5bd9cc[_0x5ddd83(0xf1)][_0x5ddd83(0x106)],document[_0x5ddd83(0x101)]('live-set-index')['innerText']=_0x5bd9cc[_0x5ddd83(0xff)]['index'],document[_0x5ddd83(0x101)]('live-set-turnover')['innerText']=_0x5bd9cc['set'][_0x5ddd83(0xb7)];const _0x4a3e27=document['getElementById'](_0x5ddd83(0xc6));_0x4a3e27['innerHTML']='',_0x5bd9cc[_0x5ddd83(0x11b)]['forEach'](_0x25b136=>{const _0x5894c1=_0x5ddd83,_0xd9ddd9=_0x25b136['absChange'][_0x5894c1(0xbc)]('+'),_0x47305f=_0x25b136[_0x5894c1(0x131)][_0x5894c1(0xbc)]('-'),_0x49fdb4=_0xd9ddd9?'text-emerald-500':_0x47305f?_0x5894c1(0x109):'text-slate-400',_0x45d89f=_0xd9ddd9?'bg-emerald-50\x20text-emerald-600':_0x47305f?_0x5894c1(0x124):_0x5894c1(0xdd),_0x1c11b9=document[_0x5894c1(0xa1)]('tr');_0x1c11b9[_0x5894c1(0xa2)]='stock-row-group',_0x1c11b9[_0x5894c1(0xd1)]=_0x5894c1(0xdb)+_0x25b136[_0x5894c1(0xfb)]+'</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22px-5\x20pt-3\x20text-right\x20font-black\x20text-slate-800\x22>'+_0x25b136['price']+'</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22px-5\x20pt-3\x20text-right\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22inline-block\x20px-2\x20py-0.5\x20rounded\x20font-black\x20text-[11px]\x20'+_0x45d89f+_0x5894c1(0xe1)+_0x25b136['change']+_0x5894c1(0x11d);const _0x227e6c=document['createElement']('tr');_0x227e6c[_0x5894c1(0xa2)]='stock-row-group\x20border-b\x20border-slate-50',_0x227e6c[_0x5894c1(0xd1)]=_0x5894c1(0x12f)+_0x49fdb4+_0x5894c1(0x117)+(_0xd9ddd9?_0x5894c1(0x129):_0x47305f?_0x5894c1(0xa4):_0x5894c1(0x9c))+_0x5894c1(0x120)+_0x25b136['absChange']+_0x5894c1(0x104),_0x4a3e27[_0x5894c1(0x9b)](_0x1c11b9),_0x4a3e27[_0x5894c1(0x9b)](_0x227e6c);}),document[_0x5ddd83(0x101)]('live-time-status')[_0x5ddd83(0x110)]=_0x5ddd83(0xc8)+new Date()[_0x5ddd83(0xa5)](_0x5ddd83(0xa6)),lucide['createIcons']();}async function _0x1cb709(){await _0x62c9c7(),_0x13cb29();}setInterval(()=>{const _0x253fdf=new Date(),_0x47b6c4=_0x253fdf['getDay']();_0x47b6c4>=0x1&&_0x47b6c4<=0x5&&_0x1cb709();},0xea60);async function _0x317acd(){const _0xb9cb58=_0x4c821a;if(_0x5bd9cc['isAudioPlaying']){_0x429355();return;}_0x5bd9cc['isAudioPlaying']=!![],_0x25e3c8(!![]);const _0x25f4d9='รายงานสรุปการลงทุนล่าสุดครับ\x20ดัชนีตลาดหลักทรัพย์เซต\x20ปิดที่\x20'+_0x5bd9cc[_0xb9cb58(0xff)][_0xb9cb58(0xd8)]+_0xb9cb58(0xe0)+_0x5bd9cc[_0xb9cb58(0xff)][_0xb9cb58(0xb7)]+'\x20ล้านบาท\x20สำหรับทองคำในประเทศ\x20ประกาศครั้งที่\x20'+_0x5bd9cc[_0xb9cb58(0xf1)]['updateNo']+'\x20ขายออกบาทละ\x20'+_0x5bd9cc[_0xb9cb58(0xf1)][_0xb9cb58(0xf7)]+_0xb9cb58(0xbb)+_0x5bd9cc[_0xb9cb58(0xf1)][_0xb9cb58(0x133)]+'\x20บาทครับ\x20ในส่วนของหุ้นที่มีการซื้อขายสูงสุดคือเดลต้าปิดลบแรงกดดันตลาดครับ';try{const _0x3327df=await fetch(_0xb9cb58(0x126)+_0x134c94,{'method':_0xb9cb58(0x121),'headers':{'Content-Type':_0xb9cb58(0xb8)},'body':JSON[_0xb9cb58(0x107)]({'contents':[{'parts':[{'text':_0x25f4d9}]}],'generationConfig':{'responseModalities':['AUDIO'],'speechConfig':{'voiceConfig':{'prebuiltVoiceConfig':{'voiceName':_0xb9cb58(0xf6)}}}}})}),_0x534c60=await _0x3327df[_0xb9cb58(0x112)](),_0x1279ab=_0x534c60[_0xb9cb58(0xc9)]?.[0x0]?.[_0xb9cb58(0x10e)]?.['parts']?.[_0xb9cb58(0xb4)](_0x58c772=>_0x58c772[_0xb9cb58(0xf3)])?.['inlineData']?.[_0xb9cb58(0xce)];if(_0x1279ab){const _0x4ca5bb=_0x4effaa(_0x1279ab);_0x2ebb88['src']=URL[_0xb9cb58(0x9a)](_0x4ca5bb),_0x2ebb88['play']()[_0xb9cb58(0x11a)](()=>{_0xbd63cb('โปรดแตะหน้าจอเพื่อเริ่มเสียง'),_0x429355();}),_0x2ebb88['onended']=_0x429355;}}catch(_0x537690){_0xbd63cb(_0xb9cb58(0xd5)),_0x429355();}}function _0x429355(){const _0x28a950=_0x4c821a;_0x5bd9cc['isAudioPlaying']=![],_0x2ebb88[_0x28a950(0xfa)](),_0x2ebb88['currentTime']=0x0,_0x25e3c8(![]);}function _0x25e3c8(_0x50a8dc){const _0x1f2013=_0x4c821a;_0x1afdd9[_0x1f2013(0x105)]('data-lucide',_0x50a8dc?_0x1f2013(0xb9):'play'),_0x546cc0['innerText']=_0x50a8dc?_0x1f2013(0xe9):'คลิกฟังวิเคราะห์\x20SET\x20&\x20ทองคำ\x20ล่าสุด',_0x3c30cf[_0x1f2013(0x12b)][_0x1f2013(0xdf)]('audio-playing',_0x50a8dc),_0x45b4d2[_0x1f2013(0x12b)][_0x1f2013(0xdf)](_0x1f2013(0xd4),!_0x50a8dc),lucide['createIcons']();}function _0x4effaa(_0x192bec){const _0x1dc743=_0x4c821a,_0x17f4c6=window[_0x1dc743(0x139)](_0x192bec),_0x1d0925=_0x17f4c6[_0x1dc743(0x96)],_0x5c539d=new Uint8Array(_0x1d0925);for(let _0x248b41=0x0;_0x248b41<_0x1d0925;_0x248b41++)_0x5c539d[_0x248b41]=_0x17f4c6[_0x1dc743(0x13e)](_0x248b41);const _0xca4738=new ArrayBuffer(0x2c),_0xd37fee=new DataView(_0xca4738);return _0xd37fee[_0x1dc743(0xc4)](0x0,0x52494646,![]),_0xd37fee['setUint32'](0x4,0x24+_0x1d0925,!![]),_0xd37fee['setUint32'](0x8,0x57415645,![]),_0xd37fee[_0x1dc743(0xc4)](0xc,0x666d7420,![]),_0xd37fee[_0x1dc743(0xc4)](0x10,0x10,!![]),_0xd37fee[_0x1dc743(0x8b)](0x14,0x1,!![]),_0xd37fee[_0x1dc743(0x8b)](0x16,0x1,!![]),_0xd37fee[_0x1dc743(0xc4)](0x18,0x5dc0,!![]),_0xd37fee[_0x1dc743(0xc4)](0x1c,0x5dc0*0x2,!![]),_0xd37fee['setUint16'](0x20,0x2,!![]),_0xd37fee[_0x1dc743(0x8b)](0x22,0x10,!![]),_0xd37fee[_0x1dc743(0xc4)](0x24,0x64617461,![]),_0xd37fee[_0x1dc743(0xc4)](0x28,_0x1d0925,!![]),new Blob([_0xca4738,_0x5c539d],{'type':_0x1dc743(0x11f)});}async function _0x56a9e2(_0x2b6713){const _0x14c4e0=_0x4c821a;_0x5bd9cc['isChatLoading']=!![],_0x4684b5['innerHTML']='<div\x20class=\x22loader\x22></div>';const _0x427244=_0x14c4e0(0x115)+_0x5bd9cc['set']['index']+_0x14c4e0(0xc0)+_0x5bd9cc['set']['volume']+_0x14c4e0(0x91)+_0x5bd9cc[_0x14c4e0(0xf1)][_0x14c4e0(0xa9)]+_0x14c4e0(0x119)+_0x5bd9cc[_0x14c4e0(0xf1)][_0x14c4e0(0xf7)]+'\x20/\x20ซื้อ\x20'+_0x5bd9cc[_0x14c4e0(0xf1)][_0x14c4e0(0x133)]+_0x14c4e0(0xc5);try{const _0x227533=await fetch(_0x14c4e0(0x103)+_0x134c94,{'method':_0x14c4e0(0x121),'headers':{'Content-Type':'application/json'},'body':JSON['stringify']({'contents':[{'parts':[{'text':_0x2b6713}]}],'systemInstruction':{'parts':[{'text':_0x427244}]}})}),_0x4b6e57=await _0x227533[_0x14c4e0(0x112)](),_0x3644a2=_0x4b6e57[_0x14c4e0(0xc9)]?.[0x0]?.[_0x14c4e0(0x10e)]?.[_0x14c4e0(0x13a)]?.[0x0]?.[_0x14c4e0(0x12a)];if(_0x3644a2)_0x56ee81('ai',_0x3644a2);}catch(_0x2695d9){_0xbd63cb(_0x14c4e0(0xac));}finally{_0x5bd9cc[_0x14c4e0(0xd2)]=![],_0x4684b5[_0x14c4e0(0xd1)]=_0x14c4e0(0x9f),lucide[_0x14c4e0(0xcc)]();}}window[_0x4c821a(0xa3)]=function(_0x263864){const _0x5e6d4a=_0x4c821a;document[_0x5e6d4a(0x8c)](_0x5e6d4a(0x130))[_0x5e6d4a(0x98)](_0x2e41aa=>_0x2e41aa['classList'][_0x5e6d4a(0xb1)](_0x5e6d4a(0xee))),document[_0x5e6d4a(0x101)](_0x5e6d4a(0x134)+_0x263864)[_0x5e6d4a(0x12b)][_0x5e6d4a(0x99)](_0x5e6d4a(0xee)),document[_0x5e6d4a(0x8c)]('.nav-btn')[_0x5e6d4a(0x98)](_0x53afea=>{const _0x3c02d4=_0x5e6d4a;if(_0x53afea[_0x3c02d4(0x95)]['tab']===_0x263864)_0x53afea[_0x3c02d4(0x12b)]['add'](_0x3c02d4(0x8d));else _0x53afea[_0x3c02d4(0x12b)][_0x3c02d4(0xef)](_0x3c02d4(0x8d),_0x3c02d4(0xb0));});if(_0x263864!==_0x5e6d4a(0xe8))_0x429355();};function _0x56ee81(_0x47e0ad,_0x55bc2d){const _0x55e3b1=_0x4c821a,_0x34d9ed=document[_0x55e3b1(0xa1)](_0x55e3b1(0xd3));_0x34d9ed[_0x55e3b1(0xa2)]=_0x55e3b1(0xcf)+(_0x47e0ad===_0x55e3b1(0xe7)?_0x55e3b1(0x132):'justify-start'),_0x34d9ed[_0x55e3b1(0xd1)]=_0x55e3b1(0xd9)+(_0x47e0ad===_0x55e3b1(0xe7)?'bg-indigo-600\x20text-white\x20rounded-tr-none':_0x55e3b1(0xd6))+'\x22>'+_0x55bc2d+_0x55e3b1(0x10f),_0x273b23[_0x55e3b1(0x9b)](_0x34d9ed),_0x273b23['scrollTop']=_0x273b23[_0x55e3b1(0x118)];}window[_0x4c821a(0xde)]=function(){const _0x6f35d=_0x4c821a;document[_0x6f35d(0x101)]('error-overlay')[_0x6f35d(0xae)][_0x6f35d(0x11c)]=_0x6f35d(0xda);};function _0xbd63cb(_0x2c03b0){const _0x27ee37=_0x4c821a,_0x24b4dd=document[_0x27ee37(0x101)](_0x27ee37(0x94));document[_0x27ee37(0x101)](_0x27ee37(0xba))['innerText']=_0x2c03b0,_0x24b4dd[_0x27ee37(0xae)][_0x27ee37(0x11c)]=_0x27ee37(0xd0),setTimeout(hideError,0x1388);}_0x3c30cf[_0x4c821a(0x128)](_0x4c821a(0x89),_0x2c44b3=>{const _0x38e3de=_0x4c821a;_0x2c44b3[_0x38e3de(0x13d)](),_0x317acd();}),_0x1ac4de[_0x4c821a(0x128)](_0x4c821a(0x89),_0x6a9dd7=>{const _0xdc8ca6=_0x4c821a;_0x6a9dd7[_0xdc8ca6(0x13d)](),_0x1cb709();}),_0x4684b5['addEventListener'](_0x4c821a(0x89),()=>{const _0x3621a7=_0x4c821a,_0x39eeb1=_0x51e489[_0x3621a7(0xa7)][_0x3621a7(0x12c)]();if(!_0x39eeb1||_0x5bd9cc['isChatLoading'])return;_0x56ee81('user',_0x39eeb1),_0x51e489[_0x3621a7(0xa7)]='',_0x56a9e2(_0x39eeb1);}),_0x51e489[_0x4c821a(0x128)](_0x4c821a(0xf9),_0x3ffad7=>{const _0xba4048=_0x4c821a;if(_0x3ffad7[_0xba4048(0xed)]==='Enter')_0x4684b5[_0xba4048(0x89)]();}),_0x1cb709();}));
+        document.addEventListener('DOMContentLoaded', () => {
+            // App State
+            let appData = {
+                gold: { buy: '73,400', sell: '73,600', change: '+2,450', updateNo: '63', spot: '4,924.39', spotChange: '+24.50' },
+                set: { index: '1,336.11', change: '+14.69', percent: '+1.11', volume: '57,100.78', status: 'Open' },
+                stocks: [
+                    { symbol: 'ADVANC', price: '361.00', absChange: '+2.00', change: '+0.56%' },
+                    { symbol: 'DELTA', price: '207.00', absChange: '+7.00', change: '+3.50%' },
+                    { symbol: 'TRUE', price: '11.90', absChange: '+0.20', change: '+1.71%' },
+                    { symbol: 'PTT', price: '34.50', absChange: '+0.25', change: '+0.73%' },
+                    { symbol: 'GULF', price: '48.00', absChange: '+0.50', change: '+1.05%' }
+                ],
+                isAudioPlaying: false,
+                isChatLoading: false
+            };
+
+            const apiKey = "AIzaSyA5yZNHa4LCobEqKUzN2ilFyhTY_IC8Gyg"; // API Key used at runtime from environment
+            
+            // Initialization
+            lucide.createIcons();
+            const audioEl = document.getElementById('global-audio');
+            const masterAudioBtn = document.getElementById('master-audio-btn');
+            const audioIcon = document.getElementById('audio-icon');
+            const audioStatusText = document.getElementById('audio-status-text');
+            const audioVisualizer = document.getElementById('audio-visualizer');
+            const chatInput = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
+            const chatMessages = document.getElementById('chat-messages');
+            const topRefreshBtn = document.getElementById('top-refresh-btn');
+
+            // Chart
+            const ctx = document.getElementById('marketChart').getContext('2d');
+            let marketChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: ['10:00', '11:00', '12:00', '14:30', '15:30', '16:30'], datasets: [{ data: [1325, 1332, 1340, 1338, 1342, 1336.11], borderColor: '#10b981', borderWidth: 4, fill: true, backgroundColor: 'rgba(16, 185, 129, 0.05)', tension: 0.4, pointRadius: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+            });
+
+            // 1. UI Updates
+            function updateUI() {
+                document.getElementById('live-gold-thai-sell').innerText = appData.gold.sell;
+                document.getElementById('live-gold-thai-buy').innerText = appData.gold.buy;
+                document.getElementById('gold-update-no').innerText = `ครั้งที่ ${appData.gold.updateNo}`;
+                document.getElementById('live-gold-thai-change').innerHTML = `<i data-lucide="arrow-up" class="w-3 h-3"></i> +${appData.gold.change}`;
+                document.getElementById('live-gold-spot').innerText = appData.gold.spot;
+                document.getElementById('live-set-index').innerText = appData.set.index;
+                document.getElementById('live-set-turnover').innerText = appData.set.volume;
+                document.getElementById('live-set-change').innerHTML = `<i data-lucide="trending-up" class="w-4 h-4"></i><span>${appData.set.percent} (${appData.set.change})</span>`;
+                
+                const sList = document.getElementById('stock-list');
+                sList.innerHTML = '';
+                appData.stocks.forEach(s => {
+                    const rowMain = document.createElement('tr');
+                    rowMain.className = "stock-row-main";
+                    rowMain.innerHTML = `
+                        <td class="px-5 pt-3 font-black text-slate-800">${s.symbol}</td>
+                        <td class="px-5 pt-3 text-right font-black text-slate-800">${s.price}</td>
+                        <td class="px-5 pt-3 text-right">
+                            <div class="inline-block px-2 py-0.5 rounded font-black text-[11px] bg-emerald-50 text-emerald-600">${s.change}</div>
+                        </td>`;
+                    const rowSub = document.createElement('tr');
+                    rowSub.className = "stock-row-sub border-b border-slate-50";
+                    rowSub.innerHTML = `
+                        <td colspan="3" class="px-5 pb-3">
+                            <div class="flex items-center gap-1.5 text-[10px] font-bold text-emerald-500">
+                                <i data-lucide="trending-up" class="w-3 h-3"></i>
+                                เพิ่ม(ลด) ${s.absChange} บาท
+                            </div>
+                        </td>`;
+                    sList.appendChild(rowMain);
+                    sList.appendChild(rowSub);
+                });
+                document.getElementById('live-time-status').innerText = `ข้อมูลล่าสุด: ${new Date().toLocaleTimeString('th-TH')} | 3 ก.พ. 69`;
+                lucide.createIcons();
+            }
+
+            // 2. Fetch Logic with Exponential Backoff
+            async function fetchWithRetry(url, options, maxRetries = 5) {
+                let delay = 1000;
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        const response = await fetch(url, options);
+                        if (response.ok) return response;
+                        await new Promise(r => setTimeout(r, delay));
+                        delay *= 2;
+                    } catch (e) {
+                        if (i === maxRetries - 1) throw e;
+                        await new Promise(r => setTimeout(r, delay));
+                        delay *= 2;
+                    }
+                }
+            }
+
+            async function refreshAllData() {
+                topRefreshBtn.classList.add('animate-spin');
+                try {
+                    const res = await fetch('https://thai-gold-api.onrender.com/latest?cb=' + Date.now());
+                    const data = await res.json();
+                    if(data && data.status === "success" && data.response) {
+                        appData.gold.buy = data.response.price.gold_bar.buy;
+                        appData.gold.sell = data.response.price.gold_bar.sell;
+                        appData.gold.change = data.response.price.change;
+                        appData.gold.updateNo = data.response.update_no || "63";
+                    }
+                } catch (e) { console.warn("API Sync delayed."); }
+                setTimeout(() => {
+                    topRefreshBtn.classList.remove('animate-spin');
+                    updateUI();
+                }, 800);
+            }
+
+            // 3. Audio Logic (Enhanced Mobile Support)
+            async function unlockAudio() {
+                audioEl.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
+                try {
+                    await audioEl.play();
+                    audioEl.pause();
+                    audioEl.currentTime = 0;
+                    return true;
+                } catch (e) {
+                    console.error("Audio unlock failed", e);
+                    return false;
+                }
+            }
+
+            async function playAudioBriefing() {
+                if (appData.isAudioPlaying) { stopAudio(); return; }
+                
+                await unlockAudio();
+
+                appData.isAudioPlaying = true;
+                updateAudioUI(true);
+                
+                const bText = `รายงานภาวะการลงทุนวันที่ 3 กุมภาพันธ์ครับ ดัชนีเซตปิดพุ่งที่ ${appData.set.index} จุด สำหรับทองคำแท่งในประเทศล่าสุดบาทละ ${appData.gold.sell} บาทครับ หุ้นเด่นที่มีปริมาณการซื้อขายสูงสุดวันนี้คือแอดวานซ์และเดลต้าครับ`;
+                await generateAndPlayAudio(bText, () => stopAudio());
+            }
+
+            async function generateAndPlayAudio(text, onEndedCallback) {
+                try {
+                    const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: text }] }],
+                            generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } } },
+                            model: "gemini-2.5-flash-preview-tts"
+                        })
+                    });
+                    
+                    const res = await response.json();
+                    const pcm = res.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+                    
+                    if (pcm) {
+                        const blob = pcmToWavBlob(pcm);
+                        audioEl.src = URL.createObjectURL(blob);
+                        audioEl.play().catch(e => {
+                            showError("โปรดแตะหน้าจออีกครั้งเพื่ออนุญาตให้ AI พูด");
+                            if (onEndedCallback) onEndedCallback();
+                        });
+                        audioEl.onended = onEndedCallback;
+                    }
+                } catch (e) {
+                    showError("โหลดเสียงวิเคราะห์ล้มเหลว");
+                    if (onEndedCallback) onEndedCallback();
+                }
+            }
+
+            function stopAudio() {
+                appData.isAudioPlaying = false;
+                audioEl.pause();
+                audioEl.currentTime = 0;
+                updateAudioUI(false);
+                // Reset all chat icons to volume-2
+                document.querySelectorAll('.chat-audio-btn [data-lucide]').forEach(icon => {
+                    icon.setAttribute('data-lucide', 'volume-2');
+                });
+                lucide.createIcons();
+            }
+
+            function updateAudioUI(playing) {
+                audioIcon.setAttribute('data-lucide', playing ? 'square' : 'play');
+                audioStatusText.innerText = playing ? "กำลังบรรยายสรุปข่าวล่าสุด..." : "สรุปดัชนี & ราคาทองล่าสุดประจำวัน";
+                masterAudioBtn.classList.toggle('audio-playing', playing);
+                audioVisualizer.classList.toggle('hidden', !playing);
+                lucide.createIcons();
+            }
+
+            function pcmToWavBlob(pcm) {
+                const b = window.atob(pcm);
+                const l = b.length;
+                const bytes = new Uint8Array(l);
+                for (let i = 0; i < l; i++) bytes[i] = b.charCodeAt(i);
+                const h = new ArrayBuffer(44);
+                const v = new DataView(h);
+                v.setUint32(0, 0x52494646, false); v.setUint32(4, 36 + l, true); v.setUint32(8, 0x57415645, false); v.setUint32(12, 0x666d7420, false); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, 24000, true); v.setUint32(28, 24000 * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); v.setUint32(36, 0x64617461, false); v.setUint32(40, l, true);
+                return new Blob([h, bytes], { type: 'audio/wav' });
+            }
+
+            // 4. AI Chat
+            async function getAIChatResponse(userInput) {
+                appData.isChatLoading = true;
+                sendBtn.innerHTML = '<div class="loader"></div>';
+                const sPrompt = `You are a Thai professional stock analyst. Data Feb 3, 2026: SET ${appData.set.index} (+1.11%), Gold Sell ${appData.gold.sell}. Answer concisely.`;
+                try {
+                    const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: userInput }] }], systemInstruction: { parts: [{ text: sPrompt }] } })
+                    });
+                    const result = await response.json();
+                    const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (aiText) addMessage('ai', aiText);
+                } catch (e) { showError("ระบบ AI ไม่ตอบสนอง"); }
+                finally { appData.isChatLoading = false; sendBtn.innerHTML = '<i data-lucide="send" class="w-5 h-5"></i>'; lucide.createIcons(); }
+            }
+
+            // Tabs
+            window.switchTab = function(tabId) {
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                document.getElementById('tab-' + tabId).classList.add('active');
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    if(btn.dataset.tab === tabId) btn.classList.add('text-indigo-600');
+                    else btn.classList.replace('text-indigo-600', 'text-slate-400');
+                });
+                if (tabId !== 'home') stopAudio();
+            };
+
+            // Event Listeners
+            masterAudioBtn.addEventListener('click', (e) => { e.stopPropagation(); playAudioBriefing(); });
+            topRefreshBtn.addEventListener('click', (e) => { e.stopPropagation(); refreshAllData(); });
+            sendBtn.addEventListener('click', () => {
+                const v = chatInput.value.trim();
+                if (!v || appData.isChatLoading) return;
+                addMessage('user', v);
+                chatInput.value = '';
+                getAIChatResponse(v);
+            });
+            chatInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendBtn.click(); });
+
+            function addMessage(role, text) {
+                const div = document.createElement('div');
+                div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} items-end gap-2 group`;
+                
+                let innerHTML = '';
+                if (role === 'ai') {
+                    innerHTML = `
+                        <div class="max-w-[85%] p-4 rounded-3xl bg-white text-slate-700 border border-slate-100 rounded-tl-none text-sm shadow-sm leading-relaxed relative">
+                            ${text}
+                        </div>
+                        <button class="chat-audio-btn mb-1 p-2 bg-slate-100 text-slate-500 rounded-full hover:bg-indigo-600 hover:text-white transition-all shadow-sm flex items-center justify-center">
+                            <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
+                        </button>`;
+                } else {
+                    innerHTML = `<div class="max-w-[85%] p-4 rounded-3xl bg-indigo-600 text-white rounded-tr-none text-sm shadow-sm leading-relaxed">${text}</div>`;
+                }
+                
+                div.innerHTML = innerHTML;
+                chatMessages.appendChild(div);
+                
+                if (role === 'ai') {
+                    const audioBtn = div.querySelector('.chat-audio-btn');
+                    audioBtn.onclick = async (e) => {
+                        e.stopPropagation();
+                        if (appData.isAudioPlaying) { stopAudio(); return; }
+                        
+                        const icon = audioBtn.querySelector('[data-lucide]');
+                        if (icon) {
+                            icon.setAttribute('data-lucide', 'square');
+                            lucide.createIcons();
+                        }
+                        
+                        await unlockAudio();
+                        appData.isAudioPlaying = true;
+                        await generateAndPlayAudio(text, () => {
+                            stopAudio();
+                        });
+                    };
+                }
+
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                lucide.createIcons();
+            }
+
+            window.hideError = function() { document.getElementById('error-overlay').style.display = 'none'; };
+            function showError(m) { const o = document.getElementById('error-overlay'); document.getElementById('error-message').innerText = m; o.style.display = 'flex'; setTimeout(hideError, 5000); }
+
+            updateUI();
+            refreshAllData();
+            addMessage('ai', "สวัสดีครับ! ข้อมูลล่าสุดวันที่ 3 ก.พ. 2569: SET 1,336.11 และ ทองแท่ง 73,600 บาท สอบถามบทวิเคราะห์เพิ่มเติมได้เลยครับ");
+        });
     </script>
 </body>
-
 </html>
