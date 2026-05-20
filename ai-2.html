@@ -1,0 +1,2165 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sales Roleplay Simulator - SalesSim Live</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Kanit', 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        
+        .ttb-gradient {
+            background: linear-gradient(135deg, #002d62 0%, #014694 50%, #f05a22 100%);
+        }
+        
+        .ttb-blue-gradient {
+            background: linear-gradient(135deg, #002d62 0%, #014694 100%);
+        }
+
+        .card-premium {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.25rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        
+        .card-premium:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -8px rgba(0, 45, 98, 0.12), 0 4px 12px -2px rgba(0, 45, 98, 0.08);
+            border-color: #cbd5e1;
+        }
+
+        .btn-ttb-primary {
+            background-color: #f05a22;
+            color: white;
+            font-weight: 600;
+            border-radius: 0.75rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(240, 90, 34, 0.2);
+        }
+        
+        .btn-ttb-primary:hover:not(:disabled) {
+            background-color: #d84815;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(240, 90, 34, 0.3);
+        }
+        
+        .btn-ttb-primary:disabled {
+            background-color: #cbd5e1;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .btn-ttb-secondary {
+            background-color: #002d62;
+            color: white;
+            font-weight: 600;
+            border-radius: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-ttb-secondary:hover:not(:disabled) {
+            background-color: #001f44;
+            transform: translateY(-1px);
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+            padding: 1rem 1.25rem;
+            border-radius: 1.25rem;
+            line-height: 1.6;
+        }
+
+        .user-bubble {
+            background-color: #014694;
+            color: white;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        .ai-bubble {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            border-bottom-left-radius: 0.25rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .pulse-accent {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(240, 90, 34, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(240, 90, 34, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(240, 90, 34, 0); }
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .glowing-circle {
+            animation: glow 3s infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(14, 165, 233, 0.5), 0 0 20px rgba(14, 165, 233, 0.3); }
+            100% { transform: scale(1.05); box-shadow: 0 0 30px rgba(14, 165, 233, 0.8), 0 0 50px rgba(14, 165, 233, 0.5); }
+        }
+
+        /* Wave visualizer animation */
+        .wave-bar {
+            width: 4px;
+            height: 15px;
+            background-color: #06b6d4;
+            border-radius: 2px;
+            animation: wave-bounce 1s ease-in-out infinite alternate;
+        }
+        @keyframes wave-bounce {
+            0% { height: 5px; }
+            100% { height: 40px; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col pt-16">
+
+    <!-- Login View -->
+    <div id="login-view" class="fixed inset-0 bg-slate-50 flex items-center justify-center z-[100] transition-opacity duration-300">
+        <div class="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl border border-slate-100 mx-4">
+            <div class="text-center">
+                <div class="w-16 h-16 ttb-gradient rounded-2xl flex items-center justify-center mx-auto shadow-md">
+                    <i class="fas fa-headset text-3xl text-white"></i>
+                </div>
+                <h2 class="mt-6 text-3xl font-extrabold text-slate-800 tracking-tight">SalesSim Live</h2>
+                <p class="text-slate-500 mt-2 mb-6">AI Real-Time Voice Roleplay & Training</p>
+            </div>
+            
+            <form id="login-form" class="space-y-4" onsubmit="event.preventDefault();">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700">รหัสพนักงาน</label>
+                    <input type="text" id="employee-id" required class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800" placeholder="ระบุรหัสพนักงาน เช่น 55018" value="55018">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700">ชื่อ-นามสกุล</label>
+                    <input type="text" id="employee-name" required class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800" placeholder="ระบุชื่อจริง เช่น อภิชาติ เลิศเดชา" value="อภิชาติ เลิศเดชา">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700">Gemini API Key (เลือกใส่หรือไม่ก็ได้)</label>
+                    <input type="password" id="custom-api-key" class="mt-1 block w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800" placeholder="เว้นว่างเพื่อเริ่มเข้าใช้งานโหมดเสียงเสถียร">
+                    <span class="text-[10px] text-slate-400 mt-1 block">ระบบมีกลไกสลับใช้งาน Web Speech API ทันทีหากไม่ได้ระบุคีย์</span>
+                </div>
+                <button type="submit" id="login-btn" class="w-full btn-ttb-primary py-3.5 px-4 rounded-xl text-base font-semibold flex items-center justify-center gap-2">
+                    เข้าสู่ระบบจำลอง <i class="fas fa-microphone text-sm"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav id="app-nav" class="bg-white/80 backdrop-blur-lg border-b border-slate-200/80 fixed top-0 left-0 right-0 z-40 hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="flex items-center gap-2 text-xl font-bold text-slate-800">
+                        <span class="w-8 h-8 ttb-blue-gradient rounded-lg flex items-center justify-center">
+                            <i class="fas fa-waveform text-sm text-white"></i>
+                        </span>
+                        SalesSim Live
+                    </span>
+                </div>
+                
+                <div class="hidden lg:flex space-x-1 items-center">
+                    <button id="nav-roleplay" class="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-all">
+                        <i class="fas fa-user-friends"></i> Roleplay
+                    </button>
+                    <button id="nav-specialist" class="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-all">
+                        <i class="fas fa-user-tie"></i> Product Specialist
+                    </button>
+                    <button id="nav-quiz" class="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-all">
+                        <i class="fas fa-graduation-cap"></i> Quiz Game
+                    </button>
+                    <button id="nav-news" class="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-all">
+                        <i class="far fa-newspaper"></i> Daily News
+                    </button>
+                    <button id="nav-leaderboard" class="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-all">
+                        <i class="fas fa-trophy"></i> Leaderboard
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div id="user-info" class="flex items-center gap-2">
+                        <div class="text-right hidden sm:block">
+                            <div id="user-display-name" class="text-sm font-semibold text-slate-800 leading-tight"></div>
+                            <span class="text-xs text-slate-400">ผู้แนะนำการเงิน ttb</span>
+                        </div>
+                        <div class="w-9 h-9 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">
+                            <i class="fas fa-user-circle text-lg"></i>
+                        </div>
+                    </div>
+                    <button id="logout-btn" class="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all" title="ออกจากระบบ">
+                        <i class="fas fa-sign-out-alt text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation bar bottom -->
+        <div class="lg:hidden border-t border-slate-100 bg-white grid grid-cols-5 py-1">
+            <button onclick="showView('customer-list-view')" class="mobile-nav-btn text-center text-slate-500 hover:text-slate-900 active-tab py-1 flex flex-col items-center gap-0.5">
+                <i class="fas fa-user-friends text-sm"></i>
+                <span class="text-[10px] font-medium">Roleplay</span>
+            </button>
+            <button onclick="showView('specialist-view')" class="mobile-nav-btn text-center text-slate-500 hover:text-slate-900 py-1 flex flex-col items-center gap-0.5">
+                <i class="fas fa-user-tie text-sm"></i>
+                <span class="text-[10px] font-medium">Specialist</span>
+            </button>
+            <button onclick="showView('quiz-view')" class="mobile-nav-btn text-center text-slate-500 hover:text-slate-900 py-1 flex flex-col items-center gap-0.5">
+                <i class="fas fa-graduation-cap text-sm"></i>
+                <span class="text-[10px] font-medium">Quiz</span>
+            </button>
+            <button onclick="showView('news-view'); fetchNews();" class="mobile-nav-btn text-center text-slate-500 hover:text-slate-900 py-1 flex flex-col items-center gap-0.5">
+                <i class="far fa-newspaper text-sm"></i>
+                <span class="text-[10px] font-medium">News</span>
+            </button>
+            <button onclick="showView('leaderboard-view')" class="mobile-nav-btn text-center text-slate-500 hover:text-slate-900 py-1 flex flex-col items-center gap-0.5">
+                <i class="fas fa-trophy text-sm"></i>
+                <span class="text-[10px] font-medium">Leader</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main views wrapper -->
+    <main id="main-content" class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 hidden pb-24 lg:pb-8">
+        
+        <!-- View 1: Customer list selection -->
+        <div id="customer-list-view" class="main-view">
+            <!-- Intelligent Notice banner for microphone usage in iframes -->
+            <div class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between text-amber-800 text-sm">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-info-circle text-lg flex-shrink-0"></i>
+                    <p><strong>แนะนำความเสถียร:</strong> หากพบปัญหาในการเข้าถึงไมโครโฟน โปรดตรวจสอบความถูกต้องของการให้สิทธิ์ใช้ไมค์บนบราวเซอร์ของคุณ หรือเปิดลิงก์ในแท็บใหม่</p>
+                </div>
+            </div>
+
+            <header class="mb-10 text-center lg:text-left">
+                <h1 class="text-3xl font-extrabold text-slate-900">AI Sales Roleplay Simulator</h1>
+                <p class="text-slate-500 mt-2">โปรดเลือกโปรไฟล์ลูกค้าเพื่อเริ่มต้นการจำลองสถานการณ์การขายและทดสอบการคุยด้วยเสียงจริง</p>
+            </header>
+            <div id="customer-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Customer cards generated by JS -->
+            </div>
+        </div>
+
+        <!-- View 2: Product Specialist overview -->
+        <div id="specialist-view" class="main-view hidden">
+            <header class="mb-10 text-center lg:text-left">
+                <h1 class="text-3xl font-extrabold text-slate-900">Product Specialist (AI Co-Pilot)</h1>
+                <p class="text-slate-500 mt-2">พบปะพูดคุยเพื่อสอบถามและเรียนรู้รายละเอียดผลิตภัณฑ์การเงินอย่างเจาะลึกจากผู้เชี่ยวชาญ AI ด้วยโหมดสนทนาคู่สายโทรศัพท์</p>
+            </header>
+            <div id="specialist-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Specialist cards generated by JS -->
+            </div>
+        </div>
+
+        <!-- View 3: Quiz Select product -->
+        <div id="quiz-view" class="main-view hidden">
+            <header class="mb-10 text-center lg:text-left">
+                <h1 class="text-3xl font-extrabold text-slate-900">Knowledge Quiz Game</h1>
+                <p class="text-slate-500 mt-2">ทดสอบความรู้ความเข้าใจเกี่ยวกับผลิตภัณฑ์ของ ttb พร้อมระบบจับเวลาและรับใบรับรองคะแนน</p>
+            </header>
+            <div id="quiz-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Quiz category cards generated by JS -->
+            </div>
+        </div>
+
+        <!-- View 4: Product Detail Sheets -->
+        <div id="quiz-product-detail-view" class="main-view hidden">
+            <div id="product-detail-content">
+                <!-- Dynamically injected -->
+            </div>
+        </div>
+
+        <!-- View 5: Daily News Summaries -->
+        <div id="news-view" class="main-view hidden">
+            <header class="mb-10 text-center lg:text-left">
+                <h1 class="text-3xl font-extrabold text-slate-900">Daily Economic & Investment News</h1>
+                <p class="text-slate-500 mt-2">สรุปวิเคราะห์แนวโน้มตลาดทองคำ หุ้น น้ำมัน และปัจจัยระดับโลกเพื่อใช้อัปเดตกับลูกค้า</p>
+            </header>
+            <div id="news-content-wrapper">
+                <!-- News cards injected dynamically -->
+            </div>
+        </div>
+
+        <!-- View 6: Leaderboard standings -->
+        <div id="leaderboard-view" class="main-view hidden">
+            <header class="mb-10 text-center lg:text-left">
+                <h1 class="text-3xl font-extrabold text-slate-900">SalesSim Champion Leaderboard</h1>
+                <p class="text-slate-500 mt-2">ตารางจัดอันดับพนักงานขายที่ทำผลงานคะแนนประเมินเฉลี่ยสะสมได้ดีที่สุด</p>
+            </header>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200">
+                                <th class="p-5 text-xs font-bold uppercase tracking-wider text-slate-500 w-24 text-center">อันดับ</th>
+                                <th class="p-5 text-xs font-bold uppercase tracking-wider text-slate-500">พนักงาน</th>
+                                <th class="p-5 text-xs font-bold uppercase tracking-wider text-slate-500">รหัสพนักงาน</th>
+                                <th class="p-5 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">คะแนนจำลองเฉลี่ย</th>
+                                <th class="p-5 text-xs font-bold uppercase tracking-wider text-slate-500 text-center">การทดสอบล่าสุด</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body" class="divide-y divide-slate-100 text-slate-700">
+                            <!-- Table rows generated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- View 7: Active Quiz Interface -->
+        <div id="quiz-interface-view" class="main-view hidden max-w-3xl mx-auto">
+            <div class="bg-white rounded-3xl shadow-lg border border-slate-200/80 p-6 md:p-8">
+                <div class="flex items-center justify-between mb-8 border-b border-slate-100 pb-5">
+                    <div>
+                        <h2 id="quiz-title" class="text-2xl font-bold text-slate-800"></h2>
+                        <p id="quiz-progress" class="text-sm font-semibold text-slate-500 mt-1"></p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div id="quiz-timer-box" class="flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-xl font-bold text-lg">
+                            <i class="far fa-clock"></i>
+                            <span id="quiz-timer">30</span>
+                        </div>
+                        <button id="quiz-sound-toggle" class="w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-600 border border-slate-200" title="เปิด/ปิด เสียงบรรยาย">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="quiz-question-card" class="bg-slate-50 rounded-2xl p-6 mb-6 min-h-[140px] flex items-center justify-center border border-slate-100">
+                    <p id="quiz-question-text" class="text-lg md:text-xl text-slate-800 font-semibold text-center leading-relaxed"></p>
+                </div>
+                
+                <div id="quiz-options" class="grid grid-cols-1 gap-4">
+                    <!-- Option buttons will be generated dynamically -->
+                </div>
+                
+                <!-- Feedback panel -->
+                <div id="quiz-feedback" class="mt-6 p-5 rounded-2xl hidden transition-all duration-300">
+                    <div class="flex items-start gap-3">
+                        <div id="feedback-icon-box" class="w-8 h-8 rounded-full flex items-center justify-center text-white mt-0.5"></div>
+                        <div>
+                            <h4 id="quiz-feedback-title" class="font-bold text-lg"></h4>
+                            <p id="quiz-feedback-text" class="mt-1 text-slate-600 text-sm leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-right mt-8 border-t border-slate-100 pt-6">
+                    <button id="quiz-next-btn" class="btn-ttb-primary px-8 py-3.5 flex items-center gap-2 inline-flex ml-auto">
+                        <span>ถัดไป</span> <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- View 8: Quiz Summary Result Card -->
+        <div id="quiz-results-view" class="main-view hidden max-w-xl mx-auto">
+            <div class="bg-white rounded-3xl shadow-lg border border-slate-200/80 p-8 text-center">
+                <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-sm">
+                    <i class="fas fa-award"></i>
+                </div>
+                <h2 class="text-3xl font-extrabold text-slate-800">สรุปคะแนนการทดสอบ</h2>
+                <p id="quiz-results-product" class="text-lg text-slate-500 mt-2 font-medium"></p>
+                
+                <div class="my-8">
+                    <div class="inline-block relative">
+                        <p id="quiz-results-score" class="text-7xl font-extrabold text-slate-800 leading-none">0/5</p>
+                        <span class="absolute -top-1 -right-4 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span></span>
+                    </div>
+                </div>
+
+                <div id="quiz-evaluation" class="text-left rounded-2xl p-5 border border-slate-150 mb-8 bg-slate-50">
+                    <!-- Injected details -->
+                </div>
+
+                <button onclick="showView('quiz-view')" class="btn-ttb-primary w-full py-4 text-base">
+                    กลับสู่เมนู Quiz
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Roleplay Chat Environment Screen -->
+    <div id="roleplay-view" class="hidden fixed inset-0 bg-slate-100 z-50 flex flex-col h-screen w-screen overflow-hidden">
+        
+        <!-- Header -->
+        <header class="bg-white border-b border-slate-200 p-4 shadow-sm flex items-center justify-between flex-shrink-0 z-10">
+            <div class="flex items-center gap-2 flex-wrap">
+                <button id="back-to-list-btn" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all flex items-center gap-1.5 border border-slate-200">
+                    <i class="fas fa-arrow-left"></i> กลับ
+                </button>
+                <button id="show-roleplay-info-btn" class="px-4 py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold rounded-xl text-sm transition-all flex items-center gap-1.5 border border-sky-100">
+                    <i class="fas fa-id-card"></i> แฟ้มประวัติลูกค้า
+                </button>
+                <button id="show-scoring-btn" onclick="showScoringInfo()" class="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold rounded-xl text-sm transition-all flex items-center gap-1.5 border border-emerald-100">
+                    <i class="fas fa-star-half-alt"></i> เกณฑ์ประเมิน
+                </button>
+                <button id="end-chat-btn" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl text-sm transition-all flex items-center gap-1.5 shadow-md shadow-red-500/10 disabled:bg-slate-300 disabled:shadow-none">
+                    <i class="fas fa-flag-checkered"></i> จบการขาย
+                </button>
+            </div>
+            
+            <div id="roleplay-customer-profile" class="flex items-center gap-3">
+                <!-- Avatar and Profile name generated dynamically -->
+            </div>
+        </header>
+
+        <!-- Dynamic Dossier / Chat Dual Column Panel -->
+        <div class="flex-1 flex overflow-hidden">
+            <!-- Left Panel: Conversation Chat Stream -->
+            <div class="flex-1 flex flex-col bg-slate-50 overflow-hidden h-full relative">
+                <!-- Context notification banner -->
+                <div id="conversation-context" class="p-3 bg-blue-50/95 backdrop-blur-sm border-b border-blue-100 text-xs md:text-sm text-blue-800 flex items-center gap-2 font-medium">
+                    <!-- Context brief injected -->
+                </div>
+
+                <!-- Chat history viewport -->
+                <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 no-scrollbar">
+                    <!-- Chat bubbles are injected here -->
+                </div>
+
+                <!-- Voice / Microphone Active Calling Screen Overlay (Integrated with STT + Web Speech fallback) -->
+                <div id="live-voice-call-overlay" class="absolute inset-0 bg-slate-950/95 z-20 flex flex-col items-center justify-center p-6 hidden text-white text-center">
+                    <div class="mb-6 relative">
+                        <div class="w-32 h-32 rounded-full glowing-circle bg-sky-500/10 flex items-center justify-center border border-sky-400/30">
+                            <img id="live-call-avatar" src="" alt="Customer" class="w-28 h-28 rounded-full object-cover">
+                        </div>
+                        <span id="live-indicator-badge" class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-sky-500 text-white text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider animate-pulse flex items-center gap-1">
+                            <i class="fas fa-phone-alt text-[10px]"></i> CALLING
+                        </span>
+                    </div>
+
+                    <h2 id="live-call-name" class="text-2xl font-bold mb-1">...</h2>
+                    <p id="live-call-status" class="text-sm text-sky-400 mb-6">กำลังเชื่อมต่อไมโครโฟนอัจฉริยะ...</p>
+
+                    <!-- Real-time audio waveform visualizer -->
+                    <div id="voice-waves-container" class="w-full max-w-md h-24 bg-slate-900/50 rounded-2xl border border-slate-800 flex items-center justify-center gap-1 p-4 mb-6">
+                        <div class="wave-bar" style="animation-delay: 0.1s"></div>
+                        <div class="wave-bar" style="animation-delay: 0.3s"></div>
+                        <div class="wave-bar" style="animation-delay: 0.5s"></div>
+                        <div class="wave-bar" style="animation-delay: 0.2s"></div>
+                        <div class="wave-bar" style="animation-delay: 0.4s"></div>
+                        <div class="wave-bar" style="animation-delay: 0.6s"></div>
+                    </div>
+
+                    <!-- Realtime dual transcription view -->
+                    <div class="w-full max-w-lg space-y-4 mb-8 text-left bg-slate-900/70 p-5 rounded-2xl border border-slate-800 max-h-48 overflow-y-auto no-scrollbar">
+                        <div id="live-user-transcript" class="text-slate-400 text-sm">
+                            <strong class="text-sky-400"><i class="fas fa-microphone mr-1.5"></i>เสียงพูดของคุณ (กำลังฟัง):</strong>
+                            <p class="italic mt-1 text-slate-300">เริ่มพูดใส่ไมโครโฟนได้เลยระบบกำลังรอรับเสียงพูดของคุณ...</p>
+                        </div>
+                        <div id="live-ai-transcript" class="text-slate-400 text-sm border-t border-slate-800/80 pt-3">
+                            <strong class="text-orange-400"><i class="fas fa-volume-up mr-1.5"></i>เสียงตอบกลับลูกค้า (TTS):</strong>
+                            <p class="italic mt-1 text-slate-300">รอรับฟังเสียงธรรมชาติจากคู่สาย...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <button id="mute-voice-btn" class="w-12 h-12 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-white text-lg transition-colors border border-slate-700" title="ปิดเสียงชั่วคราว">
+                            <i class="fas fa-microphone-slash"></i>
+                        </button>
+                        <button id="hangup-voice-btn" class="px-8 py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl flex items-center gap-2 shadow-lg shadow-red-600/30 transition-all">
+                            <i class="fas fa-phone-slash"></i> วางสาย / สลับเป็นพิมพ์
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Footer TextInput Control Panel -->
+                <div class="p-4 bg-white border-t border-slate-200 flex items-center gap-3">
+                    <button id="start-voice-call-btn" class="w-12 h-12 bg-sky-50 hover:bg-sky-100 text-sky-600 flex-shrink-0 flex items-center justify-center rounded-2xl border border-sky-200 transition-colors shadow-sm" title="เปิดไมค์สนทนาด้วยเสียงสด">
+                        <i class="fas fa-microphone text-xl"></i>
+                    </button>
+                    <textarea id="chat-input" rows="1" class="flex-1 border border-slate-200 bg-slate-50 focus:bg-white rounded-2xl p-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 transition-all resize-none no-scrollbar text-sm md:text-base max-h-32" placeholder="พิมพ์ข้อความ หรือกดปุ่มไมโครโฟนซ้ายมือเพื่อคุยเสียงสด..."></textarea>
+                    <button id="send-button" class="btn-ttb-primary w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-2xl">
+                        <i class="fas fa-paper-plane text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Panel: Side Dossier on Large Screen -->
+            <aside id="desktop-dossier" class="hidden lg:block w-80 bg-white border-l border-slate-200 overflow-y-auto p-6 flex-shrink-0">
+                <div class="sticky top-0">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-3"><i class="fas fa-folder-open text-blue-600 mr-2"></i>ประวัติลูกค้า (Dossier)</h3>
+                    <div id="dossier-inner" class="space-y-4 text-sm text-slate-600">
+                        <!-- Customer dossier sheet injected by JS -->
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Specialist Consultation Chat Screen -->
+    <div id="specialist-chat-view" class="hidden fixed inset-0 bg-slate-100 z-50 flex flex-col h-screen w-screen overflow-hidden">
+        <!-- Header -->
+        <header class="bg-white border-b border-slate-200 p-4 shadow-sm flex items-center justify-between flex-shrink-0 z-10">
+            <button id="back-to-specialist-list-btn" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all flex items-center gap-1.5 border border-slate-200">
+                <i class="fas fa-arrow-left"></i> กลับหน้าผู้เชี่ยวชาญ
+            </button>
+            <div id="specialist-chat-profile" class="flex items-center gap-3">
+                <!-- Profile details -->
+            </div>
+            <button id="end-specialist-chat-btn" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl text-sm transition-all flex items-center gap-1.5 shadow-md shadow-red-500/10">
+                <i class="fas fa-star"></i> ให้คะแนนคำปรึกษา
+            </button>
+        </header>
+
+        <!-- Conversational body area -->
+        <div id="specialist-chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-slate-50 no-scrollbar relative">
+            <!-- Messages stream -->
+        </div>
+
+        <!-- Consultation Input Bar -->
+        <div class="p-4 bg-white border-t border-slate-200 flex items-center gap-3">
+            <textarea id="specialist-chat-input" rows="1" class="flex-1 border border-slate-200 bg-slate-50 focus:bg-white rounded-2xl p-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 transition-all resize-none no-scrollbar text-sm md:text-base max-h-32" placeholder="ป้อนคำถามเกี่ยวกับผลิตภัณฑ์ที่คุณสงสัยเพื่อศึกษาเพิ่มเติม..."></textarea>
+            <button id="specialist-send-button" class="btn-ttb-primary w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-2xl">
+                <i class="fas fa-paper-plane text-lg"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modals Viewports -->
+    
+    <!-- Dossier Modal for Small devices -->
+    <div id="info-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 md:p-8 max-w-lg w-full max-h-[85vh] flex flex-col relative">
+            <div id="info-modal-content" class="overflow-y-auto flex-1 no-scrollbar text-slate-700 pr-1"></div>
+            <div class="mt-6 text-center border-t border-slate-100 pt-5 flex-shrink-0">
+                <button onclick="closeInfoModal()" class="btn-ttb-secondary px-8 py-2.5">ตกลง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Roleplay Live Evaluation scorecard Modal -->
+    <div id="evaluation-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 md:p-8 max-w-2xl w-full max-h-[90vh] flex flex-col relative">
+            <h2 class="text-2xl font-black text-center mb-6 text-slate-800">รายงานวิเคราะห์ผลประเมิน</h2>
+            <div id="evaluation-content" class="overflow-y-auto flex-1 no-scrollbar text-slate-700 pr-1 space-y-5"></div>
+            <div class="text-center mt-6 border-t border-slate-100 pt-5 flex-shrink-0">
+                <button onclick="closeEvaluationModalAndReset()" class="btn-ttb-primary px-8 py-3">ปิดหน้าประเมินและรีเซ็ต</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard detailed score history modal -->
+    <div id="leaderboard-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 md:p-8 max-w-lg w-full max-h-[80vh] flex flex-col relative text-slate-700">
+            <div id="leaderboard-modal-content" class="overflow-y-auto flex-1 no-scrollbar pr-1"></div>
+            <div class="mt-6 text-center border-t border-slate-100 pt-5">
+                <button onclick="closeLeaderboardModal()" class="btn-ttb-secondary px-8 py-2.5">กลับ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scoring guidelines Info Modal -->
+    <div id="scoring-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 md:p-8 max-w-lg w-full max-h-[80vh] flex flex-col relative text-slate-700">
+            <div id="scoring-modal-content" class="overflow-y-auto flex-1 no-scrollbar pr-1"></div>
+            <div class="mt-6 text-center border-t border-slate-100 pt-5">
+                <button onclick="closeScoringModal()" class="btn-ttb-secondary px-8 py-2.5">รับทราบเกณฑ์ประเมิน</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Specialist rating interactive stars Modal -->
+    <div id="rating-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 max-w-sm w-full relative text-center">
+            <img id="rating-specialist-image" src="" alt="Specialist" class="w-20 h-20 rounded-full object-cover border-4 border-slate-150 mx-auto -mt-16 mb-4 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-800">ประเมินทักษะการให้คำปรึกษา</h2>
+            <p id="rating-specialist-name" class="text-slate-500 mb-6 text-sm"></p>
+            
+            <div id="rating-stars-container" class="flex justify-center text-3xl gap-2 mb-4 text-slate-300">
+                <!-- Star icons injected dynamically -->
+            </div>
+            
+            <p id="rating-feedback" class="text-emerald-600 font-semibold h-6 text-sm"></p>
+            <div class="mt-4 flex gap-2 justify-center">
+                <button onclick="closeRatingModal()" class="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-all border border-slate-200">
+                    เสร็จสิ้น
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Importing Gemini official client-side modules -->
+    <script type="module">
+        import { GoogleGenAI, LiveServerMessage, Modality } from 'https://esm.sh/@google/genai';
+
+        // --- DATA STRUCTURES ---
+        const customers = [
+            {
+                id: 1,
+                name: 'สมชาย เกียรติสกุล',
+                age: 62,
+                gender: 'male',
+                image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+                title: 'Senior Business Owner',
+                segment: 'Platinum',
+                riskAppetite: 'Conservative',
+                details: {
+                    'Suitability Score': '1',
+                    'Main bank': 'SCB',
+                    'ttb Payroll': 'ไม่เป็น',
+                    'เคยซื้อ Structured Note': 'ไม่เคย',
+                    'เคยซื้อหุ้นกู้ (Bond)': 'เคย',
+                    'เคยซื้อ MF Type B': 'ไม่เคย',
+                    'เคยซื้อกองทุนลดหย่อนภาษี': 'เคย',
+                    'เคยมีประสบการณ์ FX': 'ไม่เคย'
+                },
+                summary: 'ผมเป็นเจ้าของธุรกิจใหญ่ใกล้เกษียณ มีความมั่งคั่งสูง แต่กังวลเรื่องความเสี่ยงและเน้นการรักษาเงินต้นเป็นหลัก สนใจการลงทุนที่ให้ผลตอบแทนดีกว่าเงินฝากแต่ต้องปลอดภัยสูง',
+                personaPrompt: 'คุณคือ สมชาย เกียรติสกุล, เจ้าของธุรกิจวัย 62 ปีที่ประสบความสำเร็จและกำลังวางแผนเกษียณ คุณเป็นคนรอบคอบมากเรื่องการเงิน ไม่ชอบความเสี่ยง และให้ความสำคัญกับการรักษาเงินต้นสูงสุด คุณมีประสบการณ์ลงทุนในกองทุนลดหย่อนภาษีบ้าง แต่ไม่เคยแตะผลิตภัณฑ์ที่ซับซ้อน เป้าหมายของคุณคือหาผลตอบแทนที่ชนะเงินเฟ้อโดยไม่ต้องเสี่ยงมากเกินไป คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ'
+            },
+            {
+                id: 2,
+                name: 'อลิสา วัฒนากุล',
+                age: 35,
+                gender: 'female',
+                image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=face',
+                title: 'Tech Startup Founder',
+                segment: 'Gold',
+                riskAppetite: 'Growth Investor',
+                details: {
+                    'Suitability Score': '4',
+                    'Main bank': 'ttb',
+                    'ttb Payroll': 'เป็น',
+                    'เคยซื้อ Structured Note': 'เคย',
+                    'เคยซื้อหุ้นกู้ (Bond)': 'เคย',
+                    'เคยซื้อ MF Type B': 'เคย',
+                    'เคยซื้อกองทุนลดหย่อนภาษี': 'ไม่เคย',
+                    'เคยมีประสบการณ์ FX': 'เคย'
+                },
+                summary: 'ดิฉันเป็นผู้ก่อตั้งสตาร์ทอัพด้านเทคโนโลยี มีรายได้สูงและยอมรับความเสี่ยงได้ดี มองหาการลงทุนที่เติบโตสูงในระยะยาว และสนใจนวัตกรรมการเงินใหม่ๆ',
+                personaPrompt: 'คุณคือ อลิสา วัฒนากุล, CEO สตาร์ทอัพเทคโนโลยีวัย 35 ปี คุณมีความเข้าใจในเทคโนโลยีเป็นอย่างดีและยอมรับความเสี่ยงได้สูงเพื่อผลตอบแทนที่คุ้มค่า คุณมองหาการลงทุนที่จะช่วยต่อยอดความมั่งคั่งอย่างรวดเร็ว และไม่กลัวความผันผวนในระยะสั้น คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ'
+            },
+            {
+                id: 3,
+                name: 'ปรีชา ตั้งใจจริง',
+                age: 45,
+                gender: 'male',
+                image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face',
+                title: 'Government Officer',
+                segment: 'Silver',
+                riskAppetite: 'Balanced',
+                details: {
+                    'Suitability Score': '3',
+                    'Main bank': 'KBANK',
+                    'ttb Payroll': 'เป็น',
+                    'เคยซื้อ Structured Note': 'ไม่เคย',
+                    'เคยซื้อหุ้นกู้ (Bond)': 'เคย',
+                    'เคยซื้อ MF Type B': 'เคย',
+                    'เคยซื้อกองทุนลดหย่อนภาษี': 'เคย',
+                    'เคยมีประสบการณ์ FX': 'ไม่เคย'
+                },
+                summary: 'ผมเป็นข้าราชการระดับสูง มีความมั่นคงในอาชีพ ต้องการวางแผนการเงินเพื่อการศึกษาบุตรและวัยเกษียณ รับความเสี่ยงได้ปานกลาง เน้นการลงทุนแบบสมดุล',
+                personaPrompt: 'คุณคือ ปรีชา ตั้งใจจริง, ข้าราชการวัย 45 ปี คุณมีเป้าหมายทางการเงินที่ชัดเจนคือเพื่อการศึกษาของลูกและเพื่อการเกษียณอย่างสุขสบาย คุณไม่ต้องการความเสี่ยงที่สูงเกินไป แต่ก็เข้าใจว่าการฝากเงินอย่างเดียวไม่เพียงพอ คุณมองหาการลงทุนที่สมดุลระหว่างการเติบโตและความมั่นคง คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ'
+            },
+            {
+                id: 4,
+                name: 'มาลินี สดใส',
+                age: 28,
+                gender: 'female',
+                image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face',
+                title: 'Freelance Designer',
+                segment: 'Basic',
+                riskAppetite: 'Conservative',
+                details: {
+                    'Suitability Score': '2',
+                    'Main bank': 'SCB',
+                    'ttb Payroll': 'ไม่เป็น',
+                    'เคยซื้อ Structured Note': 'ไม่เคย',
+                    'เคยซื้อหุ้นกู้ (Bond)': 'ไม่เคย',
+                    'เคยซื้อ MF Type B': 'ไม่เคย',
+                    'เคยซื้อกองทุนลดหย่อนภาษี': 'ไม่เคย',
+                    'เคยมีประสบการณ์ FX': 'ไม่เคย'
+                },
+                summary: 'ฉันเป็นดีไซน์เนอร์ฟรีแลนซ์ค่ะ เพิ่งเริ่มสร้างตัวและเก็บเงิน มีความรู้ด้านการเงินจำกัด ต้องการลงทุนที่เข้าใจง่าย ความเสี่ยงต่ำ และมีสภาพคล่อง',
+                personaPrompt: 'คุณคือ มาลินี สดใส, ฟรีแลนซ์ดีไซน์เนอร์วัย 28 ปี คุณเพิ่งเริ่มอาชีพและกำลังสร้างความมั่นคงทางการเงิน คุณกลัวการขาดทุนและอยากเริ่มต้นลงทุนกับอะไรที่ปลอดภัย เข้าใจง่าย และสามารถนำเงินออกมาใช้ได้เมื่อจำเป็น คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ'
+            },
+            {
+                id: 5,
+                name: 'วิลเลียม เฉิน',
+                age: 50,
+                gender: 'male',
+                image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face',
+                title: 'Expat Executive',
+                segment: 'Platinum',
+                riskAppetite: 'Aggressive',
+                details: {
+                    'Suitability Score': '5',
+                    'Main bank': 'ttb',
+                    'ttb Payroll': 'เป็น',
+                    'เคยซื้อ Structured Note': 'เคย',
+                    'เคยซื้อหุ้นกู้ (Bond)': 'เคย',
+                    'เคยซื้อ MF Type B': 'เคย',
+                    'เคยซื้อกองทุนลดหย่อนภาษี': 'เคย',
+                    'เคยมีประสบการณ์ FX': 'เคย'
+                },
+                summary: 'ผมเป็นผู้บริหารชาวต่างชาติที่ทำงานในไทย มีความรู้ด้านการลงทุนเป็นอย่างดีและรับความเสี่ยงได้สูงมาก มองหาโอกาสการลงทุนทั่วโลกเพื่อสร้างผลตอบแทนสูงสุด',
+                personaPrompt: 'คุณคือ วิลเลียม เฉิน, ผู้บริหารระดับสูงวัย 50 ปี คุณมีประสบการณ์การลงทุนทั่วโลกและมองหาผลตอบแทนที่ดีที่สุดเสมอ คุณไม่กลัวความเสี่ยงและสนใจผลิตภัณฑ์การเงินที่ซับซ้อนที่สามารถสร้าง Alpha ได้ คุณต้องการคุยกับที่ปรึกษาที่เข้าใจตลาดโลกและนำเสนอไอเดียที่น่าสนใจได้ คุณจะรอให้พนักงานเป็นฝ่ายเริ่มบทสนทนาก่อนเสมอ'
+            }
+        ];
+
+        const specialists = [
+            { id: 1, name: 'อ. ซัน', gender: 'male', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face', products: ['เงินฝากดิจิทัล', 'บัญชีเงินฝาก'], rating: 4.8, ratingsCount: 25 },
+            { id: 2, name: 'คุณปรียา (AI)', gender: 'female', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face', products: ['บัตรเครดิต', 'บัตรเดบิต'], rating: 4.6, ratingsCount: 18 },
+            { id: 3, name: 'อ. ท๊อป', gender: 'male', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face', products: ['กองทุนรวม', 'การลงทุน'], rating: 4.9, ratingsCount: 32 },
+            { id: 4, name: 'คุณนลินี (AI)', gender: 'female', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face', products: ['สินเชื่อบ้าน', 'สินเชื่อบุคคล'], rating: 4.7, ratingsCount: 21 },
+            { id: 5, name: 'คุณเจษฎา (AI)', gender: 'male', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', products: ['ประกันชีวิต', 'ประกันภัย'], rating: 4.5, ratingsCount: 15 },
+            { id: 6, name: 'อ. ตุ๊ก', gender: 'female', image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face', products: ['วางแผนการเงิน', 'สินเชื่อธุรกิจ'], rating: 4.8, ratingsCount: 29 }
+        ];
+
+        const quizProducts = [
+            { name: 'บัญชี ทีทีบี ออลล์ฟรี', desc: 'บัญชีเพื่อใช้ ที่ให้คุณใช้ชีวิตฟรีรอบด้าน' },
+            { name: 'บัญชี ทีทีบี โนฟิกซ์', desc: 'บัญชีออมเงินดิจิทัลที่ให้ดอกเบี้ยสูง ถอนเมื่อไหร่ก็ได้' },
+            { name: 'บัตรเครดิต ทีทีบี โซ ฟาสต์', desc: 'บัตรเครดิตสำหรับคนชอบสะสมคะแนน รับคะแนนเร็วทุกการใช้จ่าย' },
+            { name: 'บัตรเครดิต ทีทีบี โกลบอลเฮ้าส์', desc: 'บัตรเครดิตสำหรับคนรักบ้าน รับส่วนลดและสิทธิพิเศษที่ Global House' },
+            { name: 'สินเชื่อบ้านแลกเงิน ทีทีบี', desc: 'เปลี่ยนบ้านที่ปลอดภาระหนี้สินให้เป็นเงินก้อน เพิ่มสภาพคล่องในยามจำเป็น' }
+        ];
+
+        const productDetailsData = {
+            'บัญชี ทีทีบี ออลล์ฟรี': {
+                title: 'บัญชี ทีทีบี ออลล์ฟรี',
+                summary: 'ทีทีบี ออลล์ฟรี คือบัญชีที่ถูกออกแบบมาเพื่อการใช้งานในชีวิตประจำวันอย่างแท้จริง ให้คุณ "ใช้ชีวิตฟรีรอบด้าน" โดยไม่ต้องกังวลเรื่องค่าธรรมเนียมจุกจิกอีกต่อไป ไม่ว่าจะเป็นการทำธุรกรรมพื้นฐานอย่างการโอนเงิน กดเงิน หรือจ่ายบิล ก็ทำได้ฟรีไม่จำกัดจำนวนครั้งผ่านแอป ttb touch นอกจากนี้ยังมาพร้อมกับบัตรเดบิตที่มอบสิทธิประโยชน์เหนือกว่า ทั้งประกันอุบัติเหตุที่ครอบคลุมค่ารักษาพยาบาล และประกันการซื้อของออนไลน์ เพิ่มความมั่นใจและความคุค่าในบัญชีเดียว',
+                points: [
+                    '**ฟรีค่าธรรมเนียมแบบไร้กังวล:** กดเงินสดได้ทุกตู้ ทุกธนาคารทั่วประเทศ, โอนเงินต่างธนาคาร, จ่ายบิล, และเติมเงิน ทั้งหมดนี้ฟรีเมื่อทำผ่านแอปพลิเคชัน ttb touch',
+                    '**ความคุ้มครองที่เหนือกว่า:** รับฟรีประกันอุบัติเหตุ เพียงคงเงินในบัญชีไว้เฉลี่ย 5,000 บาทขึ้นไป ก็ได้รับความคุ้มครองชีวิตสูงสุด 3 ล้านบาท และค่ารักษาพยาบาลจากอุบัติเหตุครั้งละ 3,000 บาท โดยไม่ต้องสำรองจ่ายก่อน',
+                    '**ช้อปออนไลน์อย่างอุ่นใจ:** บัตรเดบิต ttb all free มาพร้อมประกันซื้อสินค้าออนไลน์ กรณีไม่ได้ของหรือสินค้าไม่ตรงปก คุ้มครองสูงสุด 5,000 บาทต่อครั้ง',
+                    '**คล่องตัวทุกการใช้งาน:** สามารถเปิดบัญชีได้โดยไม่มีขั้นต่ำ และใช้งานบัตรเดบิตเพื่อแตะจ่าย (Contactless) หรือรูดซื้อสินค้าได้ทั่วโลกที่มีสัญลักษณ์ Visa'
+                ]
+            },
+            'บัญชี ทีทีบี โนฟิกซ์': {
+                title: 'บัญชี ทีทีบี โนฟิกซ์',
+                summary: 'ทีทีบี โนฟิกซ์ เป็นบัญชีเงินฝากออมทรัพย์ดิจิทัลที่ให้ดอกเบี้ยสูงเทียบเท่าเงินฝากประจำ แต่ให้อิสระในการถอนเงินได้ตลอดเวลาโดยไม่ถูกลดดอกเบี้ย เหมาะอย่างยิ่งสำหรับเป็นบัญชีพักเงินก้อนเพื่อรับผลตอบแทนที่ดีกว่าดอกเบี้ยออมทรัพย์ทั่วไป แต่ยังคงสภาพคล่องไว้ใช้ในยามจำเป็น สามารถเปิดบัญชีและจัดการทุกอย่างได้ง่ายผ่านแอป ttb touch',
+                points: [
+                    '**รับดอกเบี้ยสูง:** คิดดอกเบี้ยให้ทุกวันและจ่ายให้ปีละ 2 ครั้ง พร้อมรับโบนัสพิเศษเมื่อใช้จ่ายผ่านบัญชี all free ตามที่กำหนด',
+                    '**อิสระและคล่องตัว:** สามารถฝาก-ถอนเมื่อไหร่ก็ได้ ไม่จำกัดจำนวนครั้ง และไม่มีขั้นต่ำในการฝาก',
+                    '**ปลอดภัย:** เป็นบัญชีสำหรับเก็บเงินโดยเฉพาะ ไม่ผูกกับบัตรเดบิต จึงช่วยลดความเสี่ยงจากการถูกโจรกรรมข้อมูลบัตร',
+                    '**สะดวกสบาย:** เปิดบัญชีง่ายผ่านแอป ttb touch ไม่ต้องไปสาขา และสามารถตั้งรายการโอนล่วงหน้าจากบัญชีอื่นมาเก็บไว้ได้'
+                ]
+            },
+            'บัตรเครดิต ทีทีบี โซ ฟาสต์': {
+                title: 'บัตรเครดิต ทีทีบี โซ ฟาสต์',
+                summary: 'บัตรเครดิตที่ออกแบบมาเพื่อสายสะสมคะแนนโดยเฉพาะ ให้คุณได้รับคะแนนสะสม ttb rewards plus เร็วกว่าใครในทุกการใช้จ่าย โดยทุก 10 บาท รับ 1 คะแนน เพื่อนำไปแลกของรางวัล, ไมล์สะสม, หรือเครดิตเงินคืนได้อย่างคุ้มค่า พร้อมสิทธิประโยชน์ด้านการผ่อนชำระและการเดินทางที่ครบครัน เป็นบัตรที่ตอบโจทย์ทุกไลฟ์สไตล์ที่ต้องการความคุ้มค่าสูงสุดจากการใช้จ่าย',
+                points: [
+                    '**คะแนนสะสมเร็วทุกการใช้จ่าย:** ทุก 10 บาทที่ใช้จ่ายผ่านบัตร รับทันที 1 คะแนนสะสม ทำให้คุณสะสมคะแนนได้เร็วกว่าบัตรทั่วไปถึง 2.5 เท่า',
+                    '**แบ่งจ่าย 0% นาน 3 เดือน (ttb so goood):** เปลี่ยนทุกยอดใช้จ่าย 1,000 บาทขึ้นไป ให้เป็นยอดแบ่งจ่าย 0% นาน 3 เดือนได้ด้วยตัวเองผ่านแอป ttb touch เพิ่มความยืดหยุ่นในการบริหารค่าใช้จ่าย',
+                    '**ฟรีค่าธรรมเนียม:** สมัครง่ายโดยไม่มีค่าธรรมเนียมแรกเข้าและรายปี ช่วยลดภาระค่าใช้จ่ายแฝง',
+                    '**ประกันการเดินทาง:** อุ่นใจทุกการเดินทางด้วยวงเงินคุ้งครองอุบัติเหตุสูงสุด 6 ล้านบาท เมื่อชำระค่าตั๋วเครื่องบินผ่านบัตร',
+                    '**ความคุ้มครองการซื้อของออนไลน์:** ช้อปปิ้งออนไลน์อย่างมั่นใจ ด้วยวงเงินประกันสูงสุด 5,000 บาทต่อครั้ง'
+                ]
+            },
+            'บัตรเครดิต ทีทีบี โกลบอลเฮ้าส์': {
+                title: 'บัตรเครดิต ทีทีบี โกลบอลเฮ้าส์',
+                summary: 'บัตรเครดิตที่คนรักบ้านต้องมี! มอบส่วนลดและสิทธิประโยชน์มากมายเมื่อใช้จ่ายที่โกลบอลเฮ้าส์และร้านค้าวัสดุก่อสร้างทั่วประเทศ ทำให้การแต่งบ้าน, ซ่อมแซม, หรือต่อเติมบ้านของคุณคุ้มค่ากว่าที่เคย พร้อมรับคะแนนสะสมในทุกการใช้จ่าย และยังสามารถใช้บริการแบ่งจ่าย 0% เพื่อช่วยแบ่งเบาภาระค่าใช้จ่ายก้อนใหญ่ได้อีกด้วย',
+                points: [
+                    '**ส่วนลดสูงสุด 13% ที่โกลบอลเฮ้าส์:** รับส่วนลดทันที 3% และสามารถใช้คะแนนสะสมเท่ายอดซื้อเพื่อแลกรับส่วนลดเพิ่มอีก 10% ทำให้ประหยัดได้มากขึ้น',
+                    '**รับส่วนลด 5%:** ที่ร้านค้าวัสดุและอุปกรณ์ตกแต่งบ้านชั้นนำอื่นๆ ที่ร่วมรายการทั่วประเทศ',
+                    '**คะแนนสะสม:** ทุก 25 บาท รับ 1 คะแนน เพื่อแลกของรางวัล หรือใช้เป็นส่วนลดเพิ่มเติม',
+                    '**บริการแบ่งจ่าย 0% นาน 3 เดือน:** สามารถเปลี่ยนยอดซื้อสินค้าชิ้นใหญ่ให้เป็นยอดผ่อนชำระ 0% ได้ด้วยตนเองผ่านแอป ttb touch',
+                    '**ฟรีค่าธรรมเนียม:** ไม่มีค่าธรรมเนียมแรกเข้าและรายปี'
+                ]
+            },
+            'สินเชื่อบ้านแลกเงิน ทีทีบี': {
+                title: 'สินเชื่อบ้านแลกเงิน ทีทีบี',
+                summary: 'เปลี่ยนบ้านที่ปลอดภาระหนี้สินของคุณให้กลายเป็นเงินก้อนโต เพื่อเพิ่มสภาพคล่องทางการเงิน นำไปใช้จ่ายได้ตามความต้องการ ไม่ว่าจะเป็นการต่อเติมบ้าน, เป็นทุนการศึกษาบุตร, ปิดหนี้บัตรเครดิต, หรือเป็นเงินทุนหมุนเวียนธุรกิจ ด้วยจุดเด่นที่ดอกเบี้ยต่ำกว่าและผ่อนสบายกว่าสินเชื่อประเภทอื่น ทำให้คุณสามารถจัดการภาระหนี้และวางแผนการเงินได้อย่างมีประสิทธิภาพ',
+                points: [
+                    '**อัตราดอกเบี้ยต่ำ:** ดอกเบี้ยพิเศษเริ่มต้น MRR - 2.83% ต่อปี ทำให้ภาระการผ่อนต่อเดือนน้อยลงอย่างเห็นได้ชัด',
+                    '**วงเงินอนุมัติสูง:** ให้วงเงินสูงสุดถึง 15 ล้านบาท หรือ 100% ของราคาประเมิน เพื่อให้คุณมีเงินทุนเพียงพอสำหรับทุกแผน',
+                    '**ผ่อนชำระได้นาน:** เลือกระยะเวลาผ่อนได้นานสูงสุดถึง 30 ปี ช่วยให้ยอดผ่อนต่อเดือนไม่สูงเกินไป',
+                    '**อเนกประสงค์:** สามารถนำเงินไปใช้จ่ายได้ทุกวัตถุประสงค์ตามที่ต้องการ ไม่ว่าจะเป็นการรวมหนี้เพื่อลดภาระดอกเบี้ย หรือใช้จ่ายตามความฝัน'
+                ]
+            }
+        };
+
+        const allQuizQuestions = {
+            'บัญชี ทีทีบี ออลล์ฟรี': [
+                {
+                    question: 'ข้อใดไม่ใช่จุดเด่นหลักของบัญชี ttb all free',
+                    options: ['โอนเงินต่างธนาคารฟรี', 'กดเงินไม่ใช้บัตรฟรี', 'ให้ดอกเบี้ยเงินฝากสูง', 'จ่ายบิลฟรี'],
+                    correctAnswer: 'ให้ดอกเบี้ยเงินฝากสูง',
+                    explanation: 'ttb all free เป็นบัญชีเพื่อ "ใช้" ที่เน้นฟรีค่าธรรมเนียมและประกันอุบัติเหตุ ไม่ใช่บัญชีเพื่อ "ออม" ที่เน้นผลตอบแทนของอัตราดอกเบี้ย'
+                },
+                {
+                    question: 'ลูกค้าต้องมียอดเงินคงเหลือในบัญชี ttb all free เฉลี่ยเท่าไหร่ จึงจะได้รับความคุ้มครองประกันอุบัติเหตุฟรี',
+                    options: ['ไม่มีขั้นต่ำ', '3,000 บาท', '5,000 บาท', '10,000 บาท'],
+                    correctAnswer: '5,000 บาท',
+                    explanation: 'เพียงมียอดเงินฝากคงเหลือในบัญชีเฉลี่ย 5,000 บาทขึ้นไป จะได้รับสิทธิ์ความคุ้มครองอุบัติเหตุฟรีรักษาพยาบาล'
+                },
+                {
+                    question: 'บัญชี ttb all free มอบค่ารักษาพยาบาลจากอุบัติเหตุสูงสุดครั้งละเท่าไหร่',
+                    options: ['1,000 บาท', '2,000 บาท', '3,000 บาท', '5,000 บาท'],
+                    correctAnswer: '3,000 บาท',
+                    explanation: 'ความคุ้มครองประกันอุบัติเหตุจากบัญชี ttb all free ครอบคลุมค่ารักษาพยาบาล 3,000 บาทต่ออุบัติเหตุแต่ละครั้ง โดยไม่ต้องสำรองจ่ายก่อน'
+                }
+            ],
+            'บัญชี ทีทีบี โนฟิกซ์': [
+                {
+                    question: 'บัญชี ทีทีบี โนฟิกซ์ จ่ายดอกเบี้ยให้ลูกค้าปีละกี่ครั้ง',
+                    options: ['1 ครั้ง', '2 ครั้ง', '4 ครั้ง', '12 ครั้ง'],
+                    correctAnswer: '2 ครั้ง',
+                    explanation: 'บัญชี ttb no-fixed จะคำนวณสะสมดอกเบี้ยเป็นรายวัน และทำการโอนจ่ายปีละ 2 ครั้งในเดือนมิถุนายนและธันวาคม'
+                },
+                {
+                    question: 'ข้อใดคือจุดเด่นที่สุดของบัญชี ทีทีบี โนฟิกซ์',
+                    options: ['ดอกเบี้ยสูงเหมือนฝากประจำ แต่ถอนได้', 'ได้คะแนนสะสมพิเศษ', 'ฟรีประกันอุบัติเหตุ', 'มีบัตรเอทีเอ็มฟรี'],
+                    correctAnswer: 'ดอกเบี้ยสูงเหมือนฝากประจำ แต่ถอนได้',
+                    explanation: 'จุดเด่นหลักของบัญชีออมทรัพย์ดิจิทัลนี้คือความยืดหยุ่นที่ให้อัตราดอกเบี้ยสูงในขณะที่มีอิสระในการฝาก-ถอนได้ตลอดเวลา'
+                }
+            ]
+        };
+
+        // Competitive leaderboard mocks
+        const leaderboardData = [
+            { rank: 1, name: 'อภิชาต เลิศเดชา', id: '55012', score: 72.5 },
+            { rank: 2, name: 'อารยา สุขใจ', id: '55018', score: 70.1 },
+            { rank: 3, name: 'วิชัย มีมานะ', id: '55005', score: 68.9 },
+            { rank: 4, name: 'มานี ใจดี', id: '55023', score: 65.4 },
+            { rank: 5, name: 'ปิติ รักเรียน', id: '55011', score: 62.2 }
+        ];
+
+        const roleplayHistoryData = {
+            '55012': [
+                { customerName: 'สมชาย เกียรติสกุล', date: '20/05/2026', score: 74 },
+                { customerName: 'อลิสา วัฒนากุล', date: '19/05/2026', score: 71 }
+            ],
+            '55018': [
+                { customerName: 'วิลเลียม เฉิน', date: '15/05/2026', score: 72 },
+                { customerName: 'มาลินี สดใส', date: '13/05/2026', score: 68 }
+            ]
+        };
+
+        // --- DOM Elements Configuration ---
+        const loginView = document.getElementById('login-view');
+        const mainContent = document.getElementById('main-content');
+        const nav = document.getElementById('app-nav');
+        const employeeIdInput = document.getElementById('employee-id');
+        const employeeNameInput = document.getElementById('employee-name');
+        const customApiKeyInput = document.getElementById('custom-api-key');
+        const userDisplayName = document.getElementById('user-display-name');
+        const logoutBtn = document.getElementById('logout-btn');
+        const mainViews = document.querySelectorAll('.main-view');
+        const roleplayView = document.getElementById('roleplay-view');
+        const customerGridView = document.getElementById('customer-grid');
+        const specialistGridView = document.getElementById('specialist-grid');
+        const quizGridView = document.getElementById('quiz-grid');
+        const productDetailContent = document.getElementById('product-detail-content');
+        const newsWrapper = document.getElementById('news-content-wrapper');
+        const infoModal = document.getElementById('info-modal');
+        const infoModalContent = document.getElementById('info-modal-content');
+        const evaluationModal = document.getElementById('evaluation-modal');
+        const evaluationContent = document.getElementById('evaluation-content');
+        const leaderboardModal = document.getElementById('leaderboard-modal');
+        const leaderboardModalContent = document.getElementById('leaderboard-modal-content');
+        const scoringModal = document.getElementById('scoring-modal');
+        const scoringModalContent = document.getElementById('scoring-modal-content');
+        const ratingModal = document.getElementById('rating-modal');
+        const chatContainer = document.getElementById('chat-container');
+        const chatInput = document.getElementById('chat-input');
+        const sendButton = document.getElementById('send-button');
+        const endChatButton = document.getElementById('end-chat-btn');
+        const showRoleplayInfoButton = document.getElementById('show-roleplay-info-btn');
+        const contextContainer = document.getElementById('conversation-context');
+        const specialistChatView = document.getElementById('specialist-chat-view');
+        const specialistChatContainer = document.getElementById('specialist-chat-container');
+        const specialistChatInput = document.getElementById('specialist-chat-input');
+        const specialistSendButton = document.getElementById('specialist-send-button');
+        const endSpecialistChatButton = document.getElementById('end-specialist-chat-btn');
+        
+        const startVoiceCallBtn = document.getElementById('start-voice-call-btn');
+        const liveVoiceCallOverlay = document.getElementById('live-voice-call-overlay');
+        const liveCallAvatar = document.getElementById('live-call-avatar');
+        const liveCallName = document.getElementById('live-call-name');
+        const liveCallStatus = document.getElementById('live-call-status');
+        const liveUserTranscript = document.getElementById('live-user-transcript');
+        const liveAiTranscript = document.getElementById('live-ai-transcript');
+        const muteVoiceBtn = document.getElementById('mute-voice-btn');
+        const hangupVoiceBtn = document.getElementById('hangup-voice-btn');
+        const liveIndicatorBadge = document.getElementById('live-indicator-badge');
+        
+        const quizTitleEl = document.getElementById('quiz-title');
+        const quizProgressEl = document.getElementById('quiz-progress');
+        const quizTimerEl = document.getElementById('quiz-timer');
+        const quizQuestionTextEl = document.getElementById('quiz-question-text');
+        const quizOptionsEl = document.getElementById('quiz-options');
+        const quizFeedbackEl = document.getElementById('quiz-feedback');
+        const quizFeedbackTitleEl = document.getElementById('quiz-feedback-title');
+        const quizFeedbackTextEl = document.getElementById('quiz-feedback-text');
+        const quizNextBtn = document.getElementById('quiz-next-btn');
+        const quizSoundToggle = document.getElementById('quiz-sound-toggle');
+        
+        // Navigation Buttons
+        const navRoleplay = document.getElementById('nav-roleplay');
+        const navSpecialist = document.getElementById('nav-specialist');
+        const navQuiz = document.getElementById('nav-quiz');
+        const navNews = document.getElementById('nav-news');
+        const navLeaderboard = document.getElementById('nav-leaderboard');
+
+        let currentUser = null;
+        let systemApiKey = "";
+        let genAI = null;
+        let conversationHistory = [];
+        let currentCustomer = null;
+        let currentSpecialist = null;
+        let turnCount = 0;
+        const maxTurns = 5;
+        let voices = [];
+        let isEvaluationInProgress = false;
+        let currentQuizProduct = '';
+        let shuffledQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+        const QUIZ_LENGTH = 3;
+        const TIME_LIMIT = 30;
+        let quizTimerInterval = null;
+        let timeLeft = 0;
+        let isQuizMuted = false;
+        let isGlobalMuted = false;
+
+        // Streaming Voice Web-Speech & Live WebSockets fallback configurations
+        let bidiLiveSession = null;
+        let micStream = null;
+        let isMuted = false;
+        let localSpeechRecognition = null;
+        let activeVoiceMode = "web-speech"; // "gemini-live" or "web-speech" fallback
+
+        // sound effects for quiz
+        const soundEffects = {
+            playCorrect: () => {
+                if (isQuizMuted) return;
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.06, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.35);
+                } catch(e){}
+            },
+            playIncorrect: () => {
+                if (isQuizMuted) return;
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, ctx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(120, ctx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.3);
+                } catch(e){}
+            }
+        };
+
+        function loadVoices() {
+            voices = window.speechSynthesis.getVoices();
+        }
+        loadVoices();
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        const speakText = (text, gender = 'female', isQuizSound = false) => {
+            if (isQuizSound && isQuizMuted) return;
+            if (!isQuizSound && isGlobalMuted) return;
+            
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            
+            setTimeout(() => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 1.05;
+                
+                const thaiVoices = voices.filter(v => v.lang === 'th-TH' || v.lang.startsWith('th'));
+                if (thaiVoices.length > 0) {
+                    let chosen = null;
+                    if (gender === 'male') {
+                        chosen = thaiVoices.find(v => v.name.includes('Sitti') || v.name.includes('Pattara') || v.name.includes('Narisa'));
+                    } else {
+                        chosen = thaiVoices.find(v => v.name.includes('Kanya') || v.name.includes('Prema') || v.name.includes('Acapela'));
+                    }
+                    utterance.voice = chosen || thaiVoices[0];
+                }
+                window.speechSynthesis.speak(utterance);
+            }, 50);
+        };
+
+        // --- AUTH & LOGIN PROCESS ---
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const idVal = employeeIdInput.value.trim();
+            const nameVal = employeeNameInput.value.trim();
+            const customKey = customApiKeyInput.value.trim();
+            
+            if (idVal && nameVal) {
+                currentUser = { id: idVal, name: nameVal };
+                systemApiKey = customKey || "";
+                
+                // Initialize GoogleGenAI SDK with key
+                genAI = new GoogleGenAI({ apiKey: systemApiKey });
+
+                loginView.classList.add('hidden');
+                nav.classList.remove('hidden');
+                mainContent.classList.remove('hidden');
+                userDisplayName.textContent = currentUser.name;
+                
+                renderCustomers();
+                renderSpecialists();
+                renderQuizzes();
+                renderLeaderboard();
+                showView('customer-list-view');
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            currentUser = null;
+            loginView.classList.remove('hidden');
+            nav.classList.add('hidden');
+            mainContent.classList.add('hidden');
+            if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+        });
+
+        // --- NAVIGATION CONTROLLER ---
+        function showView(viewId) {
+            if (quizTimerInterval) clearInterval(quizTimerInterval);
+            if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+            
+            mainViews.forEach(view => {
+                if (view.id === viewId) {
+                    view.classList.remove('hidden');
+                } else {
+                    view.classList.add('hidden');
+                }
+            });
+
+            const navMap = {
+                'customer-list-view': navRoleplay,
+                'specialist-view': navSpecialist,
+                'quiz-view': navQuiz,
+                'quiz-product-detail-view': navQuiz,
+                'quiz-interface-view': navQuiz,
+                'quiz-results-view': navQuiz,
+                'news-view': navNews,
+                'leaderboard-view': navLeaderboard
+            };
+
+            const activeBtn = navMap[viewId];
+            document.querySelectorAll('nav button').forEach(btn => {
+                if (btn === activeBtn) {
+                    btn.classList.add('bg-slate-100', 'text-slate-900');
+                    btn.classList.remove('text-slate-600');
+                } else {
+                    btn.classList.remove('bg-slate-100', 'text-slate-900');
+                    btn.classList.add('text-slate-600');
+                }
+            });
+        }
+
+        navRoleplay.addEventListener('click', () => showView('customer-list-view'));
+        navSpecialist.addEventListener('click', () => showView('specialist-view'));
+        navQuiz.addEventListener('click', () => showView('quiz-view'));
+        navNews.addEventListener('click', () => { showView('news-view'); fetchNews(); });
+        navLeaderboard.addEventListener('click', () => showView('leaderboard-view'));
+
+        // --- CUSTOMER RENDERERS ---
+        function renderCustomers() {
+            customerGridView.innerHTML = '';
+            customers.forEach(cust => {
+                const card = document.createElement('div');
+                card.className = 'card-premium p-6 flex flex-col items-center text-center space-y-4';
+                card.innerHTML = `
+                    <div class="relative">
+                        <img src="${cust.image}" alt="${cust.name}" class="w-24 h-24 rounded-full object-cover ring-4 ring-slate-100 shadow-inner">
+                        <span class="absolute bottom-1 right-1 px-2.5 py-0.5 text-[10px] font-black tracking-wider uppercase rounded-full ${cust.segment === 'Platinum' ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700'}">
+                            ${cust.segment}
+                        </span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 leading-snug">${cust.name}</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">${cust.title} (อายุ ${cust.age} ปี)</p>
+                    </div>
+                    <p class="text-xs text-slate-500 line-clamp-2 h-8 leading-normal">${cust.summary}</p>
+                    <div class="flex gap-2 w-full pt-2">
+                        <button onclick="showCustomerInfo(${cust.id})" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100">
+                            ข้อมูลลูกค้า
+                        </button>
+                        <button onclick="startRoleplay(${cust.id})" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
+                            เริ่มจำลองการขาย
+                        </button>
+                    </div>
+                `;
+                customerGridView.appendChild(card);
+            });
+        }
+
+        window.showCustomerInfo = (id) => {
+            const cust = customers.find(c => c.id === id);
+            if (!cust) return;
+
+            infoModalContent.innerHTML = `
+                <div class="flex flex-col sm:flex-row items-center gap-6 mb-6">
+                    <img src="${cust.image}" alt="${cust.name}" class="w-20 h-20 rounded-full object-cover ring-4 ring-slate-150">
+                    <div class="text-center sm:text-left">
+                        <h3 class="text-2xl font-bold text-slate-800">${cust.name}</h3>
+                        <p class="text-slate-400 text-sm mt-0.5">${cust.title} (อายุ ${cust.age} ปี)</p>
+                        <span class="inline-block mt-2 px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-700 border border-slate-200 uppercase">
+                            ความเสี่ยง: ${cust.riskAppetite}
+                        </span>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b pb-1">เป้าหมาย & บุคลิก</h4>
+                    <p class="text-sm text-slate-600 leading-relaxed">${cust.summary}</p>
+                    
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b pb-1 mt-6">ประวัติและข้อมูลการเงิน</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-50 p-4 rounded-xl border border-slate-150">
+                        ${Object.entries(cust.details).map(([key, value]) => `
+                            <div>
+                                <span class="text-slate-400 font-semibold block mb-0.5">${key}</span>
+                                <strong class="text-slate-700">${value}</strong>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            speakText(cust.summary, cust.gender);
+            infoModal.classList.remove('hidden');
+            infoModal.classList.add('flex');
+        };
+
+        window.closeInfoModal = () => {
+            if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+            infoModal.classList.add('hidden');
+            infoModal.classList.remove('flex');
+        };
+
+        // --- STREAMING_CHUNK: Initializing Roleplay Sessions and fallbacks ---
+        window.startRoleplay = (id) => {
+            currentCustomer = customers.find(c => c.id === id);
+            if (!currentCustomer) return;
+
+            turnCount = 0;
+            isEvaluationInProgress = false;
+            
+            const dossierInner = document.getElementById('dossier-inner');
+            dossierInner.innerHTML = `
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-150 space-y-3">
+                    <div class="text-center">
+                        <img src="${currentCustomer.image}" alt="${currentCustomer.name}" class="w-16 h-16 rounded-full mx-auto object-cover ring-2 ring-slate-200">
+                        <h4 class="font-bold text-slate-800 mt-2">${currentCustomer.name}</h4>
+                        <span class="text-xs text-slate-400">${currentCustomer.title} (${currentCustomer.age} ปี)</span>
+                    </div>
+                    <div class="border-t border-slate-200 pt-2 space-y-1 text-xs text-slate-600">
+                        <p><strong>ระดับลูกค้า:</strong> ${currentCustomer.segment}</p>
+                        <p><strong>ความเสี่ยง:</strong> ${currentCustomer.riskAppetite}</p>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <h5 class="font-bold text-slate-800 text-xs uppercase tracking-wider">เกร็ดความรู้ประวัติ</h5>
+                    <p class="text-xs text-slate-500 leading-relaxed">${currentCustomer.summary}</p>
+                </div>
+            `;
+
+            conversationHistory = [
+                {
+                    role: 'system',
+                    parts: [{
+                        text: `${currentCustomer.personaPrompt}. คุณจะไม่เริ่มพูดก่อน คุณจะรอให้พนักงานขายเป็นฝ่ายแนะนำตัวและแนะนำข้อเสนอทางการเงินก่อนเสมอ ตอบสั้นๆ และสุภาพ ไม่ยาวเกิน 3 ประโยค`
+                    }]
+                }
+            ];
+
+            document.getElementById('roleplay-customer-profile').innerHTML = `
+                <div class="text-right">
+                    <h4 class="font-bold text-slate-800 text-sm leading-tight">${currentCustomer.name}</h4>
+                    <span class="text-xs text-slate-400">${currentCustomer.title}</span>
+                </div>
+                <img src="${currentCustomer.image}" alt="${currentCustomer.name}" class="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100">
+            `;
+
+            contextContainer.innerHTML = `
+                <span class="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0">เริ่มต้น</span>
+                <p class="truncate text-slate-700">พนักงานขายแนะนำตัวเพื่อเข้าพบ ${currentCustomer.name} (${currentCustomer.title})</p>
+            `;
+
+            chatContainer.innerHTML = `
+                <div class="chat-bubble self-start ai-bubble max-w-sm flex flex-col gap-1.5 shadow-sm">
+                    <span class="text-xs text-slate-400 font-bold">${currentCustomer.name}</span>
+                    <p class="text-sm font-semibold text-slate-700">กำลังรอพนักงานขายกล่าวทักทาย... (คุณสามารถเปิดไมค์คุยสดแบบโทรศัพท์ได้จากปุ่มซ้ายล่าง)</p>
+                </div>
+            `;
+            
+            endChatButton.disabled = true;
+            chatInput.disabled = false;
+            sendButton.disabled = false;
+            chatInput.value = '';
+
+            roleplayView.classList.remove('hidden');
+            chatInput.focus();
+        };
+
+        document.getElementById('back-to-list-btn').addEventListener('click', () => {
+            if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+            hangupLiveVoice();
+            roleplayView.classList.add('hidden');
+            showView('customer-list-view');
+        });
+
+        // Keyboard and submission actions
+        const handleChatSubmission = () => {
+            const msg = chatInput.value.trim();
+            if (msg && !isEvaluationInProgress) {
+                addUserMessage(chatContainer, msg);
+                chatInput.value = '';
+                processUserRoleplayTurn(msg);
+            }
+        };
+
+        sendButton.addEventListener('click', handleChatSubmission);
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleChatSubmission();
+            }
+        });
+
+        const addUserMessage = (container, text) => {
+            const row = document.createElement('div');
+            row.className = 'flex justify-end w-full';
+            row.innerHTML = `
+                <div class="chat-bubble user-bubble shadow-sm flex flex-col gap-1 text-sm md:text-base">
+                    <span class="text-[10px] text-blue-200 font-semibold text-right">คุณ</span>
+                    <p>${text}</p>
+                </div>
+            `;
+            container.appendChild(row);
+            container.scrollTop = container.scrollHeight;
+        };
+
+        const addAiMessage = (container, sender, initialText) => {
+            const row = document.createElement('div');
+            row.className = 'flex justify-start w-full';
+            row.innerHTML = `
+                <div class="chat-bubble ai-bubble shadow-sm flex flex-col gap-1 text-sm md:text-base max-w-md">
+                    <span class="text-[10px] text-slate-400 font-bold">${sender}</span>
+                    <div class="ai-response-content">${initialText}</div>
+                </div>
+            `;
+            container.appendChild(row);
+            container.scrollTop = container.scrollHeight;
+            return row.querySelector('.ai-response-content');
+        };
+
+        const generateSimulatedReply = (userInput, customerObj, turn) => {
+            const text = userInput.toLowerCase();
+            const recommendedProduct = (text.includes('ออลล์ฟรี') || text.includes('all free')) ? 'allfree' :
+                                      (text.includes('โนฟิกซ์') || text.includes('no fix') || text.includes('no-fixed')) ? 'nofix' :
+                                      (text.includes('โซ ฟาสต์') || text.includes('so fast')) ? 'sofast' : 'none';
+
+            if (customerObj.id === 1) { // Somchai (Conservative)
+                if (turn === 1) return `สวัสดีครับ... คุณพนักงานมาแนะนำอะไรครับ? แก่แล้ว ขี้เกียจฟังกองทุนเสี่ยงๆ นะครับ ถ้าเน้นฝากเงินปลอดภัย คุ้มค่าเงินต้นค่อยน่าคุย`;
+                if (text.includes('โนฟิกซ์') || text.includes('no-fixed')) {
+                    return `อืม บัญชี "โนฟิกซ์" ดอกเบี้ยสูงหรอครับ? มีความปลอดภัยแค่ไหน เงินฝากประเภทนี้มีสิทธิ์ประกันเงินฝากหรือเปล่า และต้องเก็บเงินไว้ห้าปีสิบปีไหมกว่าจะได้ดอกเบี้ยสูง?`;
+                }
+                if (text.includes('ประกัน') || text.includes('ปลอดภัย') || text.includes('ถอนได้')) {
+                    return `ถ้าถอนเมื่อไหร่ก็ได้โดยไม่ถูกลดดอกเบี้ยก็น่าสนใจอยู่ครับ แล้วมันต้องมีเงินฝากขั้นต่ำในตอนเริ่มต้นเปิดบัญชีเท่าไหร่ล่ะพนักงาน?`;
+                }
+                return `ผมเน้นเรื่องไม่เสี่ยงเลยครับ ถ้ามีอะไรที่รับประกันความปลอดภัยของเงินต้นที่ดี และถอนใช้ได้สบายๆ ลองอธิบายเงื่อนไขหลักให้ชัดๆ สิครับ`;
+            } else if (customerObj.id === 2) { // Alisa (Aggressive Growth)
+                if (turn === 1) return `สวัสดีค่ะ ช่วงนี้โปรดักส์กลุ่มสินทรัพย์อะไรที่ให้รีเทิร์นสู้สภาวะเงินเฟ้อแบบนี้บ้างคะ? ดิฉันชอบเทคโนโลยีและรับความเสี่ยงได้ค่อนข้างสูงนะ`;
+                if (text.includes('โซ ฟาสต์') || text.includes('so fast')) {
+                    return `บัตร "โซ ฟาสต์" มีสิทธิพิเศษยังไงที่เด่นกว่าแบรนด์คู่แข่งในตลาดบ้างคะ? แล้ววงเงินสะสมคะแนนเร่งรีบจริงหรือเปล่า?`;
+                }
+                if (text.includes('คะแนน') || text.includes('แลก')) {
+                    return `แล้วเรื่องพวกบริการแปลงค่าผ่อนล่ะคะ? มีบริการแบ่งจ่ายหรือแปลงยอดไหม เพราะบางเดือนบริษัทสตาร์ทอัพของฉันต้องการจัดการกระแสเงินสดให้คล่องตัว`;
+                }
+                return `น่าสนใจดีค่ะ ผลตอบแทนเฉลี่ยกับโปรดักส์ที่นำเสนอมา มีจุดเด่นอะไรที่คิดว่านวัตกรรมตัวนี้เหมาะกับคนเวลาน้อยแบบฉันอีกไหม?`;
+            } else if (customerObj.id === 3) { // Preecha (Balanced)
+                if (turn === 1) return `สวัสดีครับ ผมอยากปรึกษาเรื่องการออมและสร้างความมั่นคงเพื่อเตรียมส่งลูกเรียนต่อต่างประเทศน่ะครับ มีโปรดักส์ตัวไหนแนะนำไหม?`;
+                if (text.includes('โนฟิกซ์') || text.includes('no-fixed') || text.includes('ออม')) {
+                    return `บัญชี "โนฟิกซ์" ดอกเบี้ยจูงใจไหมครับ แล้วถ้าต้องการฝากสม่ำเสมอทุกเดือนเพื่อระดมทุนการศึกษา จะมีข้อผูกมัดเรื่องจำนวนรอบการถอนหรือไม่?`;
+                }
+                return `เข้าใจแล้วครับ สำหรับการศึกษาที่มั่นคง ผมอยากเน้นเรื่องระบบจัดการผ่านสมาร์ทโฟนที่ลูกของผมก็ตรวจสอบสถิติการออมได้ มี ttb touch คอยช่วยประสานงานใช่ไหม?`;
+            } else { // Generic / Malinee / William
+                if (turn === 1) return `สวัสดีค่ะ ยินดีที่ได้คุยด้วยค่ะ ช่วงนี้อยากเริ่มต้นบริหารเงินออมอเนกประสงค์แบบปลอดภัย ต้องวางแผนจัดแจงอย่างไรบ้างคะ?`;
+                return `ข้อมูลละเอียดมากค่ะ แล้วในแง่ของความคุ้มครอง เช่นประกันหรือสิทธิ์ทดแทนอุบัติเหตุ มีพ่วงมากับโปรดักส์ออมเงินหลักๆ ด้วยไหมคะ?`;
+            }
+        };
+
+        const processUserRoleplayTurn = async (userMsg) => {
+            turnCount++;
+            conversationHistory.push({ role: 'user', parts: [{ text: userMsg }] });
+
+            const aiBubbleText = addAiMessage(chatContainer, currentCustomer.name, '<i class="fas fa-spinner fa-spin"></i> คิดสักครู่...');
+            
+            chatInput.disabled = true;
+            sendButton.disabled = true;
+            endChatButton.disabled = true;
+
+            setTimeout(() => {
+                const reply = generateSimulatedReply(userMsg, currentCustomer, turnCount);
+                conversationHistory.push({ role: 'model', parts: [{ text: reply }] });
+                aiBubbleText.innerHTML = reply;
+                speakText(reply, currentCustomer.gender);
+                
+                chatInput.disabled = false;
+                sendButton.disabled = false;
+                chatInput.focus();
+                
+                if (turnCount >= 2) {
+                    endChatButton.disabled = false;
+                }
+                
+                contextContainer.innerHTML = `
+                    <span class="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0">รอบที่ ${turnCount}/5</span>
+                    <p class="truncate text-slate-700">กำลังเจรจากับ ${currentCustomer.name}</p>
+                `;
+
+                if (turnCount >= maxTurns) {
+                    chatInput.disabled = true;
+                    sendButton.disabled = true;
+                    addAiMessage(chatContainer, 'SalesSim System', '<i class="fas fa-info-circle text-orange-500"></i> คุณใช้โควตาครบ 5 รอบประโยคแล้ว โปรดกดปุ่ม "จบการขาย" เพื่อรับรายงานการประเมิน');
+                }
+            }, 800);
+        };
+
+        // --- STREAMING_CHUNK: Designing Bulletproof Microphone & Fallback Voice-To-Voice System ---
+        // Web Speech API fallback allows full Thai voice conversation without strict iframe WebSocket issues
+        async function startLiveVoiceSession(personaPrompt, targetProfile) {
+            // Terminate speech synthesis if speaking
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+
+            liveCallAvatar.src = targetProfile.image;
+            liveCallName.textContent = targetProfile.name;
+            liveCallStatus.textContent = "กำลังเชื่อมต่อระบบพูดคุยเสถียร (Web Speech API)...";
+            document.getElementById('live-user-transcript').querySelector('p').textContent = "กำลังฟังเสียงพูดภาษาไทยของคุณ...";
+            document.getElementById('live-ai-transcript').querySelector('p').textContent = "กำลังวิเคราะห์...";
+            liveVoiceCallOverlay.classList.remove('hidden');
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                liveCallStatus.textContent = "เบราว์เซอร์ของคุณไม่รองรับการจำลองเสียงพูดภาษาไทย (แนะนำ Google Chrome)";
+                return;
+            }
+
+            try {
+                // Initialize clean Speech Recognition
+                localSpeechRecognition = new SpeechRecognition();
+                localSpeechRecognition.lang = 'th-TH';
+                localSpeechRecognition.continuous = false;
+                localSpeechRecognition.interimResults = false;
+
+                localSpeechRecognition.onstart = () => {
+                    liveCallStatus.textContent = "เชื่อมต่อคู่สายแล้ว! กรุณาเริ่มพูดคุยได้เลย";
+                    liveIndicatorBadge.className = "absolute -bottom-2 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider animate-pulse flex items-center gap-1";
+                    liveIndicatorBadge.innerHTML = `<i class="fas fa-dot-circle text-[10px]"></i> ON AIR`;
+                };
+
+                localSpeechRecognition.onresult = (event) => {
+                    const speechToTextResult = event.results[0][0].transcript;
+                    document.getElementById('live-user-transcript').querySelector('p').textContent = speechToTextResult;
+                    
+                    // Add message and trigger process
+                    addUserMessage(chatContainer, speechToTextResult);
+                    processVoiceRoleplayResponse(speechToTextResult, targetProfile);
+                };
+
+                localSpeechRecognition.onerror = (err) => {
+                    console.warn("Speech Recognition Warn/Error:", err);
+                    if (err.error === 'not-allowed') {
+                        liveCallStatus.textContent = "กรุณาเปิดสิทธิ์เข้าใช้ไมโครโฟนเพื่อความสะดวกสูงสุด";
+                    } else {
+                        // Automatically restart listener quietly
+                        restartVoiceListenerQuietly();
+                    }
+                };
+
+                localSpeechRecognition.onend = () => {
+                    // Automatically restart listing if voice call panel is still open and not speaking
+                    if (!liveVoiceCallOverlay.classList.contains('hidden') && !window.speechSynthesis.speaking) {
+                        restartVoiceListenerQuietly();
+                    }
+                };
+
+                localSpeechRecognition.start();
+
+            } catch (error) {
+                console.error("Mic Initialisation Fallback Failure:", error);
+                liveCallStatus.textContent = "การเริ่มต้นใช้ระบบเสียงขัดข้องชั่วคราว";
+            }
+        }
+
+        function restartVoiceListenerQuietly() {
+            if (localSpeechRecognition && !window.speechSynthesis.speaking && !liveVoiceCallOverlay.classList.contains('hidden')) {
+                try {
+                    localSpeechRecognition.start();
+                } catch(e){}
+            }
+        }
+
+        async function processVoiceRoleplayResponse(userSpeechText, targetProfile) {
+            turnCount++;
+            conversationHistory.push({ role: 'user', parts: [{ text: userSpeechText }] });
+            
+            liveCallStatus.textContent = "ลูกค้ากำลังฟังและประมวลผลข้อเสนอ...";
+            
+            // Get mock response instantly
+            const reply = generateSimulatedReply(userSpeechText, targetProfile, turnCount);
+            conversationHistory.push({ role: 'model', parts: [{ text: reply }] });
+            
+            const aiContentPlaceholder = addAiMessage(chatContainer, targetProfile.name, reply);
+            document.getElementById('live-ai-transcript').querySelector('p').textContent = reply;
+            
+            // Speak text out loud seamlessly
+            speakText(reply, targetProfile.gender);
+
+            liveCallStatus.textContent = "พร้อมฟังประโยคถัดไปจากคุณแล้ว...";
+
+            if (turnCount >= 2) {
+                endChatButton.disabled = false;
+            }
+
+            // Bind check for starting speech recognition again once synthesizer ends speaking
+            const monitorSpeakingInterval = setInterval(() => {
+                if (!window.speechSynthesis.speaking) {
+                    clearInterval(monitorSpeakingInterval);
+                    restartVoiceListenerQuietly();
+                }
+            }, 300);
+        }
+
+        function hangupLiveVoice() {
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            if (localSpeechRecognition) {
+                try {
+                    localSpeechRecognition.stop();
+                } catch(e){}
+                localSpeechRecognition = null;
+            }
+
+            isMuted = false;
+            muteVoiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+            liveVoiceCallOverlay.classList.add('hidden');
+        }
+
+        // Set voice button actions
+        startVoiceCallBtn.addEventListener('click', () => {
+            if (currentCustomer) {
+                startLiveVoiceSession(currentCustomer.personaPrompt, currentCustomer);
+            }
+        });
+
+        hangupVoiceBtn.addEventListener('click', () => {
+            hangupLiveVoice();
+        });
+
+        muteVoiceBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            if (isMuted) {
+                if (localSpeechRecognition) {
+                    try { localSpeechRecognition.stop(); } catch(e){}
+                }
+                muteVoiceBtn.innerHTML = '<i class="fas fa-microphone text-red-500 animate-pulse"></i>';
+                liveCallStatus.textContent = "ปิดไมโครโฟนชั่วคราว";
+            } else {
+                muteVoiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+                liveCallStatus.textContent = "เชื่อมต่อไมโครโฟนเรียบร้อยแล้ว";
+                restartVoiceListenerQuietly();
+            }
+        });
+
+        // --- STREAMING_CHUNK: Managing dynamic score reports ---
+        const calculateDynamicScores = (chatLog) => {
+            let pKnowledge = 10;
+            let presentation = 10;
+            let process = 10;
+            let expertise = 10;
+            let closing = 10;
+
+            const fullText = chatLog.map(turn => turn.parts ? turn.parts[0].text : '').join(' ').toLowerCase();
+
+            // Keyword grading
+            if (fullText.includes('ดอกเบี้ย') || fullText.includes('ค่าธรรมเนียม') || fullText.includes('รักษาพยาบาล')) pKnowledge += 2;
+            if (fullText.includes('โนฟิกซ์') || fullText.includes('ออลล์ฟรี') || fullText.includes('โซ ฟาสต์')) pKnowledge += 2;
+            if (fullText.includes('ค่ะ') || fullText.includes('ครับ') || fullText.includes('ยินดี')) presentation += 2;
+            if (fullText.includes('ขออธิบาย') || fullText.includes('จุดเด่น') || fullText.includes('เงื่อนไข')) expertise += 2;
+            if (fullText.includes('เปิดบัญชี') || fullText.includes('ตกลง') || fullText.includes('นัดหมาย') || fullText.includes('สมัคร')) closing += 3;
+
+            pKnowledge = Math.min(15, pKnowledge);
+            presentation = Math.min(15, presentation);
+            process = Math.min(15, process);
+            expertise = Math.min(15, expertise);
+            closing = Math.min(15, closing);
+
+            const totalScore = pKnowledge + presentation + process + expertise + closing;
+            
+            let strengthsText = "คุณสื่อสารด้วยถ้อยคำที่สุภาพ เข้าใจพฤติกรรมการออมของลูกค้าเบื้องต้น และพยายามอิงตามหลักการแนะนำผลิตภัณฑ์เพื่อการออมทรัพย์แบบคล่องตัว";
+            let improvementsText = "ควรเพิ่มการเจาะลึกข้อมูลตัวเลข เช่น อัตราดอกเบี้ย หรือสิทธิ์ทดแทนอย่างชัดเจนขึ้น และควรพยายามถามคำถามเพื่อกระตุ้นจุดจบการเสนอขายให้เฉียบคมกว่านี้";
+
+            if (totalScore >= 65) {
+                strengthsText = "ยอดเยี่ยมมาก! คุณดำเนินการขายอย่างมีลำดับขั้นตอน มีการนำเสนอที่ดึงดูดใจ และตอบโจทย์ความต้องการเฉพาะตัวของลูกค้าที่กลัวความเสี่ยงได้อย่างแม่นยำ";
+                improvementsText = "เกือบสมบูรณ์แบบแล้ว รักษามาตรฐานการขายและทักษะการสบตาเชื่อมโยงความรู้สึกแบบนี้เอาไว้ได้เป็นอย่างดี";
+            }
+
+            return {
+                scores: {
+                    productKnowledge: pKnowledge,
+                    presentationSkills: presentation,
+                    salesProcess: process,
+                    expertise: expertise,
+                    closingAbility: closing
+                },
+                totalScore,
+                summary: {
+                    strengths: strengthsText,
+                    improvements: improvementsText
+                }
+            };
+        };
+
+        const getFinalEvaluation = () => {
+            isEvaluationInProgress = true;
+            chatInput.disabled = true;
+            sendButton.disabled = true;
+            endChatButton.disabled = true;
+
+            addAiMessage(chatContainer, 'SalesSim Engine', '<i class="fas fa-chart-line text-blue-500"></i> สรุปผลบทสนทนาและกำลังรวบรวมเกรดประเมิน...');
+
+            setTimeout(() => {
+                const result = calculateDynamicScores(conversationHistory);
+                
+                // Render Evaluation Modal
+                const textClass = result.totalScore >= 60 ? 'text-emerald-500' : result.totalScore >= 45 ? 'text-amber-500' : 'text-red-500';
+                evaluationContent.innerHTML = `
+                    <div class="text-center bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                        <p class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">ผลคะแนนของคุณ</p>
+                        <h3 class="text-6xl font-black ${textClass}">${result.totalScore}<span class="text-2xl text-slate-400 font-bold"> / 75</span></h3>
+                    </div>
+                    
+                    <div class="space-y-4 pt-3">
+                        <h4 class="text-xs font-bold text-slate-800 uppercase tracking-widest border-b pb-1">รายละเอียดเกณฑ์คะแนน</h4>
+                        
+                        <div class="space-y-3.5">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="font-medium text-slate-600">1. ความเข้าใจในผลิตภัณฑ์ (Product Knowledge)</span>
+                                    <strong class="text-slate-800">${result.scores.productKnowledge} / 15</strong>
+                                </div>
+                                <div class="w-full bg-slate-100 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: ${(result.scores.productKnowledge / 15) * 100}%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="font-medium text-slate-600">2. ทักษะการนำเสนอ (Presentation Skills)</span>
+                                    <strong class="text-slate-800">${result.scores.presentationSkills} / 15</strong>
+                                </div>
+                                <div class="w-full bg-slate-100 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: ${(result.scores.presentationSkills / 15) * 100}%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="font-medium text-slate-600">3. ลำดับขั้นตอนการนำเสนอขาย (Sales Process)</span>
+                                    <strong class="text-slate-800">${result.scores.salesProcess} / 15</strong>
+                                </div>
+                                <div class="w-full bg-slate-100 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: ${(result.scores.salesProcess / 15) * 100}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-5 border-t border-slate-100">
+                        <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl">
+                            <h5 class="text-xs font-black text-emerald-800 uppercase tracking-wider mb-1"><i class="fas fa-check-circle mr-1"></i> จุดแข็ง (Strengths)</h5>
+                            <p class="text-xs text-emerald-700 leading-relaxed">${result.summary.strengths}</p>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl">
+                            <h5 class="text-xs font-black text-amber-800 uppercase tracking-wider mb-1"><i class="fas fa-exclamation-triangle mr-1"></i> ข้อดีที่ควรพัฒนา</h5>
+                            <p class="text-xs text-amber-700 leading-relaxed">${result.summary.improvements}</p>
+                        </div>
+                    </div>
+                `;
+
+                leaderboardData.push({
+                    rank: 0, 
+                    name: currentUser.name, 
+                    id: currentUser.id, 
+                    score: parseFloat(result.totalScore.toFixed(1))
+                });
+                
+                leaderboardData.sort((a, b) => b.score - a.score);
+                leaderboardData.forEach((item, index) => {
+                    item.rank = index + 1;
+                });
+                
+                if (!roleplayHistoryData[currentUser.id]) {
+                    roleplayHistoryData[currentUser.id] = [];
+                }
+                roleplayHistoryData[currentUser.id].unshift({
+                    customerName: currentCustomer.name,
+                    date: new Date().toLocaleDateString('en-GB'),
+                    score: result.totalScore
+                });
+
+                renderLeaderboard();
+                
+                evaluationModal.classList.remove('hidden');
+                evaluationModal.classList.add('flex');
+            }, 1200);
+        };
+
+        window.closeEvaluationModalAndReset = () => {
+            evaluationModal.classList.add('hidden');
+            evaluationModal.classList.remove('flex');
+            roleplayView.classList.add('hidden');
+            showView('customer-list-view');
+        };
+
+        window.showScoringInfo = () => {
+            scoringModalContent.innerHTML = `
+                <h3 class="text-xl font-bold text-slate-800 mb-4 border-b pb-2">เกณฑ์การวัดระดับคะแนน</h3>
+                <div class="space-y-4 text-sm leading-relaxed text-slate-600">
+                    <p>ระบบ SalesSim คำนวณความถูกต้องและการสื่อสารของคุณผ่าน 5 มิติคุณภาพสูงสุด (มิติมหภาคละ 15 คะแนน):</p>
+                    <ul class="list-disc list-inside space-y-2 text-xs">
+                        <li><strong>ความรู้ความแม่นยำโปรดักส์:</strong> การจำแนกประเภทและจุดเด่น ttb No Fixed, ttb all free, ttb so fast</li>
+                        <li><strong>ทักษะการเล่าเรื่อง:</strong> มีการใช้คำสุภาพ ยินดีรับบริการ ต้อนรับลูกค้า</li>
+                        <li><strong>ขั้นตอนการขาย:</strong> ตั้งแต่เปิดสนทนา ซักถาม เสนอโปรเจ็คต์ และตอบข้อกังวล</li>
+                    </ul>
+                </div>
+            `;
+            scoringModal.classList.remove('hidden');
+            scoringModal.classList.add('flex');
+        };
+
+        window.closeScoringModal = () => {
+            scoringModal.classList.add('hidden');
+            scoringModal.classList.remove('flex');
+        };
+
+        // --- PRODUCT SPECIALIST LOGIC ---
+        function renderSpecialists() {
+            specialistGridView.innerHTML = '';
+            specialists.forEach(spec => {
+                const card = document.createElement('div');
+                card.className = 'card-premium p-6 flex flex-col items-center text-center space-y-4';
+                card.innerHTML = `
+                    <div class="relative">
+                        <img src="${spec.image}" alt="${spec.name}" class="w-20 h-20 rounded-full object-cover ring-4 ring-slate-100">
+                        <span class="absolute top-1 right-1 flex h-3.5 w-3.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+                        </span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">${spec.name}</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">ผู้เชี่ยวชาญ ttb</p>
+                    </div>
+                    <div class="flex items-center gap-1 text-amber-500 text-xs font-bold bg-amber-50 px-3 py-1 rounded-full">
+                        <i class="fas fa-star"></i> ${spec.rating} (${spec.ratingsCount} รีวิว)
+                    </div>
+                    <div class="text-xs text-slate-500 bg-slate-50 p-3 rounded-xl w-full border border-slate-150">
+                        <span class="font-bold text-slate-700 block mb-1 text-[10px] uppercase tracking-wider">เชี่ยวชาญด้านเป็นพิเศษ</span>
+                        ${spec.products.join(', ')}
+                    </div>
+                    <button onclick="startSpecialistChat(${spec.id})" class="btn-ttb-primary w-full py-2.5 text-xs font-bold rounded-xl mt-2">
+                        สอบถามข้อมูลด้วยสายสนทนา
+                    </button>
+                `;
+                specialistGridView.appendChild(card);
+            });
+        }
+
+        window.startSpecialistChat = (id) => {
+            currentSpecialist = specialists.find(s => s.id === id);
+            if (!currentSpecialist) return;
+
+            // Trigger call layout directly
+            startLiveVoiceSession(`คุณคือผู้เชี่ยวชาญผลิตภัณฑ์ของธนาคารทหารไทยธนชาต (ttb bank) ชื่อ ${currentSpecialist.name}. คุณให้ข้อมูลทางการเงินอย่างเป็นมิตร สุภาพ และถูกต้อง ตอบสั้นกระชับเข้าใจง่าย`, currentSpecialist);
+        };
+
+        document.getElementById('back-to-specialist-list-btn').addEventListener('click', () => {
+            if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+            specialistChatView.classList.add('hidden');
+            showView('specialist-view');
+        });
+
+        endSpecialistChatButton.addEventListener('click', () => {
+            showRatingModal();
+        });
+
+        // --- STAR RATING LOGIC ---
+        function showRatingModal() {
+            document.getElementById('rating-specialist-image').src = currentSpecialist.image;
+            document.getElementById('rating-specialist-name').textContent = `ให้คำแนะนำโดย ${currentSpecialist.name}`;
+            
+            const starsBox = document.getElementById('rating-stars-container');
+            starsBox.innerHTML = '';
+            
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('i');
+                star.className = 'far fa-star cursor-pointer hover:text-amber-500 transition-colors duration-150';
+                star.onclick = () => submitRating(i);
+                starsBox.appendChild(star);
+            }
+            
+            document.getElementById('rating-feedback').textContent = '';
+            ratingModal.classList.remove('hidden');
+            ratingModal.classList.add('flex');
+        }
+
+        window.submitRating = (rating) => {
+            const stars = document.querySelectorAll('#rating-stars-container i');
+            stars.forEach((star, idx) => {
+                if (idx < rating) {
+                    star.className = 'fas fa-star text-amber-500';
+                } else {
+                    star.className = 'far fa-star text-slate-300';
+                }
+            });
+
+            const feedback = document.getElementById('rating-feedback');
+            feedback.textContent = `ขอบคุณที่ให้การประเมิน ${rating} ดาว!`;
+            
+            setTimeout(() => {
+                closeRatingModal();
+            }, 1000);
+        };
+
+        window.closeRatingModal = () => {
+            ratingModal.classList.add('hidden');
+            ratingModal.classList.remove('flex');
+            specialistChatView.classList.add('hidden');
+            showView('specialist-view');
+        };
+
+        // --- KNOWLEDGE QUIZ RENDERERS ---
+        function renderQuizzes() {
+            quizGridView.innerHTML = '';
+            quizProducts.forEach(prod => {
+                const card = document.createElement('div');
+                card.className = 'card-premium p-6 flex flex-col justify-between items-start';
+                card.innerHTML = `
+                    <div class="space-y-4 w-full">
+                        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl shadow-sm">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 leading-snug">${prod.name}</h3>
+                            <p class="text-xs text-slate-400 mt-1">${prod.desc}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 w-full pt-6 mt-4 border-t border-slate-100">
+                        <button onclick="showProductDetail('${prod.name}')" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100">
+                            รู้จักผลิตภัณฑ์
+                        </button>
+                        <button onclick="startQuiz('${prod.name}')" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-orange-500 hover:bg-orange-600 text-white shadow-sm">
+                            เริ่มทดสอบ
+                        </button>
+                    </div>
+                `;
+                quizGridView.appendChild(card);
+            });
+        }
+
+        window.showProductDetail = (name) => {
+            const data = productDetailsData[name];
+            if (!data) return;
+
+            productDetailContent.innerHTML = `
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mb-6 p-6 md:p-8">
+                    <div class="flex items-center gap-3 border-b border-slate-100 pb-5 mb-6">
+                        <button onclick="showView('quiz-view')" class="w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 transition-colors">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <h2 class="text-2xl font-black text-slate-800">${data.title}</h2>
+                    </div>
+                    
+                    <div class="bg-blue-50/50 p-5 rounded-2xl border border-blue-100/30 text-slate-700 leading-relaxed mb-6">
+                        <p class="text-sm md:text-base">${data.summary}</p>
+                    </div>
+
+                    <h4 class="font-bold text-slate-800 text-sm uppercase tracking-wider mb-4">จุดเด่นผลิตภัณฑ์ที่สำคัญ</h4>
+                    <ul class="space-y-3">
+                        ${data.points.map(pt => `
+                            <li class="flex items-start gap-3 bg-slate-50 p-4 rounded-xl border border-slate-150">
+                                <i class="fas fa-check-circle text-emerald-500 mt-0.5 flex-shrink-0 text-sm"></i>
+                                <span class="text-xs md:text-sm text-slate-700 leading-relaxed">${pt.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                    
+                    <button onclick="startQuiz('${name}')" class="btn-ttb-primary w-full py-4 text-base mt-8">
+                        เริ่มทำแบบทดสอบทันที
+                    </button>
+                </div>
+            `;
+            showView('quiz-product-detail-view');
+        };
+
+        // --- STREAMING_CHUNK: Displaying quiz elements ---
+        // --- ACTIVE QUIZ GAME ENGINE ---
+        window.startQuiz = (name) => {
+            currentQuizProduct = name;
+            const pool = allQuizQuestions[name];
+            
+            if (!pool || pool.length === 0) {
+                alert(`ขออภัย ระบบจะอัปเดตชุดคำถามของ ${name} เร็วๆ นี้!`);
+                return;
+            }
+
+            shuffledQuestions = [...pool].sort(() => 0.5 - Math.random()).slice(0, QUIZ_LENGTH);
+            currentQuestionIndex = 0;
+            score = 0;
+
+            showView('quiz-interface-view');
+            displayCurrentQuestion();
+        };
+
+        function displayCurrentQuestion() {
+            if (quizTimerInterval) clearInterval(quizTimerInterval);
+            isAnswered = false;
+
+            const q = shuffledQuestions[currentQuestionIndex];
+            quizTitleEl.textContent = currentQuizProduct;
+            quizProgressEl.textContent = `ข้อที่ ${currentQuestionIndex + 1} จากทั้งหมด ${QUIZ_LENGTH}`;
+            quizQuestionTextEl.textContent = q.question;
+            
+            speakText(q.question, 'female', true);
+
+            quizOptionsEl.innerHTML = '';
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option w-full py-4 px-5 text-left rounded-2xl bg-white border border-slate-200 text-slate-800 hover:bg-slate-50 focus:outline-none transition-all text-sm md:text-base font-semibold shadow-sm flex justify-between items-center';
+                btn.innerHTML = `<span>${opt}</span> <i class="far fa-circle text-slate-300"></i>`;
+                btn.onclick = () => selectAnswer(opt, btn);
+                quizOptionsEl.appendChild(btn);
+            });
+
+            quizFeedbackEl.classList.add('hidden');
+            quizNextBtn.classList.add('hidden');
+
+            timeLeft = TIME_LIMIT;
+            quizTimerEl.textContent = timeLeft;
+            
+            quizTimerInterval = setInterval(() => {
+                timeLeft--;
+                quizTimerEl.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(quizTimerInterval);
+                    handleTimeUp();
+                }
+            }, 1000);
+        }
+
+        function handleTimeUp() {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const q = shuffledQuestions[currentQuestionIndex];
+            soundEffects.playIncorrect();
+
+            document.querySelectorAll('.quiz-option').forEach(btn => {
+                btn.disabled = true;
+                const optText = btn.querySelector('span').textContent;
+                if (optText === q.correctAnswer) {
+                    btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-500');
+                    btn.classList.remove('bg-white', 'border-slate-200');
+                    btn.querySelector('i').className = 'fas fa-check-circle text-white';
+                }
+            });
+
+            quizFeedbackTitleEl.textContent = 'หมดเวลา!';
+            quizFeedbackTextEl.textContent = `คำตอบที่ถูกต้องคือ: ${q.correctAnswer}\n${q.explanation}`;
+            quizFeedbackEl.className = 'mt-6 p-5 rounded-2xl bg-red-50 border border-red-100 text-red-700';
+            quizFeedbackEl.classList.remove('hidden');
+            
+            quizNextBtn.classList.remove('hidden');
+            if (currentQuestionIndex === QUIZ_LENGTH - 1) {
+                quizNextBtn.querySelector('span').textContent = 'ดูผลสรุปคะแนน';
+            } else {
+                quizNextBtn.querySelector('span').textContent = 'ถัดไป';
+            }
+        }
+
+        function selectAnswer(selectedOption, clickedBtn) {
+            if (isAnswered) return;
+            isAnswered = true;
+            clearInterval(quizTimerInterval);
+
+            if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+
+            const q = shuffledQuestions[currentQuestionIndex];
+            const isCorrect = selectedOption === q.correctAnswer;
+
+            document.querySelectorAll('.quiz-option').forEach(btn => {
+                btn.disabled = true;
+                const optText = btn.querySelector('span').textContent;
+                
+                if (optText === q.correctAnswer) {
+                    btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-500');
+                    btn.classList.remove('bg-white', 'border-slate-200');
+                    btn.querySelector('i').className = 'fas fa-check-circle text-white';
+                } else if (btn === clickedBtn && !isCorrect) {
+                    btn.classList.add('bg-red-500', 'text-white', 'border-red-500');
+                    btn.classList.remove('bg-white', 'border-slate-200');
+                    btn.querySelector('i').className = 'fas fa-times-circle text-white';
+                }
+            });
+
+            if (isCorrect) {
+                score++;
+                soundEffects.playCorrect();
+                quizFeedbackTitleEl.textContent = 'ถูกต้อง!';
+                quizFeedbackEl.className = 'mt-6 p-5 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-700';
+            } else {
+                soundEffects.playIncorrect();
+                quizFeedbackTitleEl.textContent = 'ผิดพลาด!';
+                quizFeedbackEl.className = 'mt-6 p-5 rounded-2xl bg-red-50 border border-red-100 text-red-700';
+            }
+
+            quizFeedbackTextEl.textContent = q.explanation;
+            quizFeedbackEl.classList.remove('hidden');
+            quizNextBtn.classList.remove('hidden');
+
+            if (currentQuestionIndex === QUIZ_LENGTH - 1) {
+                quizNextBtn.querySelector('span').textContent = 'ดูผลสรุปคะแนน';
+            } else {
+                quizNextBtn.querySelector('span').textContent = 'ถัดไป';
+            }
+        }
+
+        quizNextBtn.addEventListener('click', () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < QUIZ_LENGTH) {
+                displayCurrentQuestion();
+            } else {
+                showQuizResults();
+            }
+        });
+
+        quizSoundToggle.addEventListener('click', () => {
+            isQuizMuted = !isQuizMuted;
+            quizSoundToggle.innerHTML = isQuizMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+            if (isQuizMuted && window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+        });
+
+        function showQuizResults() {
+            showView('quiz-results-view');
+            document.getElementById('quiz-results-product').textContent = `Product: ${currentQuizProduct}`;
+            document.getElementById('quiz-results-score').textContent = `${score} / ${QUIZ_LENGTH}`;
+            
+            const evalBox = document.getElementById('quiz-evaluation');
+            if (score === QUIZ_LENGTH) {
+                evalBox.innerHTML = `
+                    <h4 class="font-bold text-emerald-800 text-sm flex items-center gap-1.5"><i class="fas fa-check-circle"></i> ยอดเยี่ยม!</h4>
+                    <p class="text-xs text-emerald-700 mt-1 leading-relaxed">คุณมีความเข้าใจเกี่ยวกับเงื่อนไข จุดแข็ง และขอบเขตบริการของผลิตภัณฑ์นี้อย่างลึกซึ้ง 100% พร้อมให้คำปรึกษาลูกค้าทุกคนอย่างมั่นใจ!</p>
+                `;
+            } else if (score >= 2) {
+                evalBox.innerHTML = `
+                    <h4 class="font-bold text-amber-800 text-sm flex items-center gap-1.5"><i class="fas fa-exclamation-circle"></i> ผ่านเกณฑ์ขั้นดี</h4>
+                    <p class="text-xs text-slate-600 mt-1 leading-relaxed">คุณผ่านเกณฑ์ประเมินเบื้องต้นได้เป็นอย่างดี แต่อาจมีรายละเอียดเล็กๆ น้อยๆ เกี่ยวกับสิทธิ์หรือค่าธรรมเนียมที่ต้องทบทวนในหน้ารายละเอียดเพิ่มเติม</p>
+                `;
+            } else {
+                evalBox.innerHTML = `
+                    <h4 class="font-bold text-red-800 text-sm flex items-center gap-1.5"><i class="fas fa-info-circle"></i> ควรศึกษาเนื้อหาเพิ่มเติม</h4>
+                    <p class="text-xs text-slate-600 mt-1 leading-relaxed">แนะนำให้ลองกลับไปเปิดอ่านชีท "รู้จักผลิตภัณฑ์" ใหม่อีกครั้ง เพื่อทำความเข้าใจให้รอบด้านยิ่งขึ้น</p>
+                `;
+            }
+        }
+
+        // --- STREAMING_CHUNK: Daily investment news generator ---
+        // --- NEWS CONTENT INJECTOR ---
+        async function fetchNews() {
+            newsWrapper.innerHTML = `
+                <div class="col-span-full text-center py-20">
+                    <i class="fas fa-spinner fa-spin text-3xl text-orange-500 mb-4"></i>
+                    <p class="text-sm font-semibold text-slate-500">กำลังดึงข้อมูลและบทวิเคราะห์ทางการเงินเรียลไทม์...</p>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const today = new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
+                const mockNews = {
+                    date: `ข้อมูลสรุปภาวะเศรษฐกิจ ประจำวันที่ ${today}`,
+                    dailyBriefing: "ภาพรวมสภาวะเศรษฐกิจต่างประเทศมีความผันผวนสูง ดัชนีหลักปิดสลับบวกและลบ จากความกังวลอัตราดอกเบี้ยนโยบายระยะยาวของธนาคารกลางสหรัฐฯ ขณะที่ราคาทองคำมีแรงพยุงฐานสิทธิภัยสงคราม",
+                    keyTopics: {
+                        gold: "ราคาทองคำในประเทศยังเคลื่อนไหวทรงตัว มีแรงต้านเล็กน้อยบริเวณ 42,000 บาทต่อบาททองคำ ท่ามกลางค่าเงินบาทที่แข็งค่าจำกัด เป็นโอกาสออมสินทรัพย์ปลอดภัยระยะยาว",
+                        internationalMarkets: "ดัชนี S&P 500 และ Nasdaq ในตลาดหุ้นนิวยอร์กปรับตัวสูงขึ้นเล็กน้อยจากอานิสงส์ความต้องการชิปและเทคโนโลยี AI ของกลุ่ม Big Tech ที่แข็งแกร่ง",
+                        thaiMarkets: "ดัชนี SET ปิดปรับตัวบวกเบาๆ ทรงตัวบริเวณ 1,380 จุด ได้แรงหนุนหลักจากกลุ่มค้าปลีกและท่องเที่ยว ขณะที่ปริมาณซื้อขายยังค่อนข้างเบาบางเพื่อรอดูนโยบายกระตุ้นเศรษฐกิจใหม่",
+                        oil: "ราคาน้ำมันดิบ Brent ย่อตัวลงต่ำกว่า 83 ดอลลาร์ต่อบาร์เรล จากปริมาณสำรองน้ำมันดิบของสหรัฐฯ ที่ขยายตัวเพิ่มขึ้น สวนทางกับการจำกัดโควตาผลิตของกลุ่ม OPEC+"
+                    }
+                };
+
+                renderNews(mockNews);
+            }, 1000);
+        }
+
+        function renderNews(newsData) {
+            newsWrapper.innerHTML = `
+                <div class="col-span-full bg-slate-950 text-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-900 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div class="space-y-2">
+                        <span class="bg-orange-500 text-white text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">AI Insight Briefing</span>
+                        <h2 class="text-xl md:text-2xl font-black">${newsData.date}</h2>
+                        <p class="text-xs text-slate-400 leading-relaxed max-w-3xl">${newsData.dailyBriefing}</p>
+                    </div>
+                    <button onclick="fetchNews()" class="btn-ttb-primary px-5 py-3 text-xs font-bold rounded-xl flex items-center gap-1.5 flex-shrink-0 self-start sm:self-auto">
+                        <i class="fas fa-sync-alt"></i> อัปเดตข้อมูล
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full col-span-full">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex items-center gap-3 mb-4 text-amber-500 border-b pb-3 border-slate-100">
+                            <i class="fas fa-coins text-lg"></i>
+                            <h4 class="font-bold text-slate-800">บทวิเคราะห์ ตลาดทองคำ</h4>
+                        </div>
+                        <p class="text-xs md:text-sm text-slate-600 leading-relaxed">${newsData.keyTopics.gold}</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex items-center gap-3 mb-4 text-sky-500 border-b pb-3 border-slate-100">
+                            <i class="fas fa-chart-line text-lg"></i>
+                            <h4 class="font-bold text-slate-800">ตลาดหุ้นสหรัฐฯ & ต่างประเทศ</h4>
+                        </div>
+                        <p class="text-xs md:text-sm text-slate-600 leading-relaxed">${newsData.keyTopics.internationalMarkets}</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex items-center gap-3 mb-4 text-blue-600 border-b pb-3 border-slate-100">
+                            <i class="fas fa-signal text-lg"></i>
+                            <h4 class="font-bold text-slate-800">ตลาดหุ้นไทย (SET Index)</h4>
+                        </div>
+                        <p class="text-xs md:text-sm text-slate-600 leading-relaxed">${newsData.keyTopics.thaiMarkets}</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex items-center gap-3 mb-4 text-rose-500 border-b pb-3 border-slate-100">
+                            <i class="fas fa-gas-pump text-lg"></i>
+                            <h4 class="font-bold text-slate-800">ภาวะพลังงาน & ราคาน้ำมัน</h4>
+                        </div>
+                        <p class="text-xs md:text-sm text-slate-600 leading-relaxed">${newsData.keyTopics.oil}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- CHAMPIONS LEADERBOARD ---
+        function getRankBadge(rank) {
+            if (rank === 1) return `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-50 text-amber-500 text-sm font-black border border-amber-200"><i class="fas fa-crown"></i></span>`;
+            if (rank === 2) return `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-500 text-sm font-black border border-slate-200">2</span>`;
+            if (rank === 3) return `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-orange-50 text-orange-500 text-sm font-black border border-orange-200">3</span>`;
+            return `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-slate-400 text-xs font-bold">${rank}</span>`;
+        }
+
+        function renderLeaderboard() {
+            const body = document.getElementById('leaderboard-body');
+            body.innerHTML = '';
+            
+            leaderboardData.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/50 transition-colors border-b border-slate-100';
+                tr.innerHTML = `
+                    <td class="p-4 text-center">${getRankBadge(user.rank)}</td>
+                    <td class="p-4 font-bold text-slate-800 hover:text-blue-600 cursor-pointer" onclick="showLeaderboardDetails('${user.id}')">${user.name}</td>
+                    <td class="p-4 text-slate-400 font-mono text-xs">${user.id}</td>
+                    <td class="p-4 text-right font-black text-blue-700">${user.score.toFixed(1)} <span class="text-[10px] text-slate-400 font-bold">/ 75</span></td>
+                    <td class="p-4 text-center">
+                        <button onclick="showLeaderboardDetails('${user.id}')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-600 transition-all border border-slate-200">
+                            เปิดประวัติ
+                        </button>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+
+        window.showLeaderboardDetails = (id) => {
+            const player = leaderboardData.find(u => u.id === id);
+            if (!player) return;
+
+            const history = roleplayHistoryData[id] || [];
+            let historyHTML = `
+                <div class="text-center py-6 text-slate-400 text-xs font-semibold">
+                    <i class="far fa-folder-open text-3xl mb-2 block"></i> ยังไม่มีประวัติจำลองสถานการณ์การขายล่าสุด
+                </div>
+            `;
+
+            if (history.length > 0) {
+                historyHTML = `
+                    <div class="space-y-2.5 mt-4">
+                        ${history.map(item => `
+                            <div class="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-200/60 rounded-xl">
+                                <div>
+                                    <strong class="text-sm text-slate-700 block">${item.customerName}</strong>
+                                    <span class="text-[10px] text-slate-400 font-medium">${item.date}</span>
+                                </div>
+                                <span class="text-sm font-extrabold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100/40">${item.score} / 75</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            leaderboardModalContent.innerHTML = `
+                <div class="text-center pb-4 border-b border-slate-100 mb-5">
+                    <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-3">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 leading-tight">${player.name}</h3>
+                    <p class="text-xs text-slate-400 mt-1">รหัสพนักงาน: ${player.id} &nbsp;|&nbsp; คะแนนเฉลี่ย: ${player.score}</p>
+                </div>
+                
+                <h4 class="font-bold text-slate-700 text-xs uppercase tracking-wider mb-2">ประวัติจำลอง (Roleplay Log)</h4>
+                ${historyHTML}
+            `;
+
+            leaderboardModal.classList.remove('hidden');
+            leaderboardModal.classList.add('flex');
+        };
+
+        window.closeLeaderboardModal = () => {
+            leaderboardModal.classList.add('hidden');
+            leaderboardModal.classList.remove('flex');
+        };
+    </script>
+</body>
+</html>
