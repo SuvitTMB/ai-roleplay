@@ -1,0 +1,2096 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PK System Admin - Advanced Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Kanit', sans-serif; background-color: #fafaf9; color: #44403c; }
+        :root { --primary-color: #0056ff; --accent-orange: #f68b1f; }
+        
+        .tab-active { background-color: var(--primary-color); color: white !important; box-shadow: 0 4px 12px -2px rgba(0, 86, 255, 0.4); }
+        .tab-btn:hover { color: var(--accent-orange) !important; }
+        .tab-active:hover { color: white !important; }
+
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .modal-bg { background: rgba(28, 25, 23, 0.7); backdrop-filter: blur(8px); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Table Styles with Round Corners */
+        .rounded-table-container { border-radius: 15px; overflow: hidden; border: 1px solid #e2e8f0; background: white; }
+        th { font-size: 13px !important; font-weight: 700; color: #475569; background-color: #e2e8f0; padding: 10px 8px !important; text-align: center; text-transform: uppercase; }
+        td { border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+
+        /* Level Specific Styles */
+        .lvl-1 { font-size: 15px !important; font-weight: 700 !important; color: #1e293b; }
+        .lvl-2 { font-size: 13px !important; color: #334155; }
+
+        .row-selected { background-color: #eff6ff !important; border-left: 4px solid var(--primary-color); }
+
+        /* Custom Scrollbar for Chat and Workspace */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+
+        /* Card Scale Hover animation */
+        .roleplay-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .roleplay-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.15); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-stone-100 border-b border-stone-200 sticky top-0 z-50">
+        <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-[#0056ff] rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">A</div>
+                    <div>
+                        <h1 class="font-bold text-stone-800 leading-tight text-[16px]">Admin Manager</h1>
+                        <p id="connection-status" class="text-[13px] text-stone-400 uppercase tracking-widest font-bold italic">Checking Connection...</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-1" id="main-nav">
+                    <button onclick="navigate('roleplay')" id="nav-roleplay" class="tab-btn px-4 py-2 rounded-lg text-[13px] font-medium transition-all">Roleplay</button>
+                    <button onclick="navigate('dashboard')" id="nav-dashboard" class="tab-btn px-4 py-2 rounded-lg text-[13px] font-medium text-stone-500 transition-all">แดชบอร์ด</button>
+                    <button onclick="navigate('data-system')" id="nav-data-system" class="tab-btn px-4 py-2 rounded-lg text-[13px] font-medium text-stone-500 transition-all">ระบบข้อมูล</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-[1200px] mx-auto py-8 w-full px-4 sm:px-6 lg:px-8">
+        
+        <!-- SECTION: ROLEPLAY (NEW LANDING PAGE WITH SPECIALIST CARDS) -->
+        <section id="section-roleplay" class="content-section hidden fade-in">
+            <div class="space-y-6">
+                <!-- Headings -->
+                <div class="border-b border-stone-200 pb-4">
+                    <h1 class="text-2xl font-bold text-stone-800 tracking-tight flex items-center gap-2">
+                        <i data-lucide="sparkles" class="text-blue-600 w-6 h-6"></i>
+                        AI Sales Roleplay Simulator
+                    </h1>
+                    <p class="text-[13px] text-stone-500 font-medium mt-1">แบบจำลองสถานการณ์การนำเสนอผลิตภัณฑ์ให้ลูกค้า</p>
+                </div>
+
+                <!-- Showcase Cards Container (Drawn from ai_group nogroup=1) -->
+                <div id="roleplay-showcase-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Loading State -->
+                    <div class="col-span-full py-16 text-center text-stone-400 italic text-[13px] bg-white rounded-3xl border border-stone-200">
+                        <span class="inline-block w-4 h-4 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin mr-2"></span>
+                        กำลังเรียกข้อมูลประวัติผู้เชี่ยวชาญ (nogroup = 1) จากระบบคลาวด์...
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- SECTION: DASHBOARD (ADVANCED ROLEPLAY SIMULATOR) -->
+        <section id="section-dashboard" class="content-section hidden fade-in">
+            <div class="space-y-6">
+                <!-- Top Statistics Banner -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm flex items-center gap-4">
+                        <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
+                            <i data-lucide="book-open" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-[13px] text-stone-400 font-bold uppercase">หมวดกิจกรรม</p>
+                            <h3 id="stat-l1-count" class="text-2xl font-bold text-stone-800">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm flex items-center gap-4">
+                        <div class="p-3 bg-indigo-100 text-indigo-600 rounded-xl">
+                            <i data-lucide="users" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-[13px] text-stone-400 font-bold uppercase">ผู้เชี่ยวชาญทั้งหมด</p>
+                            <h3 id="stat-l2-count" class="text-2xl font-bold text-stone-800">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm flex items-center gap-4">
+                        <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl">
+                            <i data-lucide="mouse-pointer-click" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-[13px] text-stone-400 font-bold uppercase">ยอดคลิกสะสม</p>
+                            <h3 id="stat-clicks-count" class="text-2xl font-bold text-stone-800">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-2xl text-white shadow-md flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-sm">PK AI Specialist</h4>
+                            <p class="text-[13px] text-blue-100">จำลองสถานการณ์คุยอัจฉริยะ</p>
+                        </div>
+                        <div class="px-2.5 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg text-[13px] font-bold tracking-wider">ACTIVE</div>
+                    </div>
+                </div>
+
+                <!-- Simulation Interface Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[72vh]">
+                    
+                    <!-- Left Sidebar: Selection & Settings (Cols: 4) -->
+                    <div class="lg:col-span-4 bg-white rounded-3xl border border-stone-200 p-5 flex flex-col justify-between overflow-hidden shadow-sm">
+                        <div class="flex flex-col flex-1 overflow-hidden">
+                            <div class="border-b border-stone-100 pb-3 mb-4">
+                                <h2 class="font-bold text-stone-800 text-base flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 bg-blue-600 rounded-full animate-pulse"></span>
+                                    ตั้งค่าบทบาทจำลอง
+                                </h2>
+                                <p class="text-[13px] text-stone-400">เลือกหมวดกิจกรรมและรายชื่อผู้เชี่ยวชาญเพื่อเริ่มฝึกฝน</p>
+                            </div>
+
+                            <div class="space-y-4 overflow-y-auto flex-1 pr-1 custom-scrollbar">
+                                <!-- Scenario Selection (L1) -->
+                                <div>
+                                    <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1.5">1. เลือกหมวดกิจกรรม</label>
+                                    <select id="sim-scenario-select" onchange="onSimulatorScenarioChanged()" class="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl outline-none text-[13px] focus:border-blue-500 font-semibold text-stone-700">
+                                        <option value="">-- กรุณาเลือกหมวดกิจกรรม --</option>
+                                    </select>
+                                </div>
+
+                                <!-- Persona Selection (L2) -->
+                                <div>
+                                    <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1.5">2. เลือกผู้เชี่ยวชาญ</label>
+                                    <select id="sim-persona-select" onchange="onSimulatorPersonaChanged()" class="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl outline-none text-[13px] focus:border-blue-500 font-semibold text-stone-700" disabled>
+                                        <option value="">-- กรุณาเลือกผู้เชี่ยวชาญ --</option>
+                                    </select>
+                                </div>
+
+                                <!-- Specialist Guideline Details Display -->
+                                <div class="bg-blue-50/50 rounded-2xl p-4 border border-blue-100/50 space-y-3">
+                                    <h4 class="text-[13px] font-bold text-blue-700 uppercase flex items-center gap-1.5">
+                                        <i data-lucide="target" class="w-4 h-4"></i> รายละเอียด / ข้อมูลจำลองเพิ่มเติม
+                                    </h4>
+                                    <div id="sim-guidelines-list" class="space-y-2 text-[13px] text-stone-600 leading-relaxed">
+                                        <p class="italic text-stone-400">กรุณาเลือกหมวดกิจกรรมและผู้เชี่ยวชาญเพื่อโหลดข้อมูลจำลอง</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-stone-100 flex flex-col gap-2">
+                            <button id="btn-start-simulation" onclick="startSimulatorSessionDirectly(this)" class="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl text-sm hover:bg-blue-700 transition-all shadow-md flex items-center justify-center gap-2">
+                                <i data-lucide="play" class="w-4 h-4"></i> เริ่มการจำลองบทบาท
+                            </button>
+                            <button id="btn-reset-simulation" onclick="resetSimulatorSession()" class="w-full py-3.5 bg-stone-100 text-stone-600 font-bold rounded-xl text-[13px] hover:bg-stone-200 transition-all hidden">
+                                รีเซ็ตแบบจำลอง
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right Main Pane: Arena / Playground (Cols: 8) -->
+                    <div class="lg:col-span-8 bg-white rounded-3xl border border-stone-200 flex flex-col overflow-hidden shadow-sm relative">
+                        <!-- Welcome Idle View -->
+                        <div id="sim-idle-view" class="absolute inset-0 bg-white flex flex-col items-center justify-center p-8 z-10">
+                            <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-sm border border-blue-100/50">
+                                <i data-lucide="sparkles" class="w-10 h-10 animate-bounce"></i>
+                            </div>
+                            <h2 class="text-xl font-bold text-stone-800 mb-2 text-center">PK AI Specialist Simulator</h2>
+                            <p class="text-stone-500 text-[13px] max-w-md text-center leading-relaxed">
+                                พัฒนาทักษะการประสานงานและการเจรจากับผู้เชี่ยวชาญสาขาต่างๆ ผ่านบทบาทจำลองที่กำหนดรูปแบบบริบท (Prompt) ทั้งแบบข้อความและไฟล์ได้อิสระ
+                            </p>
+                            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg w-full">
+                                <div class="p-4 bg-stone-50 rounded-2xl border border-stone-100 flex items-start gap-3">
+                                    <div class="p-1.5 bg-indigo-100 text-indigo-600 rounded-lg"><i data-lucide="check-square" class="w-4 h-4"></i></div>
+                                    <div>
+                                        <h4 class="font-bold text-[13px] text-stone-700">ฐานข้อมูลผู้เชี่ยวชาญ</h4>
+                                        <p class="text-[13px] text-stone-400">บทสนทนาอ้างอิงและจำลองโดยยึดตามข้อมูลในกลุ่มผู้เชี่ยวชาญที่สร้างขึ้น</p>
+                                    </div>
+                                </div>
+                                <div class="p-4 bg-stone-50 rounded-2xl border border-stone-100 flex items-start gap-3">
+                                    <div class="p-1.5 bg-emerald-100 text-emerald-600 rounded-lg"><i data-lucide="trending-up" class="w-4 h-4"></i></div>
+                                    <div>
+                                        <h4 class="font-bold text-[13px] text-stone-700">Prompt Control</h4>
+                                        <p class="text-[13px] text-stone-400">ป้อนคำสั่งและอัปโหลดไฟล์คำชี้แนะจำเพาะ เพื่อควบคุมทิศทางคำตอบของลูกค้าจำลอง</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active Live Chat Simulation Interface -->
+                        <div id="sim-active-container" class="hidden flex-1 flex flex-col h-full overflow-hidden">
+                            <div class="p-4 border-b border-stone-100 bg-stone-50 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div id="sim-char-img-container" class="w-12 h-12 rounded-xl overflow-hidden shadow-inner flex items-center justify-center bg-blue-100 text-blue-700 font-bold text-xl">P</div>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <h3 id="sim-char-name" class="font-bold text-stone-800 text-[13px] leading-tight">-</h3>
+                                            <span id="sim-char-meta" class="px-2 py-0.5 bg-stone-200 text-stone-600 rounded-lg text-[13px] font-semibold"></span>
+                                        </div>
+                                        <p id="sim-char-scenario" class="text-[13px] text-stone-400 font-medium">-</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span id="sim-status-pill" class="px-3 py-1 bg-emerald-100 text-emerald-700 text-[13px] font-bold rounded-full flex items-center gap-1.5">
+                                        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                                        กำลังจำลองการพูดคุย
+                                    </span>
+                                    <button onclick="endSimulatorSession()" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 text-[13px] font-bold rounded-xl transition-all flex items-center gap-1">
+                                        <i data-lucide="flag" class="w-3.5 h-3.5"></i> สิ้นสุดและประเมินผล
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
+                                <div class="md:col-span-8 flex flex-col justify-between overflow-hidden border-r border-stone-100">
+                                    <div id="sim-chat-feed" class="flex-1 p-4 overflow-y-auto space-y-4 custom-scrollbar"></div>
+                                    <form id="sim-chat-form" class="p-3 border-t border-stone-100 flex gap-2 bg-white">
+                                        <button type="button" onclick="triggerVoiceInput()" class="mic-btn p-3 text-stone-500 hover:text-blue-600 bg-stone-50 hover:bg-blue-50 rounded-xl transition-all">
+                                            <i data-lucide="mic" class="w-5 h-5"></i>
+                                        </button>
+                                        <input type="text" id="sim-chat-input" placeholder="พิมพ์ข้อความตอบกลับลูกค้าจำลองที่นี่..." class="flex-1 px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-[13px] outline-none focus:border-blue-500" required>
+                                        <button type="submit" class="p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-md">
+                                            <i data-lucide="send" class="w-5 h-5"></i>
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <div class="md:col-span-4 bg-stone-50/50 p-4 flex flex-col overflow-hidden justify-between">
+                                    <div class="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-1">
+                                        <div class="border-b border-stone-200/60 pb-2">
+                                            <h4 class="font-bold text-stone-700 text-[13px] flex items-center gap-1.5">
+                                                <i data-lucide="heart-handshake" class="w-4 h-4 text-blue-600"></i>
+                                                ระบบแนะนำเรียลไทม์ (Live Coach)
+                                            </h4>
+                                            <p class="text-[13px] text-stone-400">ระบบประเมินอารมณ์และคำพูดทันที</p>
+                                        </div>
+
+                                        <div class="p-3 bg-white rounded-xl border border-stone-100 shadow-sm space-y-1.5">
+                                            <span class="text-[13px] text-stone-400 uppercase font-bold tracking-wider">โทนอารมณ์ลูกค้าปัจจุบัน</span>
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-4 h-4 rounded-full bg-amber-500" id="coach-sentiment-dot"></div>
+                                                <span id="coach-sentiment-text" class="text-[13px] font-bold text-stone-700">ปกติ / รอการติดต่อ</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="p-3 bg-blue-50/70 rounded-xl border border-blue-100/40 space-y-1">
+                                            <span class="text-[13px] text-blue-600 font-bold uppercase tracking-wider flex items-center gap-1">
+                                                <i data-lucide="info" class="w-3.5 h-3.5"></i> คำชี้แนะบทสนทนาถัดไป
+                                            </span>
+                                            <p id="coach-advice-text" class="text-[13px] text-stone-600 leading-relaxed">
+                                                เตรียมข้อมูลการประสานงานและตอบลูกค้าอย่างชัดเจน มีเป้าหมาย และตรงใจกับความต้องการเชิงลึก
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-t border-stone-200/60 pt-3 flex items-center justify-between text-[13px] text-stone-400 font-bold uppercase">
+                                        <span>ขับเคลื่อนด้วย Gemini AI</span>
+                                        <i data-lucide="brain-circuit" class="w-4 h-4 text-blue-600"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: DATA SYSTEM (ระบบข้อมูล) -->
+        <section id="section-data-system" class="content-section hidden fade-in">
+            <div class="space-y-6">
+                <div class="bg-stone-100 p-5 rounded-3xl border border-stone-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-indigo-100 text-indigo-700 rounded-2xl shadow-sm">
+                            <i data-lucide="database" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-bold text-stone-800 text-base leading-tight">ระบบข้อมูลหลัก (Database Hub)</h2>
+                            <p class="text-[13px] text-stone-500">จัดการระบบหมวดกิจกรรม รายชื่อผู้เชี่ยวชาญ และสถิติรายงานการประเมินทักษะทั้งหมด</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2 bg-stone-200/60 p-1.5 rounded-2xl w-full md:w-auto">
+                        <button id="sub-btn-manage-data" onclick="switchDataSubView('manage-data')" class="sub-tab-btn flex-1 md:flex-none px-5 py-2.5 rounded-xl text-[13px] font-bold transition-all flex items-center justify-center gap-1.5">
+                            <i data-lucide="sliders" class="w-4 h-4"></i> จัดการหมวดข้อมูล
+                        </button>
+                        <button id="sub-btn-evaluations" onclick="switchDataSubView('evaluations')" class="sub-tab-btn flex-1 md:flex-none px-5 py-2.5 rounded-xl text-[13px] font-bold transition-all flex items-center justify-center gap-1.5">
+                            <i data-lucide="line-chart" class="w-4 h-4"></i> การประเมินผล
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUB-VIEW 1: MANAGE DATA -->
+                <div id="sub-view-manage-data" class="data-sub-view space-y-6">
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- COLUMN 1: LEVEL 1 (หมวดกิจกรรม) -->
+                        <div class="bg-white rounded-[20px] shadow-sm border border-stone-200 p-5 flex flex-col h-[65vh] overflow-hidden">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-base font-bold text-stone-800 flex items-center gap-2">
+                                    <span class="w-2 h-6 bg-blue-600 rounded-full"></span> หมวดกิจกรรม
+                                </h2>
+                                <button onclick="openModal('add_group', 1)" class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center hover:bg-blue-700 transition-all shadow-md">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <div class="overflow-y-auto flex-1 no-scrollbar rounded-table-container">
+                                <table class="w-full">
+                                    <thead class="sticky top-0 z-10">
+                                        <tr>
+                                            <th width="12%">ลำดับ</th>
+                                            <th width="45%" class="text-left">ชื่อหมวด</th>
+                                            <th width="18%">สถานะ</th>
+                                            <th width="25%">จัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-l1-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- COLUMN 2: LEVEL 2 (รายชื่อผู้เชี่ยวชาญ) -->
+                        <div class="bg-white rounded-[20px] shadow-sm border border-stone-200 p-5 flex flex-col h-[65vh] overflow-hidden">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-base font-bold text-stone-800 flex items-center gap-2">
+                                    <span class="w-2 h-6 bg-indigo-500 rounded-full"></span> รายชื่อผู้เชี่ยวชาญ
+                                </h2>
+                                <button id="btn-add-l2" onclick="openModal('add_group', 2)" class="w-8 h-8 bg-indigo-50 text-white rounded-lg flex items-center justify-center hover:bg-indigo-600 transition-all shadow-md">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <div class="overflow-y-auto flex-1 no-scrollbar rounded-table-container">
+                                <table class="w-full">
+                                    <thead class="sticky top-0 z-10">
+                                        <tr>
+                                            <th width="8%">ลำดับ</th>
+                                            <th width="28%" class="text-left">ชื่อ-นามสกุล</th>
+                                            <th width="25%">อายุ</th>
+                                            <th width="12%">คลิก</th>
+                                            <th width="15%">สถานะ</th>
+                                            <th width="12%">จัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-l2-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-VIEW 2: EVALUATIONS (CRITERIA ADMIN VIEW) -->
+                <div id="sub-view-evaluations" class="data-sub-view hidden space-y-4">
+                    <div class="bg-white rounded-3xl border border-stone-200 p-6 shadow-sm min-h-[55vh] flex flex-col justify-between">
+                        <div>
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-100 pb-4 mb-6">
+                                <div>
+                                    <h2 class="text-base font-bold text-stone-800 flex items-center gap-2">
+                                        <i data-lucide="line-chart" class="text-blue-600 w-5 h-5"></i>
+                                        หมวดประเมินผล (Evaluation Criteria)
+                                    </h2>
+                                    <p class="text-[13px] text-stone-500">จัดการระบบเกณฑ์วัดผล สัดส่วนคะแนน และเกณฑ์การประเมินวิเคราะห์ทักษะ</p>
+                                </div>
+                                <div class="flex gap-2 w-full md:w-auto items-center">
+                                    <button onclick="openModal('add_group', 3)" class="px-5 py-2.5 bg-[#0056ff] hover:bg-blue-700 text-white font-bold rounded-xl text-[13px] transition-all flex items-center gap-1.5 shadow-md">
+                                        <i data-lucide="plus" class="w-4 h-4"></i> เพิ่มหมวดประเมินผล
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="overflow-x-auto rounded-table-container">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr>
+                                            <th width="10%">ลำดับที่</th>
+                                            <th width="20%" class="text-left">หมวดวัดผล</th>
+                                            <th width="35%" class="text-left">รายละเอียด</th>
+                                            <th width="10%">ผลคะแนน</th>
+                                            <th width="10%">%สัดส่วน</th>
+                                            <th width="10%">สถานะ</th>
+                                            <th width="10%">จัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-criteria-body">
+                                        <tr><td colspan="7" class="text-center py-10 text-stone-400 italic text-[13px]">กำลังเรียกข้อมูลประวัติจากระบบคลาวด์...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- LIGHTBOX: CUSTOMER INFO (60% WIDTH MODAL) -->
+    <div id="lightbox-customer-info" class="fixed inset-0 modal-bg hidden z-[110] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[25px] shadow-2xl w-full md:w-[60%] md:max-w-none overflow-hidden fade-in border border-stone-200">
+            <div class="p-6 bg-[#0056ff] border-b border-blue-700 flex justify-between items-center text-white">
+                <div>
+                    <h3 class="text-lg font-bold">ข้อมูลลูกค้าจำลอง</h3>
+                    <p class="text-[13px] text-blue-100">โปรไฟล์ลูกค้าสำหรับการนำเสนอผลิตภัณฑ์</p>
+                </div>
+                <button onclick="closeCustomerInfoLightbox()" class="text-white/85 hover:text-white transition-colors text-xl font-bold">✕</button>
+            </div>
+            
+            <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto custom-scrollbar">
+                <div class="flex items-center gap-4 border-b border-stone-100 pb-4">
+                    <img id="info-cust-img" src="" class="w-20 h-20 rounded-2xl object-cover border border-stone-200 shrink-0">
+                    <div>
+                        <h4 id="info-cust-name" class="font-bold text-stone-800 text-base">-</h4>
+                        <p id="info-cust-meta" class="text-[13px] text-stone-500 font-medium mt-0.5">-</p>
+                        <span id="info-cust-group" class="inline-block px-2.5 py-0.5 bg-blue-50 text-blue-700 text-[13px] rounded-lg font-bold mt-1.5">-</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="p-3 bg-stone-50 rounded-xl border border-stone-100">
+                        <span class="block text-[13px] font-bold text-stone-400 uppercase tracking-wider">รายละเอียดพฤติกรรมและความต้องการ</span>
+                        <p id="info-cust-details" class="text-[13px] text-stone-700 font-semibold leading-relaxed mt-1.5">-</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 text-[13px]">
+                        <div class="p-3 bg-stone-50 rounded-xl border border-stone-100">
+                            <span class="block font-bold text-stone-400">ตำแหน่งงาน</span>
+                            <span id="info-cust-pos" class="block font-bold text-stone-700 mt-0.5">-</span>
+                        </div>
+                        <div class="p-3 bg-stone-50 rounded-xl border border-stone-100">
+                            <span class="block font-bold text-stone-400">อายุ / เพศ</span>
+                            <span id="info-cust-age-gender" class="block font-bold text-stone-700 mt-0.5">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-stone-50 border-t border-stone-100 flex gap-3">
+                <button onclick="closeCustomerInfoLightbox()" class="flex-1 py-3 bg-stone-200 hover:bg-stone-300 text-stone-700 font-bold rounded-xl text-[13px] transition-all">
+                    ปิดข้อมูลลูกค้า
+                </button>
+                <button id="info-cust-btn-start" class="flex-1 py-3 bg-[#0056ff] hover:bg-blue-700 text-white font-bold rounded-xl text-[13px] transition-all flex items-center justify-center gap-1">
+                    <i data-lucide="play" class="w-4 h-4"></i> เริ่มการสนทนา Roleplay
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX: IMMERSIVE CHAT INTERFACE -->
+    <div id="lightbox-chat-roleplay" class="fixed inset-0 modal-bg hidden z-[120] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[30px] shadow-2xl w-full md:w-[70%] md:max-w-none h-[85vh] overflow-hidden fade-in border border-stone-200 flex flex-col justify-between">
+            <!-- Header -->
+            <div class="p-4 sm:p-5 border-b border-stone-100 bg-[#0056ff] text-white flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <img id="lb-chat-avatar" src="" class="w-12 h-12 rounded-xl object-cover shrink-0 border-2 border-white/20">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 id="lb-chat-name" class="font-bold text-white text-[15px] leading-tight">-</h3>
+                            <span id="lb-chat-meta" class="px-2 py-0.5 bg-white/25 text-white rounded-lg text-[13px] font-bold"></span>
+                        </div>
+                        <p id="lb-chat-scenario" class="text-[13px] text-blue-100 font-medium mt-0.5">-</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="hidden sm:flex px-3 py-1 bg-emerald-500/30 text-emerald-100 text-[13px] font-bold rounded-full items-center gap-1.5 border border-emerald-400/20">
+                        <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                        จำลองบริการสด
+                    </span>
+                    <button onclick="endSimulatorSession()" class="px-3.5 py-1.5 bg-red-500 hover:bg-red-600 text-white text-[13px] font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-md">
+                        <i data-lucide="flag" class="w-4 h-4"></i> สิ้นสุดและประเมินผล
+                    </button>
+                </div>
+            </div>
+
+            <!-- Middle Container -->
+            <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden bg-stone-50">
+                <!-- Chat Area -->
+                <div class="lg:col-span-8 flex flex-col justify-between overflow-hidden bg-white border-r border-stone-100 h-full">
+                    <div id="lb-chat-feed" class="flex-1 p-4 overflow-y-auto space-y-4 custom-scrollbar"></div>
+                    
+                    <!-- Bottom control layout with Close Window button on left -->
+                    <div class="p-3 border-t border-stone-100 flex gap-2 bg-stone-50 items-center justify-between">
+                        <button type="button" onclick="closeChatRoleplayLightbox()" class="px-4 py-3 bg-stone-200 hover:bg-stone-300 text-stone-700 font-bold rounded-xl text-[13px] transition-all shrink-0 shadow-sm">
+                            ปิดหน้าต่าง
+                        </button>
+                        <form id="lb-chat-form" class="flex-1 flex gap-2 m-0">
+                            <button type="button" onclick="triggerVoiceInput()" class="mic-btn p-3 text-stone-500 hover:text-blue-600 bg-white hover:bg-blue-50 border border-stone-200 rounded-xl transition-all shrink-0 shadow-sm">
+                                <i data-lucide="mic" class="w-5 h-5"></i>
+                            </button>
+                            <input type="text" id="lb-chat-input" placeholder="พิมพ์ข้อความเจรจาหรือแนะนำแคมเปญให้ลูกค้าที่นี่..." class="flex-1 px-4 py-3 bg-white border border-stone-200 rounded-xl text-[13px] outline-none focus:border-blue-500 shadow-sm" required>
+                            <button type="submit" class="p-3 bg-[#0056ff] hover:bg-blue-700 text-white rounded-xl transition-all shadow-md shrink-0">
+                                <i data-lucide="send" class="w-5 h-5"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Advisor Panel -->
+                <div class="lg:col-span-4 bg-stone-100/50 p-4 flex flex-col justify-between overflow-hidden h-full">
+                    <div class="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-1">
+                        <div class="border-b border-stone-200/80 pb-2">
+                            <h4 class="font-bold text-stone-700 text-[13px] flex items-center gap-1.5">
+                                <i data-lucide="brain" class="w-4 h-4 text-indigo-600"></i>
+                                Live Coaching Advisor
+                            </h4>
+                            <p class="text-[13px] text-stone-400">คำประเมินอารมณ์และคำพูดวิเคราะห์เรียลไทม์</p>
+                        </div>
+
+                        <div class="p-3 bg-white rounded-xl border border-stone-200 shadow-sm space-y-1.5">
+                            <span class="text-[13px] text-stone-400 uppercase font-bold tracking-wider">โทนอารมณ์ลูกค้าปัจจุบัน</span>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 rounded-full bg-emerald-500 animate-pulse" id="lb-coach-sentiment-dot"></div>
+                                <span id="lb-coach-sentiment-text" class="text-[13px] font-bold text-stone-700">ดี / รอการติดต่อ</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-indigo-50/80 rounded-xl border border-indigo-100 space-y-1">
+                            <span class="text-[13px] text-indigo-700 font-bold uppercase tracking-wider flex items-center gap-1">
+                                <i data-lucide="help-circle" class="w-3.5 h-3.5"></i> ข้อชี้แนะบทเจรจาถัดไป
+                            </span>
+                            <p id="lb-coach-advice-text" class="text-[13px] text-stone-600 leading-relaxed font-semibold">
+                                แสดงความกระตือรือร้น นำเสนอจุดเด่นผลิตภัณฑ์ และแสดงให้เห็นว่าเข้าใจความประสงค์หรือข้อจำกัดของลูกค้าอย่างแท้จริง
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-stone-200/80 pt-3 flex items-center justify-between text-[13px] text-stone-400 font-bold uppercase shrink-0">
+                        <span>Gemini Intelligent Engine</span>
+                        <i data-lucide="cpu" class="w-4 h-4 text-indigo-500"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UNIFIED SYSTEM MODAL (ADD / EDIT) -->
+    <div id="unified-modal" class="fixed inset-0 modal-bg hidden z-[100] flex items-center justify-center p-4">
+        <div id="unified-modal-container" class="bg-white rounded-[25px] shadow-2xl w-full md:w-[60%] md:max-w-none overflow-hidden fade-in border border-stone-200">
+            <div class="p-6 border-b border-blue-700 flex justify-between items-center bg-[#0056ff]">
+                <h3 id="modal-title" class="text-lg font-bold text-white">จัดการข้อมูล</h3>
+                <button onclick="closeModal()" class="text-white/80 hover:text-white transition-colors text-xl font-bold">✕</button>
+            </div>
+            
+            <form id="group-form" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                <input type="hidden" id="edit-id">
+                <input type="hidden" id="field-level" name="level">
+                <input type="hidden" id="field-parentId">
+                
+                <div id="form-content" class="space-y-4"></div>
+                <div id="modal-actions" class="flex gap-3 pt-2"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- EVALUATION OUTCOME MODAL (60% WIDTH) -->
+    <div id="evaluation-modal" class="fixed inset-0 modal-bg hidden z-[130] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[30px] shadow-2xl w-full md:w-[60%] md:max-w-none overflow-hidden fade-in border border-stone-200">
+            <div class="p-6 border-b border-blue-700 bg-gradient-to-r from-blue-600 to-indigo-600 flex justify-between items-center text-white">
+                <div>
+                    <h3 class="text-lg font-bold">ผลการประเมินทักษะและบทบาทสมมติ</h3>
+                    <p class="text-[13px] text-blue-100">ประมวลผลการจำลองสนทนาโดย PK AI Assessor</p>
+                </div>
+                <button onclick="closeEvaluationModal()" class="text-white/80 hover:text-white text-xl font-bold">✕</button>
+            </div>
+
+            <div class="p-8 space-y-6 overflow-y-auto max-h-[75vh] custom-scrollbar">
+                <!-- Evaluation Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                    <div class="md:col-span-4 text-center p-6 bg-stone-50 rounded-2xl border border-stone-100 flex flex-col justify-center items-center">
+                        <span class="text-stone-400 font-bold uppercase text-[13px] mb-1">ผลคะแนนเฉลี่ย</span>
+                        <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 text-3xl font-bold border-4 border-blue-200">
+                            <span id="eval-final-grade">A</span>
+                        </div>
+                        <p class="text-[13px] text-stone-500 font-bold mt-3 leading-relaxed" id="eval-grade-comment">กำลังวิเคราะห์ผลคะแนน...</p>
+                    </div>
+
+                    <!-- Skills Slider / Skill-bars -->
+                    <div class="md:col-span-8 space-y-4">
+                        <h4 class="text-[13px] text-stone-400 font-bold uppercase">คะแนนจำแนกตามทักษะ</h4>
+                        
+                        <div class="space-y-3">
+                            <!-- Skill 1 -->
+                            <div>
+                                <div class="flex justify-between items-center text-[13px] font-bold mb-1">
+                                    <span class="text-stone-700">Empathy (การร่วมรู้สึกเห็นอกเห็นใจ)</span>
+                                    <span id="score-empathy" class="text-blue-600">0%</span>
+                                </div>
+                                <div class="w-full bg-stone-100 h-2.5 rounded-full overflow-hidden">
+                                    <div id="bar-empathy" class="bg-blue-600 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <!-- Skill 2 -->
+                            <div>
+                                <div class="flex justify-between items-center text-[13px] font-bold mb-1">
+                                    <span class="text-stone-700">Professionalism (ความเป็นมืออาชีพ)</span>
+                                    <span id="score-professionalism" class="text-blue-600">0%</span>
+                                </div>
+                                <div class="w-full bg-stone-100 h-2.5 rounded-full overflow-hidden">
+                                    <div id="bar-professionalism" class="bg-blue-600 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <!-- Skill 3 -->
+                            <div>
+                                <div class="flex justify-between items-center text-[13px] font-bold mb-1">
+                                    <span class="text-stone-700">Problem Solving (การแก้ปัญหาเฉพาะหน้า)</span>
+                                    <span id="score-solving" class="text-blue-600">0%</span>
+                                </div>
+                                <div class="w-full bg-stone-100 h-2.5 rounded-full overflow-hidden">
+                                    <div id="bar-solving" class="bg-blue-600 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <!-- Skill 4 -->
+                            <div>
+                                <div class="flex justify-between items-center text-[13px] font-bold mb-1">
+                                    <span class="text-stone-700">Clarity (ความกระชับและชัดเจน)</span>
+                                    <span id="score-clarity" class="text-blue-600">0%</span>
+                                </div>
+                                <div class="w-full bg-stone-100 h-2.5 rounded-full overflow-hidden">
+                                    <div id="bar-clarity" class="bg-blue-600 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strengths & Suggestions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl space-y-2">
+                        <h4 class="text-emerald-700 font-bold text-[13px] uppercase flex items-center gap-1.5">
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i> จุดเด่นของคุณ
+                        </h4>
+                        <ul id="eval-strengths-list" class="list-disc pl-4 text-[13px] text-stone-600 space-y-1"></ul>
+                    </div>
+                    <div class="p-4 bg-amber-50 border border-amber-100 rounded-2xl space-y-2">
+                        <h4 class="text-amber-700 font-bold text-[13px] uppercase flex items-center gap-1.5">
+                            <i data-lucide="alert-circle" class="w-4 h-4"></i> จุดแนะนำให้ปรับปรุง
+                        </h4>
+                        <ul id="eval-improvements-list" class="list-disc pl-4 text-[13px] text-stone-600 space-y-1"></ul>
+                    </div>
+                </div>
+
+                <!-- Coach Verdict text -->
+                <div class="bg-blue-50/40 p-4 border border-blue-100/50 rounded-2xl space-y-1">
+                    <h4 class="text-blue-700 font-bold text-[13px] uppercase flex items-center gap-1">
+                        <i data-lucide="award" class="w-4 h-4"></i> ความเห็นภาพรวมจากโค้ช AI
+                    </h4>
+                    <p id="eval-verdict-text" class="text-[13px] text-stone-600 leading-relaxed italic">
+                        คำวิจารณ์กำลังคำนวณ...
+                    </p>
+                </div>
+
+                <!-- Evaluation Chat Transcript -->
+                <div class="border border-stone-200 rounded-2xl overflow-hidden space-y-1">
+                    <div class="bg-stone-50 px-4 py-2 border-b border-stone-200">
+                        <h4 class="text-stone-700 font-bold text-[13px] flex items-center gap-1.5">
+                            <i data-lucide="message-square" class="w-4 h-4 text-stone-500"></i>
+                            ประวัติบทสนทนาย้อนหลัง
+                        </h4>
+                    </div>
+                    <div id="eval-transcript-container" class="p-4 bg-stone-50/50 space-y-3 max-h-48 overflow-y-auto text-[13px] custom-scrollbar"></div>
+                </div>
+            </div>
+
+            <div class="p-6 bg-stone-50 border-t border-stone-200/60 flex gap-3">
+                <button onclick="closeEvaluationModal()" class="flex-1 py-3 bg-[#0056ff] text-white font-bold rounded-xl text-[13px] hover:bg-blue-700 shadow-md">
+                    ปิดหน้าต่างประเมินผล
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const manualFirebaseConfig = {
+            apiKey: "AIzaSyAciknEYhZU7AwOdfYytC1t_AnW2Ee11us",
+            authDomain: "faifah-ttb.firebaseapp.com",
+            projectId: "faifah-ttb",
+            storageBucket: "faifah-ttb.appspot.com",
+            messagingSenderId: "842980876200",
+            appId: "1:842980876200:web:f33bfad2ccbf263075079d"
+        };
+
+        const config = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : manualFirebaseConfig;
+        const app = initializeApp(config);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const getPath = (colName) => {
+            const sandboxId = typeof __app_id !== 'undefined' ? __app_id : null;
+            if (sandboxId) return `artifacts/${sandboxId}/public/data/${colName}`;
+            return colName;
+        };
+
+        window.appState = {
+            ai_group: [],
+            ai_specialists: [],
+            ai_criteria: [],
+            selectedL1: null,
+            selectedL2: null,
+            user: null
+        };
+
+        window.simState = {
+            activeSession: false,
+            currentL1Id: null,
+            currentL2Id: null,
+            messages: [],
+            evaluationRunning: false,
+            recognition: null
+        };
+
+        // Tab Navigation
+        window.navigate = (sectionId) => {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+            const target = document.getElementById(`section-${sectionId}`);
+            if (target) target.classList.remove('hidden');
+            
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('tab-active');
+                b.classList.add('text-stone-500');
+            });
+            const navBtn = document.getElementById(`nav-${sectionId}`);
+            if (navBtn) navBtn.classList.add('tab-active');
+            
+            lucide.createIcons();
+            
+            if (sectionId === 'roleplay') {
+                renderRoleplayShowcase();
+            } else if (sectionId === 'dashboard') {
+                renderDashboardSimulator();
+            } else if (sectionId === 'data-system') {
+                switchDataSubView(window.currentDataSubView || 'manage-data');
+            }
+        };
+
+        // Data Sub-View Toggle
+        window.currentDataSubView = 'manage-data';
+        window.switchDataSubView = (subViewId) => {
+            window.currentDataSubView = subViewId;
+            document.querySelectorAll('.data-sub-view').forEach(v => v.classList.add('hidden'));
+            const target = document.getElementById(`sub-view-${subViewId}`);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.sub-tab-btn').forEach(b => {
+                b.classList.remove('bg-indigo-600', 'text-white');
+                b.classList.add('bg-stone-100', 'text-stone-600', 'hover:bg-stone-200');
+            });
+            const activeBtn = document.getElementById(`sub-btn-${subViewId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-stone-100', 'text-stone-600', 'hover:bg-stone-200');
+                activeBtn.classList.add('bg-indigo-600', 'text-white');
+            }
+            lucide.createIcons();
+        };
+
+        const startSync = () => {
+            // Sync L1: ai_group
+            const groupRef = collection(db, getPath('ai_group'));
+            const groupQ = query(groupRef, orderBy('nogroup', 'asc'));
+            onSnapshot(groupQ, (snap) => {
+                window.appState.ai_group = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderAllTables();
+                renderRoleplayShowcase();
+            }, (err) => console.error("ai_group sync error", err));
+
+            // Sync L2: ai_specialists
+            const specRef = collection(db, getPath('ai_specialists'));
+            const specQ = query(specRef, orderBy('nogroup', 'asc'));
+            onSnapshot(specQ, (snap) => {
+                window.appState.ai_specialists = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderAllTables();
+                renderRoleplayShowcase();
+            }, (err) => console.error("ai_specialists sync error", err));
+
+            // Sync Criteria: ai_criteria
+            const criteriaRef = collection(db, getPath('ai_criteria'));
+            const criteriaQ = query(criteriaRef, orderBy('nogroup', 'asc'));
+            onSnapshot(criteriaQ, (snap) => {
+                window.appState.ai_criteria = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderCriteriaTable();
+            }, (err) => console.error("ai_criteria sync error", err));
+        };
+
+        const renderAllTables = () => {
+            renderTableL1();
+            renderTableL2();
+            renderDashboardSimulator();
+
+            // Toggle Add L2 Button based on L1 Selection
+            const btnAddL2 = document.getElementById('btn-add-l2');
+            if (btnAddL2) {
+                if (window.appState.selectedL1) {
+                    btnAddL2.disabled = false;
+                    btnAddL2.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-indigo-50', 'text-white');
+                    btnAddL2.classList.add('bg-indigo-600', 'text-white', 'hover:bg-indigo-700');
+                } else {
+                    btnAddL2.disabled = true;
+                    btnAddL2.classList.add('opacity-50', 'cursor-not-allowed', 'bg-indigo-50', 'text-white');
+                    btnAddL2.classList.remove('bg-indigo-600', 'text-white', 'hover:bg-indigo-700');
+                }
+            }
+        };
+
+        const renderRoleplayShowcase = () => {
+            const container = document.getElementById('roleplay-showcase-container');
+            if (!container) return;
+
+            const groups = window.appState.ai_group;
+            const specialists = window.appState.ai_specialists;
+
+            // Find group with nogroup == 1
+            const targetGroup = groups.find(g => Number(g.nogroup) === 1);
+            if (!targetGroup) {
+                container.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-stone-500 text-[13px] bg-white rounded-3xl border border-stone-200">
+                        <i data-lucide="info" class="w-8 h-8 text-indigo-500 mx-auto mb-2"></i>
+                        ไม่พบข้อมูลในระบบที่มี "หมวดกิจกรรม (nogroup) เท่ากับ 1" กรุณาลงทะเบียนหรือปรับปรุงข้อมูลในการจัดการหมวดข้อมูล
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            // Filter specialists under targetGroup.id (matching via parentId)
+            const matchedSpecialists = specialists.filter(spec => spec.parentId === targetGroup.id && spec.status === 'show');
+
+            if (matchedSpecialists.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-stone-500 text-[13px] bg-white rounded-3xl border border-stone-200">
+                        <i data-lucide="users" class="w-8 h-8 text-indigo-500 mx-auto mb-2"></i>
+                        ไม่พบรายชื่อผู้เชี่ยวชาญ/ลูกค้าจำลอง ภายใต้หมวดหมู่นี้ หรือประวัติทั้งหมดยังคงถูกซ่อน (Status = hide)
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            container.innerHTML = matchedSpecialists.map(item => {
+                const imgUrl = item.image_url && item.image_url.trim() !== "" 
+                    ? item.image_url 
+                    : `https://placehold.co/300x300/e0e7ff/4f46e5?text=${encodeURIComponent(item.fullname ? item.fullname.charAt(0) : 'E')}`;
+
+                return `
+                    <div class="roleplay-card bg-white rounded-2xl border border-stone-200 overflow-hidden flex flex-col justify-between shadow-sm">
+                        <div class="p-4 flex flex-col gap-4">
+                            <div class="w-full h-48 rounded-xl overflow-hidden bg-stone-100 border border-stone-200 relative">
+                                <img src="${imgUrl}" onerror="this.onerror=null; this.src='https://placehold.co/300x300/cbd5e1/475569?text=Error';" class="w-full h-full object-cover">
+                                <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full flex gap-0.5 items-center shadow-md">
+                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-400"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-400"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-400"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-400"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-400"></i>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="font-bold text-stone-800 text-[15px] truncate" title="${item.fullname}">
+                                    ${item.fullname} <span class="font-normal text-stone-500 text-[13px] ml-1">(อายุ ${item.age || '-'} ปี)</span>
+                                </h3>
+                                <div class="space-y-1.5 text-[13px] text-stone-500 font-semibold mt-1">
+                                    <div><b>ตำแหน่ง:</b> ${item.position || 'ไม่ได้ระบุ'}</div>
+                                    <div class="text-blue-600"><b>ความต้องการ:</b> ${item.conversation_topic || 'ไม่ได้ระบุ'}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-stone-50 border-t border-stone-100 grid grid-cols-2 gap-3">
+                            <button onclick="openCustomerInfoLightbox('${item.id}')" class="py-2.5 bg-stone-200/80 hover:bg-stone-200 text-stone-700 font-bold rounded-xl text-[13px] transition-all flex items-center justify-center gap-1">
+                                <i data-lucide="user" class="w-4 h-4 text-stone-600"></i> ข้อมูลลูกค้า
+                            </button>
+                            <button onclick="openChatRoleplayLightbox('${item.id}')" class="py-2.5 bg-[#0056ff] hover:bg-blue-700 text-white font-bold rounded-xl text-[13px] transition-all flex items-center justify-center gap-1 shadow-sm">
+                                <i data-lucide="message-square" class="w-4 h-4 text-white"></i> เริ่ม Roleplay
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        };
+
+        window.openCustomerInfoLightbox = (specId) => {
+            const specialist = window.appState.ai_specialists.find(s => s.id === specId);
+            if (!specialist) return;
+
+            const group = window.appState.ai_group.find(g => g.id === specialist.parentId);
+            const fallbackImg = `https://placehold.co/150x150/e0e7ff/4f46e5?text=${encodeURIComponent(specialist.fullname ? specialist.fullname.charAt(0) : 'E')}`;
+
+            document.getElementById('info-cust-img').src = specialist.image_url || fallbackImg;
+            document.getElementById('info-cust-name').innerText = specialist.fullname;
+            document.getElementById('info-cust-meta').innerText = `เพศ: ${specialist.gender || 'ไม่ระบุ'} | อายุ: ${specialist.age || '-'} ปี`;
+            document.getElementById('info-cust-group').innerText = `หมวดหมู่หลัก: ${group ? group.namegroup : '-'}`;
+            
+            document.getElementById('info-cust-details').innerHTML = `
+                <div class="space-y-2">
+                    <p class="font-medium text-stone-700 leading-relaxed">${specialist.client_details || 'ไม่มีข้อมูลรายละเอียดเชิงลึกระบุในระบบ'}</p>
+                    ${specialist.conversation_topic ? `<p class="text-blue-600 font-semibold border-t border-stone-200/60 pt-2 mt-2"><b>ความต้องการ:</b> ${specialist.conversation_topic}</p>` : ''}
+                </div>
+            `;
+            document.getElementById('info-cust-pos').innerText = specialist.position || '-';
+            document.getElementById('info-cust-age-gender').innerText = `${specialist.age || '-'} ปี / ${specialist.gender || 'ไม่ระบุ'}`;
+
+            // Attach dynamic click event to play button inside lightbox
+            const playBtn = document.getElementById('info-cust-btn-start');
+            playBtn.onclick = () => {
+                closeCustomerInfoLightbox();
+                openChatRoleplayLightbox(specId);
+            };
+
+            document.getElementById('lightbox-customer-info').classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.closeCustomerInfoLightbox = () => {
+            document.getElementById('lightbox-customer-info').classList.add('hidden');
+        };
+
+        window.openChatRoleplayLightbox = async (specId) => {
+            const specialist = window.appState.ai_specialists.find(s => s.id === specId);
+            if (!specialist) return;
+
+            const group = window.appState.ai_group.find(g => g.id === specialist.parentId);
+            const fallbackImg = `https://placehold.co/150x150/cbd5e1/475569?text=${encodeURIComponent(specialist.fullname ? specialist.fullname.charAt(0) : 'E')}`;
+
+            // Increment click counter in background
+            try {
+                const curClicks = specialist.click_count || 0;
+                await updateDoc(doc(db, getPath('ai_specialists'), specialist.id), {
+                    click_count: curClicks + 1
+                });
+            } catch (err) {
+                console.error("Failed to increment click count", err);
+            }
+
+            // Set state variables
+            window.simState.activeSession = true;
+            window.simState.currentL1Id = group ? group.id : null;
+            window.simState.currentL2Id = specialist.id;
+            window.simState.messages = [];
+
+            // UI Header variables setup
+            document.getElementById('lb-chat-avatar').src = specialist.image_url || fallbackImg;
+            document.getElementById('lb-chat-name').innerText = specialist.fullname;
+            document.getElementById('lb-chat-meta').innerText = `${specialist.position || 'ผู้เชี่ยวชาญ'} (${specialist.gender || 'ชาย'}/${specialist.age || '-'} ปี)`;
+            document.getElementById('lb-chat-scenario').innerText = `กิจกรรม: ${group ? group.namegroup : '-'}`;
+
+            // Clear chat feed
+            const feed = document.getElementById('lb-chat-feed');
+            if (feed) feed.innerHTML = '';
+
+            document.getElementById('lightbox-chat-roleplay').classList.remove('hidden');
+
+            appendSystemMessage("กำลังสร้างคาแรคเตอร์ลูกค้าจำลองผ่าน AI Engine...");
+            
+            // Initiate simulation with the specialist's customized initial message if configured
+            const greetingMsg = specialist.initial_message && specialist.initial_message.trim() !== ""
+                ? specialist.initial_message
+                : "สวัสดีครับ พอดีอยากเข้ามาขอสอบถามบริการและปรึกษารายละเอียดเพิ่มเติมหน่อยครับ";
+            
+            appendChatMessage('customer', greetingMsg);
+            window.simState.messages.push({ role: 'model', parts: [{ text: greetingMsg }] });
+            
+            lucide.createIcons();
+        };
+
+        window.closeChatRoleplayLightbox = () => {
+            document.getElementById('lightbox-chat-roleplay').classList.add('hidden');
+            window.simState.activeSession = false;
+            window.simState.messages = [];
+        };
+
+        // Render หมวดกิจกรรม (L1) Table
+        const renderTableL1 = () => {
+            const tbody = document.getElementById('table-l1-body');
+            if (!tbody) return;
+
+            const items = window.appState.ai_group;
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-stone-400 italic text-[13px]">ไม่มีข้อมูลหมวดกิจกรรม</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = items.map(item => {
+                const isSelected = window.appState.selectedL1 === item.id;
+                const statusLabel = item.status === 'show' ? '🟢 ON' : '🔴 OFF';
+                
+                return `
+                <tr onclick="selectL1('${item.id}')" class="cursor-pointer transition-colors ${isSelected ? 'row-selected' : 'hover:bg-blue-50/30'}">
+                    <td class="text-center py-3 text-stone-500 font-bold text-[13px]">${item.nogroup || '-'}</td>
+                    <td class="py-3 lvl-1">${item.namegroup || '-'}</td>
+                    <td class="text-center py-3 text-[13px] font-semibold">${statusLabel}</td>
+                    <td class="text-center py-3">
+                        <div class="flex justify-center gap-1" onclick="event.stopPropagation()">
+                            <button onclick="openModal('edit_group', 1, '${item.id}')" class="p-1.5 text-blue-500 hover:bg-blue-100 rounded-lg">
+                                <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button onclick="openModal('delete_group', 1, '${item.id}')" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+            lucide.createIcons();
+        };
+
+        const renderTableL2 = () => {
+            const tbody = document.getElementById('table-l2-body');
+            if (!tbody) return;
+
+            const selectedL1 = window.appState.selectedL1;
+            if (!selectedL1) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-stone-400 italic text-[13px]">💡 กรุณาเลือกหมวดกิจกรรมในตารางซ้ายมือเพื่อแสดงรายชื่อผู้เชี่ยวชาญ</td></tr>`;
+                return;
+            }
+
+            const items = window.appState.ai_specialists.filter(x => x.parentId === selectedL1);
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-stone-400 italic text-[13px]">ไม่มีรายชื่อผู้เชี่ยวชาญในหมวดกิจกรรมนี้</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = items.map(item => {
+                const isSelected = window.appState.selectedL2 === item.id;
+                const statusLabel = item.status === 'show' ? '🟢 ON' : '🔴 OFF';
+                
+                return `
+                <tr onclick="selectL2('${item.id}')" class="cursor-pointer transition-colors ${isSelected ? 'row-selected' : 'hover:bg-blue-50/30'}">
+                    <td class="text-center py-3 text-stone-500 font-bold text-[13px]">${item.nogroup || '-'}</td>
+                    <td class="py-3 lvl-2 font-semibold text-stone-700 text-[13px]">${item.fullname || '-'}</td>
+                    <td class="text-center py-3 text-[13px] text-stone-600 font-semibold">${item.age || '-'} ปี</td>
+                    <td class="text-center py-3 text-[13px] text-stone-500">${item.click_count || 0} ครั้ง</td>
+                    <td class="text-center py-3 text-[13px] font-semibold">${statusLabel}</td>
+                    <td class="text-center py-3">
+                        <div class="flex justify-center gap-1" onclick="event.stopPropagation()">
+                            <button onclick="openModal('edit_group', 2, '${item.id}')" class="p-1.5 text-blue-500 hover:bg-blue-100 rounded-lg">
+                                <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button onclick="openModal('delete_group', 2, '${item.id}')" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+            lucide.createIcons();
+        };
+
+        const renderCriteriaTable = () => {
+            const tbody = document.getElementById('table-criteria-body');
+            if (!tbody) return;
+
+            const items = window.appState.ai_criteria;
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-stone-400 italic text-[13px]">ไม่มีข้อมูลหมวดประเมินผล</td></tr>`;
+                return;
+            }
+
+            // Calculate total score dynamically in memory
+            const totalScore = items.reduce((sum, item) => sum + (parseFloat(item.score) || 0), 0);
+
+            let rowsHtml = items.map(item => {
+                const scoreVal = parseFloat(item.score) || 0;
+                // Dynamically calculate proportion percentage
+                const calculatedPct = totalScore > 0 ? ((scoreVal / totalScore) * 100) : 0;
+                const statusLabel = item.status === 'show' ? '🟢 ON' : '🔴 OFF';
+
+                return `
+                <tr class="hover:bg-blue-50/20 transition-colors">
+                    <td class="text-center py-3 text-stone-500 font-bold text-[13px]">${item.nogroup || '-'}</td>
+                    <td class="py-3 text-[13px] font-bold text-stone-700">${item.name || '-'}</td>
+                    <td class="py-3 text-[13px] text-stone-600">${item.description || '-'}</td>
+                    <td class="text-center py-3 text-[13px] font-semibold text-blue-600">${scoreVal}</td>
+                    <td class="text-center py-3 text-[13px] font-semibold text-indigo-600">${calculatedPct.toFixed(1)}%</td>
+                    <td class="text-center py-3 text-[13px] font-semibold">${statusLabel}</td>
+                    <td class="text-center py-3">
+                        <div class="flex justify-center gap-1">
+                            <button onclick="openModal('edit_group', 3, '${item.id}')" class="p-1.5 text-blue-500 hover:bg-blue-100 rounded-lg">
+                                <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button onclick="openModal('delete_group', 3, '${item.id}')" class="p-1.5 text-red-400 hover:bg-red-50 rounded-lg">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+
+            // Add dynamic summary row
+            const totalPercentage = totalScore > 0 ? 100 : 0;
+            rowsHtml += `
+            <tr class="bg-stone-50 font-bold border-t-2 border-stone-200">
+                <td colspan="3" class="text-right py-3 pr-4 text-stone-700 text-[13px] font-extrabold">รวมทั้งหมด:</td>
+                <td class="text-center py-3 text-[13px] font-extrabold text-blue-600">${totalScore}</td>
+                <td class="text-center py-3 text-[13px] font-extrabold text-indigo-600">${totalPercentage.toFixed(1)}%</td>
+                <td colspan="2" class="bg-stone-50"></td>
+            </tr>
+            `;
+
+            tbody.innerHTML = rowsHtml;
+            lucide.createIcons();
+        };
+
+        window.selectL1 = (id) => {
+            window.appState.selectedL1 = id;
+            renderAllTables();
+        };
+
+        window.selectL2 = (id) => {
+            window.appState.selectedL2 = id;
+            renderAllTables();
+        };
+
+        window.openModal = (type, level, id = null) => {
+            const modal = document.getElementById('unified-modal');
+            const modalContainer = document.getElementById('unified-modal-container');
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('form-content');
+            const actions = document.getElementById('modal-actions');
+            
+            document.getElementById('edit-id').value = id || '';
+            document.getElementById('field-level').value = level;
+            
+            if (!id) {
+                document.getElementById('field-parentId').value = (level === 2) ? (window.appState.selectedL1 || "") : "";
+            }
+
+            // Adjust width to 75% dynamically when adding/editing specialists (L2)
+            if (modalContainer) {
+                if (level === 2) {
+                    modalContainer.className = "bg-white rounded-[25px] shadow-2xl w-full md:w-[75%] md:max-w-none overflow-hidden fade-in border border-stone-200";
+                } else {
+                    modalContainer.className = "bg-white rounded-[25px] shadow-2xl w-full md:w-[60%] md:max-w-none overflow-hidden fade-in border border-stone-200";
+                }
+            }
+
+            modal.classList.remove('hidden');
+
+            if (level === 1) {
+                const data = id ? window.appState.ai_group.find(x => x.id === id) : null;
+                title.innerText = id ? 'แก้ไขหมวดกิจกรรม' : 'เพิ่มหมวดกิจกรรมใหม่';
+                
+                content.innerHTML = `
+                    <div>
+                        <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">ลำดับการแสดงผล (nogroup)</label>
+                        <input type="number" name="nogroup" value="${data?.nogroup || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none font-bold text-[13px]" required>
+                    </div>
+                    <div>
+                        <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">ชื่อหมวดกิจกรรม</label>
+                        <input type="text" name="namegroup" value="${data?.namegroup || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px]" required placeholder="เช่น ประสบการณ์ลูกค้า, การตลาดดิจิทัล...">
+                    </div>
+                    <div>
+                        <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">รายละเอียดเพิ่มเติม</label>
+                        <textarea name="description" rows="3" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px]" placeholder="คำอธิบายสั้นๆ ของหมวดนี้...">${data?.description || ''}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">สถานะการแสดงผล</label>
+                        <select name="status" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px] font-semibold">
+                            <option value="show" ${data?.status === 'show' ? 'selected' : ''}>🟢 แสดงผล (Show)</option>
+                            <option value="hide" ${data?.status === 'hide' ? 'selected' : ''}>🔴 ไม่แสดงผล (Hide)</option>
+                        </select>
+                    </div>
+                `;
+            } else if (level === 2) {
+                const data = id ? window.appState.ai_specialists.find(x => x.id === id) : null;
+                title.innerText = id ? 'แก้ไขข้อมูลผู้เชี่ยวชาญ' : 'เพิ่มผู้เชี่ยวชาญใหม่';
+                
+                window.handlePromptFile = (event) => {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('prompt_file_name').value = file.name;
+                        document.getElementById('prompt_file_content').value = e.target.result;
+                        document.getElementById('file-upload-status').innerText = `✅ อัปโหลดเรียบร้อย: ${file.name}`;
+                    };
+                    reader.readAsText(file);
+                };
+
+                const groupOptions = window.appState.ai_group.map(g => {
+                    const isSelected = data ? (g.id === data.parentId) : (g.id === window.appState.selectedL1);
+                    return `<option value="${g.id}" ${isSelected ? 'selected' : ''}>${g.namegroup}</option>`;
+                }).join('');
+
+                content.innerHTML = `
+                    <input type="hidden" id="prompt_file_name" name="prompt_file_name" value="${data?.prompt_file_name || ''}">
+                    <input type="hidden" id="prompt_file_content" name="prompt_file_content" value="${data?.prompt_file_content || ''}">
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">หมวดหมู่กิจกรรมสังกัด</label>
+                            <select name="parentId" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px] font-bold" required>
+                                <option value="">-- เลือกหมวดกิจกรรม --</option>
+                                ${groupOptions}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">สถานะการแสดงผล</label>
+                            <select name="status" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px] font-semibold">
+                                <option value="show" ${data?.status === 'show' ? 'selected' : ''}>🟢 ON</option>
+                                <option value="hide" ${data?.status === 'hide' ? 'selected' : ''}>🔴 OFF</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">ลำดับการแสดงผล</label>
+                            <input type="number" name="nogroup" value="${data?.nogroup || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none font-bold text-[13px]" required>
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">ชื่อ - นามสกุล</label>
+                            <input type="text" name="fullname" value="${data?.fullname || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px]" required placeholder="ดร.วิทยา บริการดี">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">ตำแหน่งงาน</label>
+                            <input type="text" name="position" value="${data?.position || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px]" required placeholder="ที่ปรึกษาอาวุโส">
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">อายุ (ปี)</label>
+                            <input type="number" name="age" value="${data?.age || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none font-bold text-[13px]" required placeholder="42">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">เพศ</label>
+                            <select name="gender" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px] font-semibold">
+                                <option value="ชาย" ${data?.gender === 'ชาย' ? 'selected' : ''}>ชาย (Male)</option>
+                                <option value="หญิง" ${data?.gender === 'หญิง' ? 'selected' : ''}>หญิง (Female)</option>
+                                <option value="อื่นๆ" ${data?.gender === 'อื่นๆ' ? 'selected' : ''}>อื่นๆ (Other)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">ลิงก์รูปภาพโปรไฟล์</label>
+                            <input type="url" name="image_url" value="${data?.image_url || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px]" placeholder="https://example.com/photo.jpg">
+                        </div>
+                    </div>
+
+                    <div class="border-t border-stone-200 pt-4 mt-2 space-y-4">
+                        <h4 class="text-[13px] font-bold text-indigo-700 uppercase flex items-center gap-1">
+                            <i data-lucide="brain" class="w-4 h-4"></i> ข้อมูลแชทบทบาทจำลอง (AI Conversational Data)
+                        </h4>
+
+                        <!-- NEW: Conversational Starter -->
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 mb-1 ml-1">ข้อความทักทายแรกสุดของลูกค้าจำลอง (Initial Message)</label>
+                            <input type="text" name="initial_message" value="${data?.initial_message || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px]" placeholder="เช่น สวัสดีค่ะ สนใจอยากสอบถามแคมเปญกู้เงินตัวใหม่ค่ะ">
+                        </div>
+
+                        <!-- NEW: Conversation Topic field -->
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 mb-1 ml-1">หัวข้อสนทนา (Conversation Topic)</label>
+                            <input type="text" name="conversation_topic" value="${data?.conversation_topic || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px]" placeholder="ระบุขอบเขตหัวเรื่องสำหรับการสวมบทบาท เช่น การเจรจาขอผ่อนผันหนี้, การขอเปิดผลิตภัณฑ์ใหม่">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- NEW: Personality attributes -->
+                            <div>
+                                <label class="block text-[13px] font-bold text-stone-500 mb-1 ml-1">บุคลิกภาพ/อารมณ์จำลอง (Personality)</label>
+                                <input type="text" name="personality" value="${data?.personality || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px]" placeholder="เช่น ใจร้อน, สุภาพแต่ถามเยอะ, ขี้ระแวง">
+                            </div>
+                            <!-- NEW: Product of Interest -->
+                            <div>
+                                <label class="block text-[13px] font-bold text-stone-500 mb-1 ml-1">ผลิตภัณฑ์ที่สนใจ (Product of Interest)</label>
+                                <input type="text" name="product_interest" value="${data?.product_interest || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px]" placeholder="เช่น บัตรเครดิต, สินเชื่อบ้าน">
+                            </div>
+                        </div>
+
+                        <!-- NEW: Objective / Objections mapping -->
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 mb-1 ml-1">ข้อโต้แย้ง/ความท้าทายหลักในใจ (Core Objections to Test Agent)</label>
+                            <input type="text" name="objection_challenges" value="${data?.objection_challenges || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px]" placeholder="เช่น ดอกเบี้ยแพงไป, ขั้นตอนข้อยุ่งยาก">
+                        </div>
+
+                        <!-- NEW: Roleplay Specific Context Area (Directly above Client Details) -->
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 mb-1 ml-1">หัวข้อ Roleplay (วัตถุประสงค์หลักการจำลอง)</label>
+                            <textarea name="roleplay_objective" rows="2" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px]" placeholder="ระบุขอบเขต วัตถุประสงค์ หรือสถานการณ์หลักสำหรับการวัดผล">${data?.roleplay_objective || ''}</textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">รายละเอียดของลูกค้าจำลอง (Client Details)</label>
+                            <textarea name="client_details" rows="3" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px]" placeholder="ระบุคาแรคเตอร์ อารมณ์ หรือประเด็นเจรจาของผู้เชี่ยวชาญคนนี้...">${data?.client_details || ''}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-stone-200 pt-3 space-y-3">
+                        <h4 class="text-[13px] font-bold text-stone-700">ส่วนของการจัดเก็บ Prompt สำหรับควบคุม AI (แอดวานซ์)</h4>
+                        
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 mb-1 ml-1">1) รูปแบบข้อความ (Prompt Text)</label>
+                            <textarea name="prompt_text" rows="3" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px] font-mono" placeholder="ป้อนชุดคำสั่งที่ต้องการควบคุมลักษณะพฤติกรรมเอไอ...">${data?.prompt_text || ''}</textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 mb-1 ml-1">2) รูปแบบไฟล์ (อัปโหลดไฟล์คำชี้แนะ .txt)</label>
+                            <div class="flex items-center gap-3">
+                                <label class="cursor-pointer px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold rounded-xl text-[13px] transition-all flex items-center gap-1">
+                                    <i data-lucide="upload-cloud" class="w-4 h-4"></i> อัปโหลดไฟล์ .txt
+                                    <input type="file" accept=".txt" class="hidden" onchange="handlePromptFile(event)">
+                                </label>
+                                <span id="file-upload-status" class="text-[13px] text-stone-500 font-semibold truncate max-w-[250px]">
+                                    ${data?.prompt_file_name ? `ไฟล์ปัจจุบัน: ${data.prompt_file_name}` : 'ยังไม่ได้แนบไฟล์เพิ่มเติม'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (level === 3) {
+                const data = id ? window.appState.ai_criteria.find(x => x.id === id) : null;
+                title.innerText = id ? 'แก้ไขหมวดประเมินผล' : 'เพิ่มหมวดประเมินผลใหม่';
+
+                content.innerHTML = `
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">ลำดับที่ (nogroup)</label>
+                            <input type="number" name="nogroup" value="${data?.nogroup || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none font-bold text-[13px]" required>
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">สถานะ</label>
+                            <select name="status" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px] font-semibold">
+                                <option value="show" ${data?.status === 'show' ? 'selected' : ''}>🟢 ON</option>
+                                <option value="hide" ${data?.status === 'hide' ? 'selected' : ''}>🔴 OFF</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">หมวดวัดผล</label>
+                        <input type="text" name="name" value="${data?.name || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px]" required placeholder="เช่น ทักษะการสื่อสาร">
+                    </div>
+                    <div>
+                        <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">รายละเอียด</label>
+                        <textarea name="description" rows="3" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none text-[13px]" placeholder="คำอธิบายรายละเอียดหัวข้อการประเมิน...">${data?.description || ''}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[13px] font-bold text-stone-500 uppercase mb-1 ml-1">ผลคะแนน</label>
+                        <input type="number" step="any" name="score" value="${data?.score || ''}" class="w-full p-3 bg-blue-50 border border-blue-100 rounded-xl outline-none font-bold text-[13px]" required placeholder="เช่น 100">
+                    </div>
+                `;
+            }
+
+            if (type === 'delete_group') {
+                const isL1 = level === 1;
+                let list = window.appState.ai_specialists;
+                if (level === 1) list = window.appState.ai_group;
+                if (level === 3) list = window.appState.ai_criteria;
+                const data = list.find(x => x.id === id);
+                
+                title.innerText = 'ยืนยันการลบข้อมูล';
+                let displayName = data?.fullname || data?.namegroup || data?.name;
+                content.innerHTML = `
+                    <div class="text-center py-2">
+                        <div class="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+                        </div>
+                        <p class="text-stone-600 text-sm">คุณต้องการลบรายชื่อ <span class="font-bold text-stone-800">"${displayName}"</span> ใช่หรือไม่?</p>
+                        ${isL1 ? '<p class="text-[13px] text-red-400 mt-2 italic">*หากลบหมวดกิจกรรมรายนี้ ผู้เชี่ยวชาญลูกในหมวดจะย้ายสังกัดหรือหายไปด้วย</p>' : ''}
+                    </div>
+                `;
+                actions.innerHTML = `
+                    <button type="button" id="btn-cancel" onclick="closeModal()" class="flex-1 py-3 bg-stone-100 text-stone-600 rounded-xl font-bold text-sm">ยกเลิก</button>
+                    <button type="button" id="btn-delete-confirm" onclick="confirmDelete('${id}', ${level}, this)" class="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold text-sm hover:bg-red-600">ลบข้อมูล</button>
+                `;
+            } else {
+                actions.innerHTML = `
+                    <button type="button" id="btn-cancel" onclick="closeModal()" class="flex-1 py-3 bg-stone-100 text-stone-600 rounded-xl font-bold text-sm hover:bg-stone-200">ยกเลิก</button>
+                    <button id="btn-submit-form" type="submit" class="flex-1 py-3 bg-[#0056ff] text-white rounded-xl font-bold text-sm hover:bg-blue-700 shadow-lg">บันทึกข้อมูล</button>
+                `;
+            }
+            lucide.createIcons();
+        };
+
+        window.closeModal = () => {
+            document.getElementById('unified-modal').classList.add('hidden');
+            document.getElementById('group-form').reset();
+        };
+
+        document.getElementById('group-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const level = parseInt(document.getElementById('field-level').value);
+            const eid = document.getElementById('edit-id').value;
+
+            // Prevent duplicate submissions by disabling the submit button and showing loader status
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const cancelBtn = document.getElementById('btn-cancel');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin mr-2"></span>กำลังบันทึก...';
+            }
+            if (cancelBtn) {
+                cancelBtn.disabled = true;
+            }
+
+            try {
+                if (level === 1) {
+                    const data = {
+                        nogroup: parseInt(fd.get('nogroup')),
+                        namegroup: fd.get('namegroup'),
+                        description: fd.get('description'),
+                        status: fd.get('status'),
+                        updatedAt: serverTimestamp()
+                    };
+                    if (eid) {
+                        await updateDoc(doc(db, getPath('ai_group'), eid), data);
+                    } else {
+                        await addDoc(collection(db, getPath('ai_group')), { ...data, createdAt: serverTimestamp() });
+                    }
+                } else if (level === 2) {
+                    const parentVal = fd.get('parentId') || null;
+                    const data = {
+                        nogroup: parseInt(fd.get('nogroup')),
+                        fullname: fd.get('fullname'),
+                        position: fd.get('position'),
+                        age: parseInt(fd.get('age')) || 0,
+                        gender: fd.get('gender'),
+                        image_url: fd.get('image_url') || '',
+                        roleplay_objective: fd.get('roleplay_objective') || '',
+                        conversation_topic: fd.get('conversation_topic') || '', 
+                        client_details: fd.get('client_details') || '',
+                        initial_message: fd.get('initial_message') || '',
+                        personality: fd.get('personality') || '',
+                        product_interest: fd.get('product_interest') || '',
+                        objection_challenges: fd.get('objection_challenges') || '',
+                        prompt_text: fd.get('prompt_text') || '',
+                        prompt_file_name: fd.get('prompt_file_name') || '',
+                        prompt_file_content: fd.get('prompt_file_content') || '',
+                        status: fd.get('status'),
+                        parentId: parentVal,
+                        updatedAt: serverTimestamp()
+                    };
+                    if (!eid) {
+                        data.click_count = 0;
+                    }
+                    if (eid) {
+                        await updateDoc(doc(db, getPath('ai_specialists'), eid), data);
+                    } else {
+                        await addDoc(collection(db, getPath('ai_specialists')), { ...data, createdAt: serverTimestamp() });
+                    }
+                } else if (level === 3) {
+                    const data = {
+                        nogroup: parseInt(fd.get('nogroup')),
+                        name: fd.get('name'),
+                        description: fd.get('description'),
+                        score: parseFloat(fd.get('score')) || 0,
+                        status: fd.get('status'),
+                        updatedAt: serverTimestamp()
+                    };
+                    if (eid) {
+                        await updateDoc(doc(db, getPath('ai_criteria'), eid), data);
+                    } else {
+                        await addDoc(collection(db, getPath('ai_criteria')), { ...data, createdAt: serverTimestamp() });
+                    }
+                }
+                closeModal();
+            } catch (err) { 
+                console.error("Error saving doc", err); 
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'บันทึกข้อมูล';
+                }
+                if (cancelBtn) {
+                    cancelBtn.disabled = false;
+                }
+            }
+        };
+
+        window.confirmDelete = async (id, level, btn) => {
+            const cancelBtn = document.getElementById('btn-cancel');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin mr-2"></span>กำลังลบ...';
+            }
+            if (cancelBtn) {
+                cancelBtn.disabled = true;
+            }
+            try {
+                let colName = 'ai_specialists';
+                if (level === 1) colName = 'ai_group';
+                if (level === 3) colName = 'ai_criteria';
+
+                await deleteDoc(doc(db, getPath(colName), id));
+                if (level === 1) {
+                    window.appState.selectedL1 = null;
+                }
+                window.appState.selectedL2 = null;
+                closeModal();
+            } catch (err) { 
+                console.error("Error deleting doc", err); 
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = 'ลบข้อมูล';
+                }
+                if (cancelBtn) {
+                    cancelBtn.disabled = false;
+                }
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                window.appState.user = user;
+                const status = document.getElementById('connection-status');
+                status.innerText = "LIVE: SYNC ACTIVE";
+                status.classList.replace('text-stone-400', 'text-emerald-500');
+                startSync();
+            }
+        });
+
+        const renderDashboardSimulator = () => {
+            const listL1 = window.appState.ai_group;
+            const listL2 = window.appState.ai_specialists;
+
+            const totalClicks = listL2.reduce((acc, curr) => acc + (curr.click_count || 0), 0);
+
+            const statL1 = document.getElementById('stat-l1-count');
+            const statL2 = document.getElementById('stat-l2-count');
+            const statClicks = document.getElementById('stat-clicks-count');
+            if (statL1) statL1.innerText = listL1.length;
+            if (statL2) statL2.innerText = listL2.length;
+            if (statClicks) statClicks.innerText = totalClicks;
+
+            const selectScenario = document.getElementById('sim-scenario-select');
+            if (selectScenario) {
+                const prevVal = selectScenario.value;
+                const shownL1 = listL1.filter(x => x.status === 'show');
+                selectScenario.innerHTML = '<option value="">-- กรุณาเลือกหมวดกิจกรรม --</option>' + 
+                    shownL1.map(item => `<option value="${item.id}">${item.namegroup}</option>`).join('');
+                if (prevVal && shownL1.some(i => i.id === prevVal)) {
+                    selectScenario.value = prevVal;
+                }
+            }
+        };
+
+        window.onSimulatorScenarioChanged = () => {
+            const selectScenario = document.getElementById('sim-scenario-select');
+            const selectPersona = document.getElementById('sim-persona-select');
+            
+            if (!selectScenario || !selectPersona) return;
+            const sId = selectScenario.value;
+            
+            if (!sId) {
+                selectPersona.innerHTML = '<option value="">-- กรุณาเลือกผู้เชี่ยวชาญ --</option>';
+                selectPersona.disabled = true;
+                return;
+            }
+
+            const childSpecs = window.appState.ai_specialists.filter(x => x.parentId === sId && x.status === 'show');
+            selectPersona.innerHTML = '<option value="">-- กรุณาเลือกผู้เชี่ยวชาญ --</option>' + 
+                childSpecs.map(item => `<option value="${item.id}">${item.fullname}</option>`).join('');
+            selectPersona.disabled = false;
+
+            const guideList = document.getElementById('sim-guidelines-list');
+            if (guideList) guideList.innerHTML = `<p class="italic text-stone-400">เลือกหมวดกิจกรรมและผู้เชี่ยวชาญเพื่อโหลดข้อมูลจำลอง</p>`;
+        };
+
+        window.onSimulatorPersonaChanged = () => {
+            const selectPersona = document.getElementById('sim-persona-select');
+            const guideList = document.getElementById('sim-guidelines-list');
+            if (!selectPersona || !guideList) return;
+
+            const pId = selectPersona.value;
+            if (!pId) {
+                guideList.innerHTML = `<p class="italic text-stone-400">เลือกผู้เชี่ยวชาญเพื่อโหลดข้อมูลจำลอง</p>`;
+                return;
+            }
+
+            const specialist = window.appState.ai_specialists.find(x => x.id === pId);
+            if (specialist) {
+                guideList.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="p-2.5 bg-white rounded-lg border border-stone-100 shadow-sm">
+                            <span class="block text-[13px] font-bold text-blue-600 uppercase">รายละเอียดลูกค้าจำลอง</span>
+                            <p class="text-stone-700 text-xs mt-1 font-medium">${specialist.client_details || 'ไม่ได้ระบุรายละเอียด'}</p>
+                        </div>
+                        <div class="p-2.5 bg-white rounded-lg border border-stone-100 shadow-sm">
+                            <span class="block text-[13px] font-bold text-indigo-600 uppercase">ข้อมูลจำลองเพิ่มเติม (Prompt Status)</span>
+                            <div class="text-stone-500 text-[13px] mt-1 italic leading-tight space-y-0.5">
+                                <div><b>ตำแหน่ง:</b> ${specialist.position || 'ไม่ระบุ'}</div>
+                                <div><b>เพศ/อายุ:</b> ${specialist.gender || 'ไม่ระบุ'} / ${specialist.age || '-'} ปี</div>
+                                <div class="text-blue-600 font-semibold"><b>ความต้องการ:</b> ${specialist.conversation_topic || 'ไม่ระบุ'}</div>
+                                <div><b>หัวข้อ Roleplay:</b> ${specialist.roleplay_objective || 'ไม่ระบุ'}</div>
+                                <div><b>อารมณ์:</b> ${specialist.personality || 'ไม่ระบุ'}</div>
+                                <div><b>บริการที่สนใจ:</b> ${specialist.product_interest || 'ไม่ระบุ'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        };
+
+        const initVoiceRecognition = () => {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                window.simState.recognition = new SpeechRecognition();
+                window.simState.recognition.continuous = false;
+                window.simState.recognition.lang = 'th-TH';
+                window.simState.recognition.interimResults = false;
+
+                window.simState.recognition.onstart = () => {
+                    // Visual feedback: Highlight all speech mic buttons to active red
+                    document.querySelectorAll('.mic-btn').forEach(btn => {
+                        btn.classList.add('text-red-500', 'animate-pulse', 'bg-red-50');
+                    });
+                };
+
+                window.simState.recognition.onend = () => {
+                    // Turn off feedback
+                    document.querySelectorAll('.mic-btn').forEach(btn => {
+                        btn.classList.remove('text-red-500', 'animate-pulse', 'bg-red-50');
+                    });
+                };
+
+                window.simState.recognition.onresult = (event) => {
+                    const resultText = event.results[0][0].transcript;
+                    const lbChat = document.getElementById('lightbox-chat-roleplay');
+                    if (lbChat && !lbChat.classList.contains('hidden')) {
+                        const inputField = document.getElementById('lb-chat-input');
+                        if (inputField) inputField.value = resultText;
+                    } else {
+                        const inputField = document.getElementById('sim-chat-input');
+                        if (inputField) inputField.value = resultText;
+                    }
+                };
+
+                window.simState.recognition.onerror = (e) => {
+                    console.error("Speech recognition error:", e);
+                    document.querySelectorAll('.mic-btn').forEach(btn => {
+                        btn.classList.remove('text-red-500', 'animate-pulse', 'bg-red-50');
+                    });
+                };
+            }
+        };
+
+        window.triggerVoiceInput = () => {
+            if (!window.simState.recognition) {
+                const dummyDiv = document.createElement('div');
+                dummyDiv.className = "fixed bottom-5 right-5 p-4 bg-red-100 text-red-700 rounded-xl z-[999] shadow-md text-[13px] font-bold";
+                dummyDiv.innerText = "เบราว์เซอร์ของคุณไม่รองรับคำสั่งเสียงแบบมาตรฐาน (Web Speech API)";
+                document.body.appendChild(dummyDiv);
+                setTimeout(() => dummyDiv.remove(), 4000);
+                return;
+            }
+            window.simState.recognition.start();
+        };
+
+        // Exponential backoff helper according to requirements
+        const fetchWithRetry = async (url, options, retries = 5, delay = 1000) => {
+            try {
+                const res = await fetch(url, options);
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return await res.json();
+            } catch (err) {
+                if (retries > 1) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return fetchWithRetry(url, options, retries - 1, delay * 2);
+                } else {
+                    throw err;
+                }
+            }
+        };
+
+        window.startSimulatorSessionDirectly = async (btn) => {
+            const selectScenario = document.getElementById('sim-scenario-select');
+            const selectPersona = document.getElementById('sim-persona-select');
+
+            if (!selectScenario || !selectPersona || !selectScenario.value || !selectPersona.value) {
+                const infoDiv = document.createElement('div');
+                infoDiv.className = "fixed bottom-5 right-5 p-4 bg-amber-100 text-amber-700 rounded-xl z-[999] shadow-md text-[13px] font-bold";
+                infoDiv.innerText = "กรุณาเลือกหมวดหมู่และรายชื่อผู้เชี่ยวชาญที่ต้องการทดสอบก่อน!";
+                document.body.appendChild(infoDiv);
+                setTimeout(() => infoDiv.remove(), 4000);
+                return;
+            }
+
+            if (btn) {
+                btn.disabled = true;
+                setTimeout(() => { btn.disabled = false; }, 3000);
+            }
+
+            openChatRoleplayLightbox(selectPersona.value);
+        };
+
+        window.resetSimulatorSession = () => {
+            window.simState.activeSession = false;
+            window.simState.messages = [];
+            closeChatRoleplayLightbox();
+        };
+
+        const appendSystemMessage = (text) => {
+            const feed = document.getElementById('lb-chat-feed');
+            if (!feed) return;
+            const div = document.createElement('div');
+            div.className = "flex justify-center";
+            div.innerHTML = `
+                <span class="px-3 py-1.5 bg-stone-100 text-stone-500 rounded-full text-[13px] font-bold tracking-wider uppercase shadow-sm">
+                    ${text}
+                </span>
+            `;
+            feed.appendChild(div);
+            feed.scrollTop = feed.scrollHeight;
+        };
+
+        const appendChatMessage = (sender, text) => {
+            const feed = document.getElementById('lb-chat-feed');
+            if (!feed) return;
+
+            const isAgent = sender === 'agent';
+            const alignmentClass = isAgent ? "justify-end" : "justify-start";
+            const bubbleBg = isAgent ? "bg-blue-600 text-white rounded-tr-none" : "bg-stone-100 text-stone-800 rounded-tl-none";
+            const senderLabel = isAgent ? "คุณ (Agent)" : "ลูกค้าจำลอง (Customer)";
+            
+            let avatarHtml = "";
+            if (isAgent) {
+                avatarHtml = `<div class="w-8 h-8 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 order-2">AG</div>`;
+            } else {
+                const l2Item = window.appState.ai_specialists.find(x => x.id === window.simState.currentL2Id);
+                if (l2Item && l2Item.image_url && l2Item.image_url.trim() !== '') {
+                    avatarHtml = `<img src="${l2Item.image_url}" onerror="this.onerror=null; this.src='https://placehold.co/150x150/cbd5e1/475569?text=Error';" class="w-8 h-8 rounded-lg shrink-0 object-cover border border-stone-200">`;
+                } else {
+                    const charInitial = l2Item ? l2Item.fullname.charAt(0).toUpperCase() : 'C';
+                    avatarHtml = `<div class="w-8 h-8 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center font-bold text-[13px] shrink-0">${charInitial}</div>`;
+                }
+            }
+
+            const div = document.createElement('div');
+            div.className = `flex gap-3 items-start ${alignmentClass} fade-in`;
+            div.innerHTML = `
+                ${avatarHtml}
+                <div class="flex flex-col max-w-[75%] ${isAgent ? 'items-end' : 'items-start'}">
+                    <span class="text-[13px] text-stone-400 font-bold mb-1 ml-1 mr-1">${senderLabel}</span>
+                    <div class="p-3 rounded-2xl text-sm leading-relaxed shadow-sm ${bubbleBg}">
+                        ${text}
+                    </div>
+                </div>
+            `;
+            feed.appendChild(div);
+            feed.scrollTop = feed.scrollHeight;
+        };
+
+        const getAIChatResponse = async (userMsgText) => {
+            appendChatMessage('agent', userMsgText);
+            
+            window.simState.messages.push({ role: 'user', parts: [{ text: userMsgText }] });
+
+            const feed = document.getElementById('lb-chat-feed');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = "sim-chat-loading";
+            loadingDiv.className = "flex gap-3 items-start justify-start fade-in";
+            loadingDiv.innerHTML = `
+                <div class="w-8 h-8 bg-indigo-50 text-indigo-500 rounded-lg flex items-center justify-center font-bold text-[13px] shrink-0">AI</div>
+                <div class="p-3 bg-stone-50 border border-stone-100 rounded-2xl rounded-tl-none text-[13px] text-stone-400 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-indigo-500 rounded-full animate-ping"></span>
+                    กำลังประมวลผลคำตอบ...
+                </div>
+            `;
+            feed.appendChild(loadingDiv);
+            feed.scrollTop = feed.scrollHeight;
+
+            const l1Item = window.appState.ai_group.find(x => x.id === window.simState.currentL1Id);
+            const l2Item = window.appState.ai_specialists.find(x => x.id === window.simState.currentL2Id);
+
+            // Rigorous prompting context powered by newly created specialists fields
+            const promptContext = `คุณกำลังจำลองบทบาทเป็นลูกค้าที่ต้องการติดต่อกับเจ้าหน้าที่ (Agent)
+ชื่อลูกค้าของคุณคือ: "${l2Item ? l2Item.fullname : 'ผู้เชี่ยวชาญ'}"
+ตำแหน่งงาน: "${l2Item ? l2Item.position : ''}"
+เพศ: "${l2Item ? l2Item.gender : ''}"
+อายุ: "${l2Item ? l2Item.age : ''} ปี"
+หมวดหมู่ปัญหา/ความเชี่ยวชาญ: "${l1Item ? l1Item.namegroup : ''}"
+หัวข้อสนทนาที่กำลังเกิดขึ้น: "${l2Item && l2Item.conversation_topic ? l2Item.conversation_topic : 'การประสานงานและเจรจาทั่วไป'}"
+รายละเอียดบทบาทพฤติกรรมลูกค้า: "${l2Item ? l2Item.client_details : ''}"
+
+ข้อมูลวัตถุประสงค์และบทบาทจำลอง (Roleplay Context):
+- วัตถุประสงค์การจำลองหลัก (Roleplay Objective): "${l2Item && l2Item.roleplay_objective ? l2Item.roleplay_objective : 'ต้องการเจรจาผลิตภัณฑ์และต่อรองหาผลลัพธ์ที่ดีที่สุด'}"
+- บุคลิกภาพเด่นจำลอง (Personality): "${l2Item && l2Item.personality ? l2Item.personality : 'สมจริงและตอบรับอย่างมีเหตุผล'}"
+- ผลิตภัณฑ์ที่สนใจ (Product of Interest): "${l2Item && l2Item.product_interest ? l2Item.product_interest : 'บริการทั่วไปของหน่วยงาน'}"
+- ข้อโต้ยอม/ความท้าทายหลักที่ต้องการทดสอบ Agent (Core Objections): "${l2Item && l2Item.objection_challenges ? l2Item.objection_challenges : 'ท้าทายเรื่องประโยชน์สูงสุด และเปรียบเทียบกับตัวเลือกอื่นในใจ'}"
+
+คำสั่งเพิ่มเติมเพื่อควบคุม AI (Prompt Text):
+"${l2Item ? l2Item.prompt_text : 'ทำตัวเป็นลูกค้าที่มีเหตุผลและตอบคำถามอย่างตรงไปตรงมา'}"
+
+ข้อมูลจากไฟล์เสริม (Prompt File Content):
+"${l2Item ? l2Item.prompt_file_content : 'ไม่มีข้อมูลเสริมจากไฟล์'}"
+
+ข้อพึงระวังสำหรับผู้สวมบทบาท:
+1. ตอบกลับกระชับ รวดเร็ว สั้นและสมจริงแบบตอบแชท (จำกัด 1 - 3 ประโยคในภาษาไทย)
+2. ยึดข้อมูลวัตถุประสงค์ บุคลิกภาพ ข้อโต้แย้ง และความท้าทายทั้งหมดอย่างเคร่งครัด ห้ามหลุดบทบาทเด็ดขาดและห้ามบอกว่าตัวคุณเป็น AI
+3. แสดงความก้าวหน้าและการจำลองพฤติกรรมตามบริบทของปัญหาอย่างต่อเนื่อง โดยเน้นคุยในหัวข้อสนทนาที่กำหนดไว้`;
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [...window.simState.messages],
+                systemInstruction: {
+                    parts: [{ text: promptContext }]
+                }
+            };
+
+            try {
+                // Modified to fetchWithRetry (exponential backoff)
+                const result = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const loader = document.getElementById('sim-chat-loading');
+                if (loader) loader.remove();
+
+                const aiMsgText = result?.candidates?.[0]?.content?.parts?.[0]?.text || "ขออภัยครับ มีความผิดปกติกับบอร์ดจำลองเล็กน้อย";
+                appendChatMessage('customer', aiMsgText);
+                window.simState.messages.push({ role: 'model', parts: [{ text: aiMsgText }] });
+
+                getCoachRealtimeAdvice(userMsgText, aiMsgText);
+
+            } catch (err) {
+                console.error("Gemini model call error", err);
+                const loader = document.getElementById('sim-chat-loading');
+                if (loader) loader.remove();
+                appendSystemMessage("ขออภัยครับ มีความผิดปกติในการเชื่อมต่อบอร์ดจำลอง กรุณาทดลองพิมพ์ใหม่อีกครั้ง");
+            }
+        };
+
+        const getCoachRealtimeAdvice = async (lastUserMsg, lastAiMsg) => {
+            const coachPrompt = `วิเคราะห์ประโยคล่าสุดของเอเจนต์ (Agent) และคำตอบกลับของลูกค้าจำลอง (Customer) เพื่อชี้แนะการเจรจาบริการลูกค้า
+ประโยคของ Agent: "${lastUserMsg}"
+ประโยคของ Customer: "${lastAiMsg}"
+
+ตอบผลลัพธ์เป็นแบบ JSON โครงสร้างตรงตามนี้อย่างเคร่งครัด:
+{
+  "sentiment": "โกรธมาก", "หงุดหงิด", "สงบ/พอใจ", หรือ "สับสน",
+  "color": "red" หรือ "amber" หรือ "emerald",
+  "advice": "แนะนำเอเจนต์สั้นกระชับไม่เกิน 1 ประโยคว่าจะชักชวนหรือพูดต่ออย่างไรดี"
+}`;
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            try {
+                // Modified to fetchWithRetry (exponential backoff)
+                const result = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: coachPrompt }] }],
+                        generationConfig: {
+                            responseMimeType: "application/json"
+                        }
+                    })
+                });
+                const rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (rawText) {
+                    const parsed = JSON.parse(rawText);
+                    const sentDot = document.getElementById('lb-coach-sentiment-dot');
+                    const sentText = document.getElementById('lb-coach-sentiment-text');
+                    const adviceText = document.getElementById('lb-coach-advice-text');
+
+                    const lbSentDot = document.getElementById('lb-coach-sentiment-dot');
+                    const lbSentText = document.getElementById('lb-coach-sentiment-text');
+                    const lbAdviceText = document.getElementById('lb-coach-advice-text');
+
+                    // Synchronize both coach UIs (in-page dashboard and overlay chat dialog)
+                    [
+                        { dot: sentDot, text: sentText, advice: adviceText },
+                        { dot: lbSentDot, text: lbSentText, advice: lbAdviceText }
+                    ].forEach(ui => {
+                        if (ui.dot && ui.text && ui.advice) {
+                            ui.text.innerText = parsed.sentiment;
+                            ui.advice.innerText = parsed.advice;
+
+                            ui.dot.className = "w-4 h-4 rounded-full";
+                            if (parsed.color === 'red') ui.dot.classList.add('bg-red-500');
+                            else if (parsed.color === 'amber') ui.dot.classList.add('bg-amber-500');
+                            else ui.dot.classList.add('bg-emerald-500');
+                        }
+                    });
+                }
+            } catch (err) {
+                console.debug("Coach analytics bypassed", err);
+            }
+        };
+
+        document.getElementById('lb-chat-form').onsubmit = (e) => {
+            e.preventDefault();
+            const inputField = document.getElementById('lb-chat-input');
+            if (!inputField) return;
+            const userMsg = inputField.value.trim();
+            if (!userMsg) return;
+
+            inputField.value = '';
+            getAIChatResponse(userMsg);
+        };
+
+        window.endSimulatorSession = async () => {
+            if (window.simState.messages.length < 2) {
+                const warningDiv = document.createElement('div');
+                warningDiv.className = "fixed bottom-5 right-5 p-4 bg-yellow-100 text-yellow-700 rounded-xl z-[999] shadow-md text-[13px] font-bold";
+                warningDiv.innerText = "บทสนทนาสั้นเกินไป กรุณาเจรจาพูดคุยตอบโต้อย่างน้อย 1 รอบ";
+                document.body.appendChild(warningDiv);
+                setTimeout(() => warningDiv.remove(), 4000);
+                return;
+            }
+
+            closeChatRoleplayLightbox();
+            openEvaluationModalLoading();
+
+            const fullConversation = window.simState.messages.map(m => {
+                const roleLabel = m.role === 'user' ? 'Agent' : 'Customer';
+                return `${roleLabel}: ${m.parts[0].text}`;
+            }).join('\n');
+
+            const l1Item = window.appState.ai_group.find(x => x.id === window.simState.currentL1Id);
+            const l2Item = window.appState.ai_specialists.find(x => x.id === window.simState.currentL2Id);
+
+            const evalPrompt = `ประเมินผลทักษะการเจรจาระหว่างเจ้าหน้าที่และตัวละคร: "${l2Item ? l2Item.fullname : 'ผู้เชี่ยวชาญ'}" (หมวด: "${l1Item ? l1Item.namegroup : ''}")
+
+ประวัติบทสนทนา:
+${fullConversation}
+
+โปรดประเมินผลออกมาในรูปแบบ JSON ข้อความภาษาไทย ที่มีโครงสร้างตรงตามนี้อย่างเคร่งครัด:
+{
+  "scores": {
+    "empathy": 80,
+    "professionalism": 90,
+    "problem_solving": 75,
+    "clarity": 85
+  },
+  "grade": "A-",
+  "grade_comment": "เช่น ยอดเยี่ยมอย่างโดดเด่น, พอใช้ควรฝึกฝนเพิ่ม",
+  "strengths": ["จุดเด่นที่ 1", "จุดเด่นที่ 2"],
+  "improvements": ["จุดที่ควรปรับปรุง 1", "จุดที่ควรปรับปรุง 2"],
+  "coaches_verdict": "บทตัดสินและคำแนะนำสรุปโดยละเอียดจากโค้ช AI"
+}`;
+
+            const apiKey = "AIzaSyDhcsn-8VnbXU8PzOXSHS22lg1jk_uZ6ek";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            try {
+                // Modified to fetchWithRetry (exponential backoff)
+                const result = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: evalPrompt }] }],
+                        generationConfig: {
+                            responseMimeType: "application/json",
+                            responseSchema: {
+                                type: "OBJECT",
+                                properties: {
+                                    scores: {
+                                        type: "OBJECT",
+                                        properties: {
+                                            empathy: { type: "NUMBER" },
+                                            professionalism: { type: "NUMBER" },
+                                            problem_solving: { type: "NUMBER" },
+                                            clarity: { type: "NUMBER" }
+                                        },
+                                        required: ["empathy", "professionalism", "problem_solving", "clarity"]
+                                    },
+                                    grade: { type: "STRING" },
+                                    grade_comment: { type: "STRING" },
+                                    strengths: { type: "ARRAY", items: { type: "STRING" } },
+                                    improvements: { type: "ARRAY", items: { type: "STRING" } },
+                                    coaches_verdict: { type: "STRING" }
+                                },
+                                required: ["scores", "grade", "grade_comment", "strengths", "improvements", "coaches_verdict"]
+                            }
+                        }
+                    })
+                });
+
+                const rawJson = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (rawJson) {
+                    const parsed = JSON.parse(rawJson);
+                    renderEvaluationDetails(parsed);
+                } else {
+                    throw new Error("Invalid scoring response");
+                }
+            } catch (err) {
+                console.error("Evaluation failed", err);
+                closeEvaluationModal();
+            }
+        };
+
+        const openEvaluationModalLoading = () => {
+            document.getElementById('evaluation-modal').classList.remove('hidden');
+            document.getElementById('eval-final-grade').innerText = "...";
+            document.getElementById('eval-grade-comment').innerText = "กำลังประมวลผลคำนวณกราฟรายงานทักษะ...";
+            document.getElementById('eval-verdict-text').innerText = "โค้ช AI กำลังชั่งน้ำหนักคำและประเมินพฤติกรรมการบริการ...";
+            
+            ['empathy', 'professionalism', 'solving', 'clarity'].forEach(s => {
+                document.getElementById(`score-${s}`).innerText = "0%";
+                document.getElementById(`bar-${s}`).style.width = "0%";
+            });
+            document.getElementById('eval-strengths-list').innerHTML = '<li>วิเคราะห์จุดเด่น...</li>';
+            document.getElementById('eval-improvements-list').innerHTML = '<li>ประเมินข้อแนะแนว...</li>';
+            document.getElementById('eval-transcript-container').innerHTML = '';
+        };
+
+        const renderEvaluationDetails = (data) => {
+            document.getElementById('eval-final-grade').innerText = data.grade;
+            document.getElementById('eval-grade-comment').innerText = data.grade_comment || "เสร็จสิ้นการสรุปผล";
+            document.getElementById('eval-verdict-text').innerText = data.coaches_verdict;
+
+            const empathyScore = data.scores?.empathy || 0;
+            document.getElementById('score-empathy').innerText = `${empathyScore}%`;
+            document.getElementById('bar-empathy').style.width = `${empathyScore}%`;
+
+            const profScore = data.scores?.professionalism || 0;
+            document.getElementById('score-professionalism').innerText = `${profScore}%`;
+            document.getElementById('bar-professionalism').style.width = `${profScore}%`;
+
+            const solvingScore = data.scores?.problem_solving || 0;
+            document.getElementById('score-solving').innerText = `${solvingScore}%`;
+            document.getElementById('bar-solving').style.width = `${solvingScore}%`;
+
+            const clarityScore = data.scores?.clarity || 0;
+            document.getElementById('score-clarity').innerText = `${clarityScore}%`;
+            document.getElementById('bar-clarity').style.width = `${clarityScore}%`;
+
+            document.getElementById('eval-strengths-list').innerHTML = (data.strengths || []).map(s => `<li>${s}</li>`).join('');
+            document.getElementById('eval-improvements-list').innerHTML = (data.improvements || []).map(i => `<li>${i}</li>`).join('');
+
+            // Format evaluation chat history log transcript
+            const transcriptContainer = document.getElementById('eval-transcript-container');
+            if (transcriptContainer && window.simState.messages.length > 0) {
+                transcriptContainer.innerHTML = window.simState.messages.map(msg => {
+                    const isAgent = msg.role === 'user';
+                    const alignmentClass = isAgent ? "text-right bg-blue-50 text-blue-800" : "text-left bg-stone-100 text-stone-800";
+                    const label = isAgent ? "คุณ (Agent)" : "ลูกค้าจำลอง";
+                    return `
+                        <div class="p-2.5 rounded-xl ${alignmentClass} space-y-0.5">
+                            <span class="block text-[10px] font-bold uppercase text-stone-400">${label}</span>
+                            <p class="text-[13px] leading-relaxed">${msg.parts[0].text}</p>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            lucide.createIcons();
+        };
+
+        window.closeEvaluationModal = () => {
+            document.getElementById('evaluation-modal').classList.add('hidden');
+            resetSimulatorSession();
+        };
+
+        const init = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                initVoiceRecognition();
+                navigate('roleplay'); // Roleplay is the primary landing screen
+            } catch (error) { console.error("Initialize error", error); }
+        };
+
+        window.onload = init;
+    </script>
+</body>
+</html>
