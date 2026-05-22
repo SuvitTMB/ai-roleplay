@@ -412,7 +412,7 @@
                                     <tbody id="table-criteria-body">
                                         <tr><td colspan="7" class="text-center py-10 text-stone-400 italic text-[13px]">กำลังเรียกข้อมูลประวัติจากระบบคลาวด์...</td></tr>
                                     </tbody>
-                                end</table>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -1848,71 +1848,97 @@
         // ฟังก์ชันระบบพูดสังเคราะห์ภาษาไทยธรรมชาติ TTS (gemini-2.5-flash-preview-tts)
         const playVoice = async (text, gender) => {
             const activeKey = getActiveApiKey();
-            if (!activeKey || activeKey.trim() === "") {
-                console.warn("TTS skipped: No API Key configured.");
-                return;
-            }
+            let success = false;
+            
+            // 1. ลองใช้โมเดลระดับสูง Gemini TTS ก่อน
+            if (activeKey && activeKey.trim() !== "") {
+                let voiceName = "Leda"; // เสียงผู้หญิงพรีเมียมเริ่มต้น
+                if (gender === "ชาย") {
+                    voiceName = "Fenrir"; // เสียงผู้ชายทุ้มลึกมีระดับ
+                } else if (gender === "หญิง") {
+                    voiceName = "Leda";
+                } else {
+                    voiceName = "Charon";
+                }
 
-            // เลือกเสียงพูดภาษาไทยธรรมชาติอิงตามเพศ
-            let voiceName = "Leda"; // เสียงผู้หญิงพรีเมียมเริ่มต้น
-            if (gender === "ชาย") {
-                voiceName = "Fenrir"; // เสียงผู้ชายทุ้มลึกมีระดับ
-            } else if (gender === "หญิง") {
-                voiceName = "Leda";
-            } else {
-                voiceName = "Charon";
-            }
+                stopVoice();
+                setSpeakingIndicatorState(true);
 
-            // สั่งหยุดเสียงปัจจุบันก่อนเริ่มเล่นประโยคใหม่
-            stopVoice();
-            setSpeakingIndicatorState(true);
-
-            const ttsUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${activeKey}`;
-            const payload = {
-                contents: [{ parts: [{ text: text }] }],
-                generationConfig: {
-                    responseModalities: ["AUDIO"],
-                    speechConfig: {
-                        voiceConfig: {
-                            prebuiltVoiceConfig: {
-                                voiceName: voiceName
+                const ttsUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${activeKey}`;
+                const payload = {
+                    contents: [{ parts: [{ text: text }] }],
+                    generationConfig: {
+                        responseModalities: ["AUDIO"],
+                        speechConfig: {
+                            voiceConfig: {
+                                prebuiltVoiceConfig: {
+                                    voiceName: voiceName
+                                }
                             }
                         }
+                    },
+                    model: "gemini-2.5-flash-preview-tts"
+                };
+
+                try {
+                    const response = await fetch(ttsUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) {
+                        const result = await response.json();
+                        const pcmBase64 = result.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+                        const mimeType = result.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType || "audio/L16;rate=24000";
+                        
+                        let sampleRate = 24000;
+                        const rateMatch = mimeType.match(/rate=(\d+)/);
+                        if (rateMatch) {
+                            sampleRate = parseInt(rateMatch[1]);
+                        }
+
+                        if (pcmBase64) {
+                            const wavUrl = pcmToWav(pcmBase64, sampleRate);
+                            currentAudio = new Audio(wavUrl);
+                            currentAudio.onended = () => setSpeakingIndicatorState(false);
+                            currentAudio.onerror = () => setSpeakingIndicatorState(false);
+                            await currentAudio.play();
+                            success = true;
+                        }
                     }
-                },
-                model: "gemini-2.5-flash-preview-tts"
-            };
-
-            try {
-                const response = await fetch(ttsUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) throw new Error("TTS Response status not OK");
-                const result = await response.json();
-                const pcmBase64 = result.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-                const mimeType = result.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType || "audio/L16;rate=24000";
-                
-                // ถอดค่า sample rate
-                let sampleRate = 24000;
-                const rateMatch = mimeType.match(/rate=(\d+)/);
-                if (rateMatch) {
-                    sampleRate = parseInt(rateMatch[1]);
+                } catch (err) {
+                    console.warn("Gemini TTS API failed or model is restricted. Switching to Web Speech Synthesis fallback...", err);
                 }
+            }
 
-                if (pcmBase64) {
-                    const wavUrl = pcmToWav(pcmBase64, sampleRate);
-                    currentAudio = new Audio(wavUrl);
-                    currentAudio.onended = () => setSpeakingIndicatorState(false);
-                    currentAudio.onerror = () => setSpeakingIndicatorState(false);
-                    await currentAudio.play();
-                } else {
+            // 2. หากเรียกใช้ Gemini TTS สำรองด้วย Web Speech Synthesis ของบราวเซอร์เพื่อความคงทนสูงสุด
+            if (!success) {
+                try {
+                    stopVoice();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'th-TH';
+                    
+                    const voices = window.speechSynthesis.getVoices();
+                    const thaiVoice = voices.find(v => v.lang.includes('th') || v.lang.includes('TH'));
+                    if (thaiVoice) utterance.voice = thaiVoice;
+
+                    if (gender === "ชาย") {
+                        utterance.pitch = 0.85; // ปรับโทนเสียงต่ำสำหรับผู้ชาย
+                        utterance.rate = 1.0;
+                    } else {
+                        utterance.pitch = 1.1; // ปรับโทนเสียงสูงสำหรับผู้หญิง
+                        utterance.rate = 1.05;
+                    }
+
+                    utterance.onstart = () => setSpeakingIndicatorState(true);
+                    utterance.onend = () => setSpeakingIndicatorState(false);
+                    utterance.onerror = () => setSpeakingIndicatorState(false);
+
+                    window.speechSynthesis.speak(utterance);
+                } catch (speechErr) {
+                    console.error("Web Speech Synthesis also failed", speechErr);
                     setSpeakingIndicatorState(false);
                 }
-            } catch (err) {
-                console.error("TTS playback error", err);
-                setSpeakingIndicatorState(false);
             }
         };
 
@@ -1920,6 +1946,9 @@
             if (currentAudio) {
                 currentAudio.pause();
                 currentAudio = null;
+            }
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
             }
             setSpeakingIndicatorState(false);
         };
@@ -1987,6 +2016,31 @@
             return URL.createObjectURL(blob);
         };
 
+        // ฟังก์ชันป้องกันและล้างอาร์เรย์ข้อความให้สลับลำดับบทบาทถูกต้องตามมาตรฐาน Gemini API เสมอ
+        const formatMessagesForGemini = (rawMessages) => {
+            const formatted = [];
+            if (rawMessages.length === 0) return formatted;
+            
+            // กฎเหล็กของ Gemini: Turn แรกในประวัติการแชท (Contents) ต้องมาจากผู้ใช้งาน (user) เสมอ
+            // หากระบบเริ่มด้วยข้อความทักทายของลูกค้าที่เป็นโมเดล (model) เราจะส่งข้อความเกริ่นบทบาทจำลองฝั่งผู้ใช้เพื่อเลี่ยงรหัส Error 400
+            if (rawMessages[0].role === 'model') {
+                formatted.push({ role: 'user', parts: [{ text: "เจ้าหน้าที่ธนาคารเปิดระบบแชทพร้อมให้บริการดูแลช่วยเหลือคุณลูกค้า" }] });
+            }
+            
+            // กรองและเรียงสลับบทบาทสลับกันระหว่าง user กับ model ไปเรื่อยๆ
+            for (let i = 0; i < rawMessages.length; i++) {
+                const msg = rawMessages[i];
+                if (formatted.length > 0 && formatted[formatted.length - 1].role === msg.role) {
+                    // ป้องกันบทบาทซ้ำซ้อนโดยใส่ข้อความตอบรับจำลองในกรณีบราวเซอร์แสดงผลซ้ำ
+                    const dummyRole = msg.role === 'user' ? 'model' : 'user';
+                    const dummyText = msg.role === 'user' ? "รับทราบค่ะ กำลังฟังเจ้าหน้าที่นำเสนออยู่นะคะ" : "เข้าใจแล้วครับ";
+                    formatted.push({ role: dummyRole, parts: [{ text: dummyText }] });
+                }
+                formatted.push(msg);
+            }
+            return formatted;
+        };
+
         const getAIChatResponse = async (userMsgText) => {
             // หยุดพูดประโยคเก่าเมื่อพนักงานเริ่มพิมพ์หรือส่งเสียง เพื่อความเป็นธรรมชาติ
             stopVoice();
@@ -2048,25 +2102,47 @@
                 return;
             }
 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${activeKey}`;
+            let modelToUse = activeModel;
+            let success = false;
+            let result = null;
 
-            const payload = {
-                contents: [...window.simState.messages],
-                systemInstruction: {
-                    parts: [{ text: promptContext }]
-                }
-            };
-
+            // วิธีรันที่มีความคงทน: ทดลองยิงด้วยโมเดลหลัก หากล้มเหลว (เช่น คีย์ทั่วไปเจอ 404 บล็อกสิทธิ์พรีวิว) จะสลับมาใช้ gemini-1.5-flash อัตโนมัติทันที
             try {
-                const result = await fetchWithRetry(apiUrl, {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${activeKey}`;
+                result = await fetchWithRetry(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        contents: formatMessagesForGemini(window.simState.messages),
+                        systemInstruction: { parts: [{ text: promptContext }] }
+                    })
                 });
-                
-                const loader = document.getElementById('sim-chat-loading');
-                if (loader) loader.remove();
+                success = true;
+            } catch (err) {
+                console.warn(`รุ่นโมเดล ${modelToUse} ไม่ได้รับการสนับสนุนกับ API Key ของคุณ พลังจำลองกำลังสลับเข้าสู่โหมดโมเดลมาตรฐาน (gemini-1.5-flash) อัตโนมัติ...`, err);
+                if (modelToUse !== "gemini-1.5-flash") {
+                    try {
+                        modelToUse = "gemini-1.5-flash";
+                        const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${activeKey}`;
+                        result = await fetchWithRetry(fallbackUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: formatMessagesForGemini(window.simState.messages),
+                                systemInstruction: { parts: [{ text: promptContext }] }
+                            })
+                        });
+                        success = true;
+                    } catch (fallbackErr) {
+                        console.error("Fallback model also failed", fallbackErr);
+                    }
+                }
+            }
+            
+            const loader = document.getElementById('sim-chat-loading');
+            if (loader) loader.remove();
 
+            if (success && result) {
                 const aiMsgText = result?.candidates?.[0]?.content?.parts?.[0]?.text || "ขออภัยครับ มีความผิดปกติกับบอร์ดจำลองเล็กน้อย";
                 appendChatMessage('customer', aiMsgText);
                 window.simState.messages.push({ role: 'model', parts: [{ text: aiMsgText }] });
@@ -2075,12 +2151,8 @@
                 playVoice(aiMsgText, l2Item ? l2Item.gender : 'อื่นๆ');
 
                 getCoachRealtimeAdvice(userMsgText, aiMsgText);
-
-            } catch (err) {
-                console.error("Gemini model call error", err);
-                const loader = document.getElementById('sim-chat-loading');
-                if (loader) loader.remove();
-                appendSystemMessage("ขออภัยครับ มีความผิดปกติในการเชื่อมต่อบอร์ดจำลอง กรุณาทดลองพิมพ์ใหม่อีกครั้ง");
+            } else {
+                appendSystemMessage("ขออภัยครับ มีความผิดปกติในการเชื่อมต่อระบบหลังบ้านจำลอง กรุณาตรวจสอบ API Key หรือทดลองสลับรูปแบบโมเดลในการตั้งค่า");
             }
         };
 
@@ -2100,48 +2172,72 @@
             const activeModel = getActiveModel();
             if (!activeKey || activeKey.trim() === "") return;
 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${activeKey}`;
-            
+            let modelToUse = activeModel;
+            let success = false;
+            let result = null;
+
             try {
-                const result = await fetchWithRetry(apiUrl, {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${activeKey}`;
+                result = await fetchWithRetry(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{ parts: [{ text: coachPrompt }] }],
-                        generationConfig: {
-                            responseMimeType: "application/json"
-                        }
+                        generationConfig: { responseMimeType: "application/json" }
                     })
                 });
+                success = true;
+            } catch (err) {
+                if (modelToUse !== "gemini-1.5-flash") {
+                    try {
+                        modelToUse = "gemini-1.5-flash";
+                        const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${activeKey}`;
+                        result = await fetchWithRetry(fallbackUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: coachPrompt }] }],
+                                generationConfig: { responseMimeType: "application/json" }
+                            })
+                        });
+                        success = true;
+                    } catch (fErr) {
+                        console.debug("Coach fallback also bypassed", fErr);
+                    }
+                }
+            }
+
+            if (success && result) {
                 const rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (rawText) {
-                    const parsed = JSON.parse(rawText);
-                    const sentDot = document.getElementById('lb-coach-sentiment-dot');
-                    const sentText = document.getElementById('lb-coach-sentiment-text');
-                    const adviceText = document.getElementById('lb-coach-advice-text');
+                    try {
+                        const parsed = JSON.parse(rawText);
+                        const sentDot = document.getElementById('lb-coach-sentiment-dot');
+                        const sentText = document.getElementById('lb-coach-sentiment-text');
+                        const adviceText = document.getElementById('lb-coach-advice-text');
 
-                    const lbSentDot = document.getElementById('lb-coach-sentiment-dot');
-                    const lbSentText = document.getElementById('lb-coach-sentiment-text');
-                    const lbAdviceText = document.getElementById('lb-coach-advice-text');
+                        const lbSentDot = document.getElementById('lb-coach-sentiment-dot');
+                        const lbSentText = document.getElementById('lb-coach-sentiment-text');
+                        const lbAdviceText = document.getElementById('lb-coach-advice-text');
 
-                    // Synchronize both coach UIs (in-page dashboard and overlay chat dialog)
-                    [
-                        { dot: sentDot, text: sentText, advice: adviceText },
-                        { dot: lbSentDot, text: lbSentText, advice: lbAdviceText }
-                    ].forEach(ui => {
-                        if (ui.dot && ui.text && ui.advice) {
-                            ui.text.innerText = parsed.sentiment;
-                            ui.advice.innerText = parsed.advice;
+                        [
+                            { dot: sentDot, text: sentText, advice: adviceText },
+                            { dot: lbSentDot, text: lbSentText, advice: lbAdviceText }
+                        ].forEach(ui => {
+                            if (ui.dot && ui.text && ui.advice) {
+                                ui.text.innerText = parsed.sentiment;
+                                ui.advice.innerText = parsed.advice;
 
-                            ui.dot.className = "w-4 h-4 rounded-full";
-                            if (parsed.color === 'red') ui.dot.classList.add('bg-red-500');
-                            else if (parsed.color === 'amber') ui.dot.classList.add('bg-amber-500');
-                            else ui.dot.classList.add('bg-emerald-500');
-                        }
-                    });
+                                ui.dot.className = "w-4 h-4 rounded-full";
+                                if (parsed.color === 'red') ui.dot.classList.add('bg-red-500');
+                                else if (parsed.color === 'amber') ui.dot.classList.add('bg-amber-500');
+                                else ui.dot.classList.add('bg-emerald-500');
+                            }
+                        });
+                    } catch (pErr) {
+                        console.debug("Failed parsing coach JSON", pErr);
+                    }
                 }
-            } catch (err) {
-                console.debug("Coach analytics bypassed", err);
             }
         };
 
@@ -2219,7 +2315,7 @@ ${fullConversation}
     "ระบุจุดที่ควรจะแก้ไขหรือปรับปรุง ข้อที่ 2"
   ],
   "others_advice": "ระบุคำแนะนำอื่น ๆ เพิ่มเติมที่เป็นประโยชน์ต่อพนักงานธนาคารในการฝึกฝนทักษะเจรจา",
-  "coaches_verdict": "บทวิจารณ์สรุปและผลตัดสินภาพรวมจากโค้ช AI วิเคราะห์สถานการณ์ปิดการขาย"
+  "coaches_verdict": "บทตัดสินและผลสรุปปิดการขายภาพรวมจากโค้ช AI"
 }
 
 เกณฑ์การประเมินทักษะที่ต้องใช้ในการคำนวณคะแนนมีดังต่อไปนี้ (โปรดประเมินคะแนนพนักงานตามเกณฑ์เหล่านี้):
@@ -2238,10 +2334,13 @@ ${criteriaDescription}`;
                 return;
             }
 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${activeKey}`;
+            let modelToUse = activeModel;
+            let success = false;
+            let result = null;
 
             try {
-                const result = await fetchWithRetry(apiUrl, {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${activeKey}`;
+                result = await fetchWithRetry(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -2265,16 +2364,57 @@ ${criteriaDescription}`;
                         }
                     })
                 });
+                success = true;
+            } catch (err) {
+                if (modelToUse !== "gemini-1.5-flash") {
+                    try {
+                        modelToUse = "gemini-1.5-flash";
+                        const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${activeKey}`;
+                        result = await fetchWithRetry(fallbackUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: evalPrompt }] }],
+                                generationConfig: {
+                                    responseMimeType: "application/json",
+                                    responseSchema: {
+                                        type: "OBJECT",
+                                        properties: {
+                                            scores: { type: "OBJECT" },
+                                            grade: { type: "STRING" },
+                                            grade_comment: { type: "STRING" },
+                                            strengths: { type: "ARRAY", items: { type: "STRING" } },
+                                            weaknesses: { type: "ARRAY", items: { type: "STRING" } },
+                                            improvements: { type: "ARRAY", items: { type: "STRING" } },
+                                            others_advice: { type: "STRING" },
+                                            coaches_verdict: { type: "STRING" }
+                                        },
+                                        required: ["scores", "grade", "grade_comment", "strengths", "weaknesses", "improvements", "others_advice", "coaches_verdict"]
+                                    }
+                                }
+                            })
+                        });
+                        success = true;
+                    } catch (fErr) {
+                        console.error("Evaluation fallback model also failed", fErr);
+                    }
+                }
+            }
 
+            if (success && result) {
                 const rawJson = result?.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (rawJson) {
-                    const parsed = JSON.parse(rawJson);
-                    renderEvaluationDetails(parsed);
+                    try {
+                        const parsed = JSON.parse(rawJson);
+                        renderEvaluationDetails(parsed);
+                    } catch (jsonErr) {
+                        console.error("Failed to parse evaluation response", jsonErr);
+                        closeEvaluationModal();
+                    }
                 } else {
-                    throw new Error("Invalid scoring response");
+                    closeEvaluationModal();
                 }
-            } catch (err) {
-                console.error("Evaluation failed", err);
+            } else {
                 closeEvaluationModal();
             }
         };
